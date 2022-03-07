@@ -2,6 +2,7 @@
 package com.example.collectqr;
 
 import com.google.common.hash.Hashing;
+
 import java.nio.charset.StandardCharsets;
 
 
