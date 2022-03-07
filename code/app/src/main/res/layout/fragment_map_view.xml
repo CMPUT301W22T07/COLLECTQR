@@ -5,9 +5,9 @@
     android:layout_height="match_parent"
     tools:context=".ui.map.MapViewFragment">
 
-    <TextView
+    <org.osmdroid.views.MapView
+        android:id="@+id/map_view"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:text="Map Top-Level Fragment" />
+        android:layout_height="match_parent"/>
 
 </FrameLayout>
