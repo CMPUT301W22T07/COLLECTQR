@@ -1,6 +1,5 @@
 package com.example.collectqr;
 
-
 public class QRCode {
     private String QRCode;
     private int score;
