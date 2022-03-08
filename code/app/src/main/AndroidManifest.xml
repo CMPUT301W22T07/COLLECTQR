@@ -20,7 +20,7 @@
             android:name="com.example.collectqr.GenerateQRCodeActivity"
             android:exported="true" />
         <activity
-            android:name="com.example.collectqr.HomeActivity"
+            android:name="com.example.collectqr.QRCodeHomeActivity"
             android:exported="true" />
         <activity
             android:name="com.example.collectqr.MainActivity"

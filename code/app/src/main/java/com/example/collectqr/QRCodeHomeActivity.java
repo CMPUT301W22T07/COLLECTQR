@@ -7,7 +7,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 
-public class HomeActivity extends AppCompatActivity {
+public class QRCodeHomeActivity extends AppCompatActivity {
 
     private Button generateQRButton;
     private Button scanQRButton;
@@ -15,7 +15,7 @@ public class HomeActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_home);
+        setContentView(R.layout.activity_home_qrcode);
 
         generateQRButton = findViewById(R.id.QRCodeGeneratorBtn);
         scanQRButton = findViewById(R.id.QRCodeScannerBtn);
@@ -23,7 +23,7 @@ public class HomeActivity extends AppCompatActivity {
         generateQRButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(HomeActivity.this, GenerateQRCodeActivity.class);
+                Intent intent = new Intent(QRCodeHomeActivity.this, GenerateQRCodeActivity.class);
                 startActivity(intent);
             }
         });
@@ -31,7 +31,7 @@ public class HomeActivity extends AppCompatActivity {
         scanQRButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(HomeActivity.this, ScanQRCodeActivity.class);
+                Intent intent = new Intent(QRCodeHomeActivity.this, ScanQRCodeActivity.class);
                 startActivity(intent);
             }
         });
