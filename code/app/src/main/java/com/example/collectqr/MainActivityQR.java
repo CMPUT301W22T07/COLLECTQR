@@ -6,8 +6,8 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.view.WindowManager;
-// temporary main activity to keep code, is not called
-public class MainActivity extends AppCompatActivity {
+
+public class MainActivityQR extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -18,7 +18,7 @@ public class MainActivity extends AppCompatActivity {
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
-                Intent intent = new Intent(MainActivity.this, QRCodeHomeActivity.class);
+                Intent intent = new Intent(MainActivityQR.this, QRCodeHomeActivity.class);
                 startActivity(intent);
                 finish();
             }
