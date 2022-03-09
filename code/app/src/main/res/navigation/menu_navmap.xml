@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/menu_navmap"
+    app:startDestination="@id/navigation_map">
+
+    <fragment
+        android:id="@+id/navigation_leaderboard"
+        android:name="com.example.collectqr.ui.leaderboard.LeaderboardFragment"
+        android:label="@string/title_leaderboard"
+        tools:layout="@layout/fragment_leaderboard" />
+    <fragment
+        android:id="@+id/navigation_map"
+        android:name="com.example.collectqr.ui.map.MapViewFragment"
+        android:label="@string/title_map"
+        tools:layout="@layout/fragment_map_view" />
+    <fragment
+        android:id="@+id/navigation_history"
+        android:name="com.example.collectqr.ui.history.HistoryFragment"
+        android:label="@string/title_history"
+        tools:layout="@layout/fragment_history" />
+</navigation>
