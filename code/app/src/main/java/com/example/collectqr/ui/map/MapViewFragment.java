@@ -1,6 +1,8 @@
 package com.example.collectqr.ui.map;
 
+import android.content.Context;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,9 +12,15 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
-import com.example.collectqr.R;
+import org.osmdroid.config.Configuration;
+import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
+import org.osmdroid.views.MapView;
 
 public class MapViewFragment extends Fragment {
+
+    // TODO: Test cases for the map bounds
+
+    private MapView mMapView;
 
     private MapViewViewModel mViewModel;
 
@@ -23,7 +31,17 @@ public class MapViewFragment extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_map_view, container, false);
+        final Context context = this.getActivity();
+        Configuration.getInstance().load(context, PreferenceManager.getDefaultSharedPreferences(context));
+
+        // MapView Setup
+        mMapView = new MapView(inflater.getContext());
+        mMapView.setDestroyMode(false);
+        mMapView.setTag("mapView");
+
+        mMapView.setTileSource(TileSourceFactory.MAPNIK);
+
+        return mMapView;
     }
 
     @Override
