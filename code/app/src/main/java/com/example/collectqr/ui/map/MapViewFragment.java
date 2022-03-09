@@ -11,6 +11,7 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
+import com.example.collectqr.R;
 import com.mapbox.maps.MapView;
 import com.mapbox.maps.Style;
 
@@ -28,10 +29,9 @@ public class MapViewFragment extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
-        final Context context = this.getActivity();
         mMapView = new MapView(inflater.getContext());
         mMapView.getMapboxMap().loadStyleUri(Style.MAPBOX_STREETS);
-        return mMapView;
+        return inflater.inflate(R.layout.fragment_map_view, container, false);
     }
 
     @Override
