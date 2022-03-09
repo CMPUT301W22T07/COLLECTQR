@@ -6,4 +6,5 @@
     <string name="title_map">Map</string>
     <string name="title_history">History</string>
     <string name="mapbox_access_token">pk.eyJ1Ijoib2tzYWNoaSIsImEiOiJjbDBoNGZ4MGswNTByM2JuejBmZzR3NDVqIn0.lZCZvqe9Wp0DkU9MAFlYZA</string>
+    <string name="lock_map_on_your_location">Lock map on your location</string>
 </resources>
