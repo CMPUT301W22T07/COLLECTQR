@@ -1,15 +1,14 @@
 package com.example.collectqr;
 
+import android.os.Bundle;
+
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
 
-import android.os.Bundle;
-
 import com.example.collectqr.databinding.ActivityAppBinding;
-import com.example.collectqr.databinding.ActivityMainBinding;
 
 public class MainAppActivity extends AppCompatActivity {
     private ActivityAppBinding binding;
