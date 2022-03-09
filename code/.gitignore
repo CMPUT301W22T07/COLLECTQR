@@ -19,7 +19,13 @@ output.json
 
 # IntelliJ
 *.iml
-.idea/
+/.idea/caches
+/.idea/libraries
+/.idea/modules.xml
+/.idea/misc.xml
+/.idea/workspace.xml
+/.idea/navEditor.xml
+/.idea/assetWizardSettings.xml
 misc.xml
 deploymentTargetDropDown.xml
 render.experimental.xml
@@ -38,7 +44,7 @@ google-services.json
 /local.properties
 
 # Build-time Properties (a.k.a tokens)
-gradle.properties
+/gradle.properties
 
 # FS Data
 .DS_Store
