@@ -1,9 +1,7 @@
-# Default ignored files
-/shelf/
-/workspace.xml
+# https://github.com/github/gitignore
+# CC0-1.0 License
+# Github & contributors
 
-# https://raw.githubusercontent.com/github/gitignore/main/Android.gitignore
-# CC-0 License
 # Gradle files
 .gradle/
 build/
@@ -23,13 +21,7 @@ output.json
 
 # IntelliJ
 *.iml
-/.idea/caches
-/.idea/libraries
-/.idea/modules.xml
-/.idea/misc.xml
-/.idea/workspace.xml
-/.idea/navEditor.xml
-/.idea/assetWizardSettings.xml
+.idea/
 misc.xml
 deploymentTargetDropDown.xml
 render.experimental.xml
@@ -43,13 +35,3 @@ google-services.json
 
 # Android Profiling
 *.hprof
-*.iml
-.gradle
-/local.properties
-
-# Build-time Properties (a.k.a tokens)
-/gradle.properties
-
-# FS Data
-.DS_Store
-
