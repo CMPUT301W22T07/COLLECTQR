@@ -5,4 +5,7 @@
     <string name="title_leaderboard">Leaderboard</string>
     <string name="title_map">Map</string>
     <string name="title_history">History</string>
+        <string name="qr_code">qr_code</string>
+        <string name="enter_your_info">Enter your info</string>
+        <string name="generate_qr_code">Generate QR Code</string>
 </resources>
