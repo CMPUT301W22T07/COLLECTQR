@@ -29,4 +29,9 @@
         <item name="colorSurfaceInverse">@color/md_theme_dark_inverseSurface</item>
         <item name="colorPrimaryInverse">@color/md_theme_dark_primaryInverse</item>
     </style>
+
+    <style name="Theme.App.Starting" parent="Theme.SplashScreen">
+        <item name="postSplashScreenTheme">@style/Theme.COLLECTQR</item>
+        <item name="windowSplashScreenAnimatedIcon">@drawable/qrcode</item>
+    </style>
 </resources>

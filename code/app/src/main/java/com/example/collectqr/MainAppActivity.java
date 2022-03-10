@@ -3,6 +3,7 @@ package com.example.collectqr;
 import android.os.Bundle;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.splashscreen.SplashScreen;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
@@ -15,8 +16,12 @@ public class MainAppActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        /* Start with a splashscreen
+           https://developer.android.com/reference/androidx/core/splashscreen/SplashScreen
+         */
+        SplashScreen.installSplashScreen(this);
+
         super.onCreate(savedInstanceState);
-//        setContentView(R.layout.activity_app);
 
         // Setup view binding in this activity; see dev docs
         binding = ActivityAppBinding.inflate(getLayoutInflater());
