@@ -8,4 +8,6 @@
         <string name="qr_code">qr_code</string>
         <string name="enter_your_info">Enter your info</string>
         <string name="generate_qr_code">Generate QR Code</string>
+    <string name="mapbox_access_token">pk.eyJ1Ijoib2tzYWNoaSIsImEiOiJjbDBoNGZ4MGswNTByM2JuejBmZzR3NDVqIn0.lZCZvqe9Wp0DkU9MAFlYZA</string>
+    <string name="lock_map_on_your_location">Lock map on your location</string>
 </resources>
