@@ -1,7 +1,7 @@
 <!--<item name="colorInversePrimary">@color/md_theme_light_inversePrimary</item>--> <!--<item name="colorShadow">@color/md_theme_light_shadow</item>-->
 <resources>
 
-<style name="Theme.COLLECTQR" parent="Theme.Material3.Light">
+    <style name="Theme.COLLECTQR" parent="Theme.Material3.Light">
         <item name="colorPrimary">@color/md_theme_light_primary</item>
         <item name="colorOnPrimary">@color/md_theme_light_onPrimary</item>
         <item name="colorPrimaryContainer">@color/md_theme_light_primaryContainer</item>
@@ -28,28 +28,5 @@
         <item name="colorOnSurfaceInverse">@color/md_theme_light_inverseOnSurface</item>
         <item name="colorSurfaceInverse">@color/md_theme_light_inverseSurface</item>
         <item name="colorPrimaryInverse">@color/md_theme_light_primaryInverse</item>
-<resources xmlns:tools="http://schemas.android.com/tools">
-    <!-- Base application theme. -->
-    <style name="Theme.QRCodeGeneratorScanner" parent="Theme.MaterialComponents.DayNight.NoActionBar">
-        <!-- Primary brand color. -->
-        <item name="colorPrimary">@color/yellow</item>
-        <item name="colorPrimaryVariant">@color/black_shade_1</item>
-        <item name="colorOnPrimary">@color/white</item>
-        <!-- Secondary brand color. -->
-        <item name="colorSecondary">@color/teal_200</item>
-        <item name="colorSecondaryVariant">@color/teal_700</item>
-        <item name="colorOnSecondary">@color/black_shade_1</item>
-        <!-- Status bar color. -->
-        <item name="android:statusBarColor" tools:targetApi="l">?attr/colorPrimaryVariant</item>
-        <!-- Customize your theme here. -->
-    </style>
-
-    <style name="AppTheme.MaterialTheme" parent="Theme.MaterialComponents.Light.DarkActionBar">
-        <item name="windowNoTitle">true</item>
-        <item name="windowActionBar">false</item>
-        <item name="colorPrimary">@color/yellow</item>
-        <item name="colorBackgroundFloating">@color/yellow</item>
-        <item name="colorAccent">@color/white</item>
-        <item name="android:singleLine">true</item>
     </style>
 </resources>
