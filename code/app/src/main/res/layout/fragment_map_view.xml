@@ -17,12 +17,12 @@
         android:elevation="2dp"
         android:src="@drawable/ic_baseline_gps_not_fixed"
         android:visibility="visible"
-        mapbox:layout_constraintBottom_toTopOf="@+id/extendedFloatingActionButton"
+        mapbox:layout_constraintBottom_toTopOf="@+id/fab_launchQRScanner"
         mapbox:layout_constraintEnd_toEndOf="parent" />
 
 
     <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
-        android:id="@+id/extendedFloatingActionButton"
+        android:id="@+id/fab_launchQRScanner"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="16dp"
