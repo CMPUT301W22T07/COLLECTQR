@@ -10,6 +10,9 @@ import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.collectqr.R;
+import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.ArrayList;
 
@@ -32,8 +35,6 @@ public class HistoryFragment extends Fragment {
     private RecyclerView recyclerView;
     private RecyclerView.Adapter adapter;
     private RecyclerView.LayoutManager layoutManager;
-
-    private ArrayList<HistoryItem> qrHistoryList;
 
     public HistoryFragment() {
         // Required empty public constructor
@@ -64,37 +65,29 @@ public class HistoryFragment extends Fragment {
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
-        qrHistoryList = new ArrayList<>();
-        qrHistoryList.add(new HistoryItem(100, R.drawable.ic_baseline_map, "example hash"));
-        qrHistoryList.add(new HistoryItem(200, R.drawable.ic_baseline_history, "example hash"));
-        qrHistoryList.add(new HistoryItem(300, R.drawable.ic_baseline_leaderboard, "example hash"));
-        qrHistoryList.add(new HistoryItem(100, R.drawable.ic_baseline_map, "example hash"));
-        qrHistoryList.add(new HistoryItem(200, R.drawable.ic_baseline_history, "example hash"));
-        qrHistoryList.add(new HistoryItem(300, R.drawable.ic_baseline_leaderboard, "example hash"));
-        qrHistoryList.add(new HistoryItem(100, R.drawable.ic_baseline_map, "example hash"));
-        qrHistoryList.add(new HistoryItem(200, R.drawable.ic_baseline_history, "example hash"));
-        qrHistoryList.add(new HistoryItem(300, R.drawable.ic_baseline_leaderboard, "example hash"));
+
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+
+        // TODO: get user stats from firestore
         /*
         https://stackoverflow.com/a/31096444
         StackOverflow, Author: The Dude
          */
-
+        /*
+        https://youtu.be/17NbUcEts9c
+        YouTube, Author: Coding in Flow
+         */
         View rootView = inflater.inflate(R.layout.fragment_history, container, false);
-
         recyclerView = rootView.findViewById(R.id.history_qr_recycler_view);
-
-        //recyclerView.setHasFixedSize(true);
+        recyclerView.setHasFixedSize(true);
         layoutManager = new GridLayoutManager(getContext(), 2);
-        adapter = new HistoryAdapter(qrHistoryList);
+        adapter = new HistoryAdapter();
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.setAdapter(adapter);
-
-
 
         // Inflate the layout for this fragment
         return rootView;

@@ -24,7 +24,7 @@
                 android:layout_marginVertical="20dp"
                 android:layout_marginLeft="20dp"
                 android:layout_marginRight="10dp"
-                android:text="27\nQR Codes"
+                android:text="15\nQR Codes"
                 android:gravity="center"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toStartOf="@+id/history_total_points"
