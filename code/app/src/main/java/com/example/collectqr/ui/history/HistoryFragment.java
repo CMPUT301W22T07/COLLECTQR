@@ -6,8 +6,12 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.collectqr.R;
+
+import java.util.ArrayList;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -24,6 +28,12 @@ public class HistoryFragment extends Fragment {
     // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
+
+    private RecyclerView recyclerView;
+    private RecyclerView.Adapter adapter;
+    private RecyclerView.LayoutManager layoutManager;
+
+    private ArrayList<HistoryItem> qrHistoryList;
 
     public HistoryFragment() {
         // Required empty public constructor
@@ -54,12 +64,40 @@ public class HistoryFragment extends Fragment {
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
+        qrHistoryList = new ArrayList<>();
+        qrHistoryList.add(new HistoryItem(100, R.drawable.ic_baseline_map, "example hash"));
+        qrHistoryList.add(new HistoryItem(200, R.drawable.ic_baseline_history, "example hash"));
+        qrHistoryList.add(new HistoryItem(300, R.drawable.ic_baseline_leaderboard, "example hash"));
+        qrHistoryList.add(new HistoryItem(100, R.drawable.ic_baseline_map, "example hash"));
+        qrHistoryList.add(new HistoryItem(200, R.drawable.ic_baseline_history, "example hash"));
+        qrHistoryList.add(new HistoryItem(300, R.drawable.ic_baseline_leaderboard, "example hash"));
+        qrHistoryList.add(new HistoryItem(100, R.drawable.ic_baseline_map, "example hash"));
+        qrHistoryList.add(new HistoryItem(200, R.drawable.ic_baseline_history, "example hash"));
+        qrHistoryList.add(new HistoryItem(300, R.drawable.ic_baseline_leaderboard, "example hash"));
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        /*
+        https://stackoverflow.com/a/31096444
+        StackOverflow, Author: The Dude
+         */
+
+        View rootView = inflater.inflate(R.layout.fragment_history, container, false);
+
+        recyclerView = rootView.findViewById(R.id.history_qr_recycler_view);
+
+        //recyclerView.setHasFixedSize(true);
+        layoutManager = new GridLayoutManager(getContext(), 2);
+        adapter = new HistoryAdapter(qrHistoryList);
+        recyclerView.setLayoutManager(layoutManager);
+        recyclerView.setAdapter(adapter);
+
+
+
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_history, container, false);
+        return rootView;
+
     }
 }
