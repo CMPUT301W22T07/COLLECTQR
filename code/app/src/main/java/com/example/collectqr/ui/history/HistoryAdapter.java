@@ -75,7 +75,6 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.ViewHold
         // Get element from your dataset at this position and replace the
         // contents of the view with that element
         HistoryItem currentItem = qrHistoryData.get(position);
-        //viewHolder.getTextView().setText("5 points");
         viewHolder.getTextView().setText(Integer.toString(currentItem.getPoints())+" points");
         viewHolder.imageView.setImageResource(currentItem.getImageResource());
     }
