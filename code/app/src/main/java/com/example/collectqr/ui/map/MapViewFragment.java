@@ -68,7 +68,7 @@ public class MapViewFragment extends Fragment {
         }
     }
 
-    public void setButtonsActions() {
+    private void setButtonsActions() {
         binding.fabLaunchQRScanner.setOnClickListener(view -> startScanner());
 
         binding.fabGpsLockLocation.setOnClickListener(view -> setMapToCurrentLocation());
@@ -76,20 +76,28 @@ public class MapViewFragment extends Fragment {
 
     private void setMapToCurrentLocation() {
         /* Permission requesting based off example; uses an older method:
-           https://developer.android.com/training/permissions/requesting */
+           https://developer.android.com/training/permissions/requesting
+
+           Requesting all permissions (location)
+           https://github.com/osmdroid/osmdroid/wiki/How-to-use-the-osmdroid-library-(Java)
+           By: IpswichMapper
+        */
         if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION)
+                == PackageManager.PERMISSION_GRANTED
+                && ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_COARSE_LOCATION)
                 == PackageManager.PERMISSION_GRANTED) {
             Toast.makeText(requireContext(), "Location perm granted", Toast.LENGTH_SHORT).show();
         } else {
             Snackbar.make(requireView(), "Cannot access location", Snackbar.LENGTH_LONG)
                     .setAction("Enable Location", view -> requestPermissions(
-                            new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                            new String[]{Manifest.permission.ACCESS_FINE_LOCATION,
+                                    Manifest.permission.ACCESS_COARSE_LOCATION},
                             LOCATION_REQUEST_CODE
                     )).show();
         }
     }
 
-    public void startScanner() {
+    private void startScanner() {
         Intent intent = new Intent(this.getActivity(), ScanQRCodeActivity.class);
         startActivity(intent);
     }
