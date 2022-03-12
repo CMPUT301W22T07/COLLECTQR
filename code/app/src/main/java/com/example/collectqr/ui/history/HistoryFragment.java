@@ -1,18 +1,29 @@
 package com.example.collectqr.ui.history;
 
+import static android.content.ContentValues.TAG;
+
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.collectqr.R;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.FirebaseFirestoreException;
 
 import java.util.ArrayList;
 
@@ -72,20 +83,45 @@ public class HistoryFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
-        // TODO: get user stats from firestore
         /*
         https://stackoverflow.com/a/31096444
         StackOverflow, Author: The Dude
          */
+        View rootView = inflater.inflate(R.layout.fragment_history, container, false);
+        String username = "realishUser"; // TODO: make username be retrieved from a parameter
+
+        TextView totalPoints = rootView.findViewById(R.id.history_total_points);
+        TextView numCodes = rootView.findViewById(R.id.history_num_codes);
+        //https://firebase.google.com/docs/firestore/query-data/listen
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        DocumentReference docRef = db.collection("Users").document(username);
+        docRef.addSnapshotListener(new EventListener<DocumentSnapshot>() {
+            @Override
+            public void onEvent(@Nullable DocumentSnapshot snapshot,
+                                @Nullable FirebaseFirestoreException e) {
+                if (e != null) {
+                    Log.w(TAG, "Listen failed.", e);
+                    return;
+                }
+
+                if (snapshot != null && snapshot.exists()) {
+                    Log.d(TAG, "Current data: " + snapshot.getData());
+                    totalPoints.setText(snapshot.get("total_points") + "\nTotal Points");
+                    numCodes.setText(snapshot.get("num_codes") + "\nQR Codes");
+                } else {
+                    Log.d(TAG, "Current data: null");
+                }
+            }
+        });
         /*
         https://youtu.be/17NbUcEts9c
         YouTube, Author: Coding in Flow
          */
-        View rootView = inflater.inflate(R.layout.fragment_history, container, false);
+        ArrayList<HistoryItem> qrHistoryArray = new ArrayList<>();
         recyclerView = rootView.findViewById(R.id.history_qr_recycler_view);
         recyclerView.setHasFixedSize(true);
         layoutManager = new GridLayoutManager(getContext(), 2);
-        adapter = new HistoryAdapter();
+        adapter = new HistoryAdapter(username, qrHistoryArray);
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.setAdapter(adapter);
 
