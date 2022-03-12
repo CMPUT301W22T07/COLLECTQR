@@ -20,16 +20,19 @@ import com.example.collectqr.R;
 import com.example.collectqr.ScanQRCodeActivity;
 import com.example.collectqr.databinding.FragmentMapViewBinding;
 import com.google.android.material.snackbar.Snackbar;
-import com.mapbox.maps.MapView;
-import com.mapbox.maps.Style;
+
+import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
+import org.osmdroid.views.MapView;
 
 public class MapViewFragment extends Fragment {
 
     final private int LOCATION_REQUEST_CODE = 1;
     // TODO: Test cases for the map bounds
     private MapViewViewModel mViewModel;
-    private MapView mMapView;
     private FragmentMapViewBinding binding;
+
+    // Map vars
+    private MapView mMapView;
 
     public static MapViewFragment newInstance() {
         return new MapViewFragment();
@@ -47,18 +50,36 @@ public class MapViewFragment extends Fragment {
 
     private void setupMap() {
         mMapView = binding.mapView;
+        mMapView.setTileSource(TileSourceFactory.MAPNIK);
+
+        if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION)
+                == PackageManager.PERMISSION_GRANTED
+                && ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_COARSE_LOCATION)
+                == PackageManager.PERMISSION_GRANTED
+                && ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                == PackageManager.PERMISSION_GRANTED) {
+            // https://stackoverflow.com/a/42001431 by EckoTan
+            binding.fabGpsLockLocation.setImageResource(R.drawable.ic_baseline_gps_fixed);
+        } else {
+            requestPermissions(
+                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION,
+                            Manifest.permission.ACCESS_COARSE_LOCATION,
+                            Manifest.permission.WRITE_EXTERNAL_STORAGE},
+                    LOCATION_REQUEST_CODE
+            );
+        }
 
         // https://developer.android.com/guide/topics/ui/look-and-feel/darktheme#java
         // https://stackoverflow.com/a/41451143 by harshithdwivedi
         int currentTheme = getResources().getConfiguration().uiMode & Configuration.UI_MODE_NIGHT_MASK;
-        switch (currentTheme) {
-            case Configuration.UI_MODE_NIGHT_NO:
-                mMapView.getMapboxMap().loadStyleUri(Style.MAPBOX_STREETS);
-                break;
-            case Configuration.UI_MODE_NIGHT_YES:
-                mMapView.getMapboxMap().loadStyleUri(Style.DARK);
-                break;
-        }
+//        switch (currentTheme) {
+//            case Configuration.UI_MODE_NIGHT_NO:
+//                mMapView.getMapboxMap().loadStyleUri(Style.MAPBOX_STREETS);
+//                break;
+//            case Configuration.UI_MODE_NIGHT_YES:
+//                mMapView.getMapboxMap().loadStyleUri(Style.DARK);
+//                break;
+//        }
     }
 
     @Override
