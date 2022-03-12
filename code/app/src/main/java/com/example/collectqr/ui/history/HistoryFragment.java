@@ -3,10 +3,12 @@ package com.example.collectqr.ui.history;
 import static android.content.ContentValues.TAG;
 
 import android.os.Bundle;
+import android.util.ArrayMap;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -18,6 +20,8 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.collectqr.R;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.android.material.bottomsheet.BottomSheetDialog;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
@@ -43,9 +47,14 @@ public class HistoryFragment extends Fragment {
     private String mParam1;
     private String mParam2;
 
+    private View rootView;
+
     private RecyclerView recyclerView;
     private RecyclerView.Adapter adapter;
     private RecyclerView.LayoutManager layoutManager;
+    private ArrayList<HistoryItem> qrHistoryArray = new ArrayList<>();
+    private String currentSort = "date_descend";
+    private BottomSheetDialog sortSheet;
 
     public HistoryFragment() {
         // Required empty public constructor
@@ -76,7 +85,6 @@ public class HistoryFragment extends Fragment {
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
-
     }
 
     @Override
@@ -87,7 +95,7 @@ public class HistoryFragment extends Fragment {
         https://stackoverflow.com/a/31096444
         StackOverflow, Author: The Dude
          */
-        View rootView = inflater.inflate(R.layout.fragment_history, container, false);
+        rootView = inflater.inflate(R.layout.fragment_history, container, false);
         String username = "realishUser"; // TODO: make username be retrieved from a parameter
 
         TextView totalPoints = rootView.findViewById(R.id.history_total_points);
@@ -113,6 +121,16 @@ public class HistoryFragment extends Fragment {
                 }
             }
         });
+
+        createSortSheetDialog();
+        FloatingActionButton fab = rootView.findViewById(R.id.sort_history_fab);
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                sortSheet.show();
+            }
+        });
+
         /*
         https://youtu.be/17NbUcEts9c
         YouTube, Author: Coding in Flow
@@ -127,6 +145,43 @@ public class HistoryFragment extends Fragment {
 
         // Inflate the layout for this fragment
         return rootView;
+    }
 
+    private void createSortSheetDialog() {
+        /*
+        YouTube video
+        Author: Code Vendanam
+        https://youtu.be/sODN0SMiUhk
+
+        Author: Joseph Chege
+        https://www.section.io/engineering-education/bottom-sheet-dialogs-using-android-studio/
+         */
+        sortSheet = new BottomSheetDialog(rootView.getContext());
+        sortSheet.setContentView(R.layout.history_sort_fragment);
+        TextView byPointsDescend = sortSheet.findViewById(R.id.history_sort_points_descend);
+        TextView byPointsAscend = sortSheet.findViewById(R.id.history_sort_points_ascend);
+        TextView byDateDescend = sortSheet.findViewById(R.id.history_sort_date_descend);
+        byPointsAscend.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                currentSort = "points_ascend";
+                sortSheet.dismiss();
+            }
+        });
+        byPointsDescend.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                currentSort = "points_descend";
+                sortSheet.dismiss();
+
+            }
+        });
+        byDateDescend.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                currentSort = "date_descend";
+                sortSheet.dismiss();
+            }
+        });
     }
 }
