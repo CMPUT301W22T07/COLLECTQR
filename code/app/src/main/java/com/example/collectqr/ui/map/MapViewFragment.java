@@ -3,6 +3,7 @@ package com.example.collectqr.ui.map;
 import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.content.res.Configuration;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -15,6 +16,7 @@ import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
+import com.example.collectqr.R;
 import com.example.collectqr.ScanQRCodeActivity;
 import com.example.collectqr.databinding.FragmentMapViewBinding;
 import com.google.android.material.snackbar.Snackbar;
@@ -38,9 +40,25 @@ public class MapViewFragment extends Fragment {
                              @Nullable Bundle savedInstanceState) {
         binding = FragmentMapViewBinding.inflate(inflater, container, false);
         View view = binding.getRoot();
-        mMapView = binding.mapView;
-        mMapView.getMapboxMap().loadStyleUri(Style.MAPBOX_STREETS);
+
+        setupMap();
         return view;
+    }
+
+    private void setupMap() {
+        mMapView = binding.mapView;
+
+        // https://developer.android.com/guide/topics/ui/look-and-feel/darktheme#java
+        // https://stackoverflow.com/a/41451143 by harshithdwivedi
+        int currentTheme = getResources().getConfiguration().uiMode & Configuration.UI_MODE_NIGHT_MASK;
+        switch (currentTheme) {
+            case Configuration.UI_MODE_NIGHT_NO:
+                mMapView.getMapboxMap().loadStyleUri(Style.MAPBOX_STREETS);
+                break;
+            case Configuration.UI_MODE_NIGHT_YES:
+                mMapView.getMapboxMap().loadStyleUri(Style.DARK);
+                break;
+        }
     }
 
     @Override
@@ -52,11 +70,6 @@ public class MapViewFragment extends Fragment {
     }
 
     @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-    }
-
-    @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         if (requestCode == LOCATION_REQUEST_CODE) {
             if (grantResults.length > 0 &&
@@ -64,6 +77,7 @@ public class MapViewFragment extends Fragment {
                 Toast.makeText(requireContext(), "Location permission granted", Toast.LENGTH_SHORT).show();
             } else {
                 Toast.makeText(requireContext(), "Location permission denied", Toast.LENGTH_SHORT).show();
+                binding.fabGpsLockLocation.setImageResource(R.drawable.ic_baseline_gps_off);
             }
         }
     }
@@ -87,6 +101,9 @@ public class MapViewFragment extends Fragment {
                 && ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_COARSE_LOCATION)
                 == PackageManager.PERMISSION_GRANTED) {
             Toast.makeText(requireContext(), "Location perm granted", Toast.LENGTH_SHORT).show();
+            // binding.fabGpsLockLocation.setSize(FloatingActionButton.SIZE_MINI);
+            // https://stackoverflow.com/a/42001431 by EckoTan
+            binding.fabGpsLockLocation.setImageResource(R.drawable.ic_baseline_gps_fixed);
         } else {
             Snackbar.make(requireView(), "Cannot access location", Snackbar.LENGTH_LONG)
                     .setAction("Enable Location", view -> requestPermissions(
@@ -100,5 +117,11 @@ public class MapViewFragment extends Fragment {
     private void startScanner() {
         Intent intent = new Intent(this.getActivity(), ScanQRCodeActivity.class);
         startActivity(intent);
+    }
+
+    @Override
+    public void onConfigurationChanged(@NonNull Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        setupMap();
     }
 }
