@@ -19,7 +19,7 @@ import java.util.ArrayList;
 public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.ViewHolder> {
 
     private ArrayList<HistoryItem> qrHistoryData;
-    //private FirebaseFirestore db = FirebaseFirestore.getInstance(); TODO: why does this cause a crash?
+    private FirebaseFirestore db = FirebaseFirestore.getInstance();
 
     /**
      * Provide a reference to the type of views that you are using
