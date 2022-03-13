@@ -1,23 +1,28 @@
 package com.example.collectqr;
 
+import com.firebase.geofire.GeoFireUtils;
+import com.firebase.geofire.GeoLocation;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 
 public class QRCode {
     private String sha256;
     private Integer points;
-    private String latitude;
-    private String longitude;
+    private Double latitude;
+    private Double longitude;
+    private GeoLocation location;
     private String qr_image;
     private HashMap<String, String> scanned_by;
     private HashMap<String, String> comments;
     private ArrayList<String> all_images;
 
-    public QRCode(String sha256, String latitude, String longitude) {
+    public QRCode(String sha256, Double latitude, Double longitude) {
         this.sha256 = sha256;
         this.points = 0; //this needs to be updated immediately
         this.latitude = latitude;
         this.longitude = longitude;
+        this.location = new GeoLocation(latitude, longitude);
         this.qr_image = "";
         this.scanned_by = new HashMap<>();
         this.comments = new HashMap<>();
@@ -44,11 +49,36 @@ public class QRCode {
         return sha256;
     }
 
-    public String getLatitude() {
+    /**
+     * Computes a GeoHash with a longitude and latitude.
+     * <a href="https://firebase.google.com/docs/firestore/solutions/geoqueries#java">Source</a>
+     * @return  A string-representation of a GeoHash
+     */
+    public String getGeoHash() {
+        return GeoFireUtils.getGeoHashForLocation(location);
+    }
+
+    /**
+     * Return a latitude, usually a Double, as a String.
+     * @return  The latitude of a location as a String.
+     */
+    public String getLatitudeAsString() {
+        return String.valueOf(latitude);
+    }
+
+    /**
+     * Return a longitude, usually a Double, as a String.
+     * @return  The longitude of a location as a String.
+     */
+    public String getLongitudeAsString() {
+        return String.valueOf(longitude);
+    }
+
+    public Double getLatitude() {
         return latitude;
     }
 
-    public String getLongitude() {
+    public Double getLongitude() {
         return longitude;
     }
 
@@ -66,5 +96,9 @@ public class QRCode {
 
     public ArrayList<String> getAll_images() {
         return all_images;
+    }
+
+    public GeoLocation getLocation() {
+        return location;
     }
 }

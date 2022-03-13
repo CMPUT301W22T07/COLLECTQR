@@ -22,8 +22,9 @@ public class QRCodeController {
 
         HashMap<String, String> data = new HashMap<>();
         data.put("sha256", code.getSha256());
-        data.put("latitude", code.getLatitude());
-        data.put("longitude", code.getLongitude());
+        data.put("geohash", code.getGeoHash());
+        data.put("latitude", code.getLatitudeAsString());
+        data.put("longitude", code.getLongitudeAsString());
         data.put("qr_image", code.getQr_image());
         data.put("points", code.getPoints().toString());
 

@@ -1,14 +1,13 @@
 package com.example.collectqr;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 
 public class User {
-    private String username;
-    private String email;
-    private String phone;
-    private HashMap<String, Integer> stats;
-    private HashMap<String, HashMap<String, String>> codes_scanned; //sha : date scanned
+    private final String username;
+    private final String email;
+    private final String phone;
+    private final HashMap<String, Integer> stats;
+    private final HashMap<String, HashMap<String, String>> codes_scanned; //sha : date scanned
 
     public User(String username) {
         this.username = username;
@@ -23,11 +22,13 @@ public class User {
         this.codes_scanned = new HashMap<String, HashMap<String, String>>();
     }
 
-    public void addCode(String sha, Integer points, String latitude, String longitude, String date) {
+    public void addCode(String sha, Integer points, String latitude, String longitude,
+                        String geohash, String date) {
         HashMap<String, String> inner = new HashMap<>();
         inner.put("points", points.toString());
         inner.put("latitude", latitude);
         inner.put("longitude", longitude);
+        inner.put("geohash", geohash);
         inner.put("date", date);
         this.codes_scanned.put(sha, inner);
     }

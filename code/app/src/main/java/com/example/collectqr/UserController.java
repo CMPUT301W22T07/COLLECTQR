@@ -63,6 +63,7 @@ public class UserController {
             qrdata.put("points", value.get("points"));
             qrdata.put("latitude", value.get("latitude"));
             qrdata.put("longitude", value.get("longitude"));
+            qrdata.put("geohash", value.get("geohash"));
             qrdata.put("date", value.get("date"));
 
             codesReference
