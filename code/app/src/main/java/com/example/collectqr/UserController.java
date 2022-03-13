@@ -24,7 +24,7 @@ public class UserController {
         //Move stats from HashMap to db
         for (Map.Entry<String, Integer> stats : user.getStats().entrySet()) {
             String key = stats.getKey();
-            String value = stats.getValue().toString();
+            int value = stats.getValue();
             data.put(key, value);
         }
 
@@ -38,10 +38,10 @@ public class UserController {
         final CollectionReference codesReference = db.collection("Users").document(user.getUsername()).collection("ScannedCodes");
 
         //document per qrcode scanned
-        for (Map.Entry<String, HashMap<String, String>> stats : user.getCodes_scanned().entrySet()) {
-            HashMap<String, String> qrdata = new HashMap<>();
+        for (Map.Entry<String, HashMap<String, Object>> stats : user.getCodes_scanned().entrySet()) {
+            HashMap<String, Object> qrdata = new HashMap<>();
             String key = stats.getKey();
-            HashMap<String, String> value = stats.getValue();
+            HashMap<String, Object> value = stats.getValue();
             qrdata.put("hash", key);
             qrdata.put("points", value.get("points"));
             qrdata.put("date", value.get("date"));

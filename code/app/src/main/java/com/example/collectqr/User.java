@@ -1,5 +1,6 @@
 package com.example.collectqr;
 
+import java.util.Date;
 import java.util.HashMap;
 
 public class User {
@@ -7,7 +8,7 @@ public class User {
     private final String email;
     private final String phone;
     private final HashMap<String, Integer> stats;
-    private final HashMap<String, HashMap<String, String>> codes_scanned; //sha : date scanned
+    private final HashMap<String, HashMap<String, Object>> codes_scanned; //sha : date scanned
 
     public User(String username) {
         this.username = username;
@@ -23,8 +24,8 @@ public class User {
     }
 
     public void addCode(String hash, Integer points, String latitude, String longitude,
-                        String geohash, String date, String image) {
-        HashMap<String, String> inner = new HashMap<>();
+                        String geohash, Date date, String image) {
+        HashMap<String, Object> inner = new HashMap<>();
         inner.put("points", points.toString());
         inner.put("latitude", latitude);
         inner.put("longitude", longitude);
@@ -50,7 +51,7 @@ public class User {
         return stats;
     }
 
-    public HashMap<String, HashMap<String, String>> getCodes_scanned() {
+    public HashMap<String, HashMap<String, Object>> getCodes_scanned() {
         return codes_scanned;
     }
 }
