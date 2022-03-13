@@ -6,8 +6,15 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.collectqr.R;
+import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.FirebaseFirestore;
+
+import java.util.ArrayList;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -24,6 +31,10 @@ public class HistoryFragment extends Fragment {
     // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
+
+    private RecyclerView recyclerView;
+    private RecyclerView.Adapter adapter;
+    private RecyclerView.LayoutManager layoutManager;
 
     public HistoryFragment() {
         // Required empty public constructor
@@ -54,12 +65,32 @@ public class HistoryFragment extends Fragment {
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
+
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+
+        // TODO: get user stats from firestore
+        /*
+        https://stackoverflow.com/a/31096444
+        StackOverflow, Author: The Dude
+         */
+        /*
+        https://youtu.be/17NbUcEts9c
+        YouTube, Author: Coding in Flow
+         */
+        View rootView = inflater.inflate(R.layout.fragment_history, container, false);
+        recyclerView = rootView.findViewById(R.id.history_qr_recycler_view);
+        recyclerView.setHasFixedSize(true);
+        layoutManager = new GridLayoutManager(getContext(), 2);
+        adapter = new HistoryAdapter();
+        recyclerView.setLayoutManager(layoutManager);
+        recyclerView.setAdapter(adapter);
+
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_history, container, false);
+        return rootView;
+
     }
 }
