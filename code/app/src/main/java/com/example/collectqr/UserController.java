@@ -24,7 +24,7 @@ public class UserController {
         //Move stats from HashMap to db
         for (Map.Entry<String, Integer> stats : user.getStats().entrySet()) {
             String key = stats.getKey();
-            String value = stats.getValue().toString();
+            int value = stats.getValue();
             data.put(key, value);
         }
 
