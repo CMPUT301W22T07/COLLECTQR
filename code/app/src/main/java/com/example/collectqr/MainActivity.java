@@ -1,19 +1,12 @@
 package com.example.collectqr;
 
-import android.content.Intent;
-import androidx.appcompat.app.AppCompatActivity;
-
-import android.content.Intent;
 import android.os.Bundle;
+import android.view.WindowManager;
 
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.collectqr.databinding.ActivityMainBinding;
-import androidx.appcompat.app.AppCompatActivity;
-
 import com.google.firebase.firestore.FirebaseFirestore;
-import android.os.Handler;
-import android.view.WindowManager;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -25,7 +18,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
 
         // Launch main application activity
-        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,WindowManager.LayoutParams.FLAG_FULLSCREEN);
+        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
 
         setContentView(R.layout.activity_main);
 

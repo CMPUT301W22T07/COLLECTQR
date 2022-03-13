@@ -1,7 +1,7 @@
 package com.example.collectqr;
 
-import android.content.Context;
 import android.os.Bundle;
+import android.util.Log;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.splashscreen.SplashScreen;
@@ -10,7 +10,12 @@ import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
 
+import com.example.collectqr.data.GeoHashQuery;
 import com.example.collectqr.databinding.ActivityAppBinding;
+import com.firebase.geofire.GeoLocation;
+import com.google.firebase.firestore.DocumentSnapshot;
+
+import java.util.List;
 
 public class MainAppActivity extends AppCompatActivity {
     private ActivityAppBinding binding;
@@ -45,6 +50,5 @@ public class MainAppActivity extends AppCompatActivity {
                 Navigation.findNavController(this, R.id.nav_host_fragment_container_main);
         NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
         NavigationUI.setupWithNavController(binding.bottomnavContainer, navController);
-
     }
 }
