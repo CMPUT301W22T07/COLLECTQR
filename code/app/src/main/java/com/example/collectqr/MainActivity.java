@@ -9,8 +9,10 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.EventListener;
@@ -19,6 +21,7 @@ import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 
 public class MainActivity extends AppCompatActivity {
@@ -30,19 +33,43 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        User test = new User("testusername");
-        test.addCode("code1", 10, "fakelat", "fakelon", "fakedate");
-        test.addCode("code2", 20, "fakelat", "fakelon", "fakedate");
-        test.addCode("code3", 5000, "fakelat", "fakelon", "fakedate");
-        UserController controller = new UserController();
-        controller.writeToFirestore(test);
+        //get reference to database
+        db = FirebaseFirestore.getInstance();
 
-        QRCode code = new QRCode("fakesha", "fakelat", "fakelon");
-        code.addComment("User1", "this is a comment");
-        code.addScannedBy("User2", "scanned on this date");
+        //load username from SharedPreferences
 
-        QRCodeController controller1 = new QRCodeController();
-        controller1.writeToFirestore(code);
+        Preferences.savePreferences(this, "PZ");
+        String username = Preferences.loadPreferences(this);
+
+        //if username is null, this is the user should be prompted to create a username
+        if(username == null) {
+            //TODO: Intent to Login
+        }
+
+        //if not null, the user can just be redirected to the main activity
+        //TODO: Intent to map activity
+
+        /*db.collection("Users")
+                .whereEqualTo("username", "penguin")
+                .get()
+                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                        if (task.isSuccessful()) {
+                            if(task.getResult().isEmpty()) {
+                                System.out.println("empty!!!!!!");
+                            } else {
+                                System.out.println("notempty!!!!!!!!");
+                            }
+                            for (QueryDocumentSnapshot document : task.getResult()) {
+                                System.out.println(document.get("username"));
+                                Log.d(TAG, document.getId() + " => " + document.getData());
+                            }
+                        } else {
+                            Log.d(TAG, "Error getting documents: ", task.getException());
+                        }
+                    }
+                });*/
 
     };
 }
