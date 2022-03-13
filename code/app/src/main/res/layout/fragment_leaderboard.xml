@@ -3,17 +3,12 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="vertical"
     tools:context=".ui.leaderboard.LeaderboardFragment">
 
-<!--    <org.osmdroid.views.MapView-->
-<!--        android:id="@+id/view_mapView"-->
-<!--        android:layout_width="match_parent"-->
-<!--        android:layout_height="match_parent"/>-->
-
-    <TextView
-        android:id="@+id/tv_map_screen_fragment"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Leaderboard Top-Level Fragment" />
+    <ListView
+        android:id="@+id/leaderboard_list"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"/>
 
 </FrameLayout>
