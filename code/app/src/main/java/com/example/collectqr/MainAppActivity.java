@@ -1,7 +1,7 @@
 package com.example.collectqr;
 
+import android.app.ActivityManager;
 import android.os.Bundle;
-import android.util.Log;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.splashscreen.SplashScreen;
@@ -10,12 +10,8 @@ import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
 
-import com.example.collectqr.data.GeoHashQuery;
 import com.example.collectqr.databinding.ActivityAppBinding;
-import com.firebase.geofire.GeoLocation;
-import com.google.firebase.firestore.DocumentSnapshot;
-
-import java.util.List;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
 public class MainAppActivity extends AppCompatActivity {
     private ActivityAppBinding binding;
@@ -26,6 +22,7 @@ public class MainAppActivity extends AppCompatActivity {
            https://developer.android.com/reference/androidx/core/splashscreen/SplashScreen
          */
         SplashScreen.installSplashScreen(this);
+        noMonkeys();
 
         super.onCreate(savedInstanceState);
 
@@ -50,5 +47,25 @@ public class MainAppActivity extends AppCompatActivity {
                 Navigation.findNavController(this, R.id.nav_host_fragment_container_main);
         NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
         NavigationUI.setupWithNavController(binding.bottomnavContainer, navController);
+
+    }
+
+
+    /**
+     * Keep the monkeys out
+     */
+    public void noMonkeys() {
+        if (ActivityManager.isUserAMonkey()) {
+            new MaterialAlertDialogBuilder(this,
+                    com.google.android.material.R.style.ThemeOverlay_Material3_Dialog)
+                    // https://stackoverflow.com/a/19064968 Singhak
+                    .setCancelable(false)
+                    .setMessage("Cease your monkeying")
+                    .setPositiveButton("Sorry, I'll leave", (dialogInterface, i) -> {
+                        // https://stackoverflow.com/a/27765687 by sivi
+                        finishAndRemoveTask();
+                    })
+                    .show();
+        }
     }
 }
