@@ -6,6 +6,10 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.bumptech.glide.request.RequestOptions;
 import com.example.collectqr.R;
 import java.util.ArrayList;
 
@@ -16,6 +20,7 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.ViewHold
 
     private ArrayList<HistoryItem> qrHistoryData;
     final private String username;
+    private ViewGroup viewGroup;
 
     /**
      * Provide a reference to the type of views that you are using
@@ -56,6 +61,7 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.ViewHold
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup viewGroup, int viewType) {
         // Create a new view, which defines the UI of the list item
+        this.viewGroup = viewGroup;
         View view = LayoutInflater.from(viewGroup.getContext())
                 .inflate(R.layout.history_list_item, viewGroup, false);
         return new ViewHolder(view);
@@ -68,12 +74,15 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.ViewHold
         // contents of the view with that element
         HistoryItem currentItem = qrHistoryData.get(position);
         viewHolder.getPointsView().setText(currentItem.getPoints()+" points");
-        viewHolder.getImageView().setImageResource(currentItem.getImageResource());
         String scannedOn = currentItem.getDate().toString();
         viewHolder.getDateView().setText(String.format("%s %s %s",
                 scannedOn.substring(11,16),
                 scannedOn.substring(4,10),
                 scannedOn.substring(23)));
+        // https://firebase.google.com/docs/storage/android/download-files#downloading_images_with_firebaseui
+        Glide.with(viewGroup.getContext())
+                .load("https://firebasestorage.googleapis.com/v0/b/collectqr7.appspot.com/o/test.jpg?alt=media&token=ed2687e8-daaf-4bdd-b04c-c36b10141a1f")
+                .into(viewHolder.getImageView());
     }
 
     // Return the size of your dataset (invoked by the layout manager)
