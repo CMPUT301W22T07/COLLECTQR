@@ -1,6 +1,7 @@
 package com.example.collectqr;
 
 import android.app.ActivityManager;
+import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -12,8 +13,10 @@ import androidx.navigation.ui.NavigationUI;
 
 import com.example.collectqr.databinding.ActivityAppBinding;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
+import com.google.firebase.firestore.FirebaseFirestore;
 
 public class MainAppActivity extends AppCompatActivity {
+    private FirebaseFirestore db;
     private ActivityAppBinding binding;
 
     @Override
@@ -23,6 +26,7 @@ public class MainAppActivity extends AppCompatActivity {
          */
         SplashScreen.installSplashScreen(this);
         noMonkeys();
+        doesUserExist();
 
         super.onCreate(savedInstanceState);
 
@@ -48,6 +52,24 @@ public class MainAppActivity extends AppCompatActivity {
         NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
         NavigationUI.setupWithNavController(binding.bottomnavContainer, navController);
 
+    }
+
+
+    /**
+     * Check if a user already exists on the device. If not, start Login activity
+     */
+    public void doesUserExist() {
+        //load username from SharedPreferences
+        //Preferences.savePreferences(this, "localusername");
+
+        // Preferences.deletePreferences(this);
+        String username = Preferences.loadPreferences(this);
+
+        //if username is null, this is the user should be prompted to create a username
+        if(username == null) {
+            Intent intent = new Intent(this, LoginActivity.class);
+            startActivity(intent);
+        }
     }
 
 
