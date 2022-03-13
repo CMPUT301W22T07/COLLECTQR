@@ -42,12 +42,10 @@ public class UserController {
             HashMap<String, String> qrdata = new HashMap<>();
             String key = stats.getKey();
             HashMap<String, String> value = stats.getValue();
-            qrdata.put("hash", key);
+            qrdata.put("sha256", key);
             qrdata.put("points", value.get("points"));
-            qrdata.put("latitude", value.get("latitude"));
-            qrdata.put("longitude", value.get("longitude"));
-            qrdata.put("geohash", value.get("geohash"));
             qrdata.put("date", value.get("date"));
+            qrdata.put("image", value.get("image"));
 
             codesReference
                     .document(key)
