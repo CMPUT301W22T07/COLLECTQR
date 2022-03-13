@@ -9,11 +9,14 @@ import android.os.Bundle;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.collectqr.databinding.ActivityMainBinding;
+import androidx.appcompat.app.AppCompatActivity;
+
 import com.google.firebase.firestore.FirebaseFirestore;
 import android.os.Handler;
 import android.view.WindowManager;
 
 public class MainActivity extends AppCompatActivity {
+
     FirebaseFirestore db;
     private ActivityMainBinding binding;
 
@@ -25,15 +28,21 @@ public class MainActivity extends AppCompatActivity {
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,WindowManager.LayoutParams.FLAG_FULLSCREEN);
 
         setContentView(R.layout.activity_main);
-        new Handler().postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                Intent intent = new Intent(MainActivity.this, QRCodeHomeActivity.class);
-                startActivity(intent);
-                finish();
-            }
-        },2000);
 
+        User test = new User("testusername");
+        test.addCode("code1", 10, "fakelat", "fakelon", "fakegeohash", "fakedate");
+        test.addCode("code2", 20, "fakelat", "fakelon", "faksgeohash", "fakedate");
+        test.addCode("code3", 5000, "fakelat", "fakelon", "faksgeohash", "fakedate");
+        UserController controller = new UserController();
+        controller.writeToFirestore(test);
+
+        QRCode code = new QRCode("fakesha", 53.5261794, -113.5259656);
+        code.addComment("User1", "this is a comment");
+        code.addScannedBy("User2", "scanned on this date");
+
+        QRCodeController controller1 = new QRCodeController();
+        controller1.writeToFirestore(code);
 
     }
+
 }
