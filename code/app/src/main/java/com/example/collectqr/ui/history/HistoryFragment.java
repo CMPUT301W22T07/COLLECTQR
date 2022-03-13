@@ -3,33 +3,30 @@ package com.example.collectqr.ui.history;
 import static android.content.ContentValues.TAG;
 
 import android.os.Bundle;
-import android.util.ArrayMap;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.WindowManager;
 import android.widget.TextView;
 
-import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.collectqr.R;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -49,10 +46,12 @@ public class HistoryFragment extends Fragment {
 
     private View rootView;
 
+    private String username = "realishUser"; // TODO: make username be retrieved from a parameter
+
     private RecyclerView recyclerView;
-    private RecyclerView.Adapter adapter;
     private RecyclerView.LayoutManager layoutManager;
-    private ArrayList<HistoryItem> qrHistoryArray = new ArrayList<>();
+    private RecyclerView.Adapter adapter;
+    private ArrayList<HistoryItem> data;
     private String currentSort = "date_descend";
     private BottomSheetDialog sortSheet;
 
@@ -96,7 +95,6 @@ public class HistoryFragment extends Fragment {
         StackOverflow, Author: The Dude
          */
         rootView = inflater.inflate(R.layout.fragment_history, container, false);
-        String username = "realishUser"; // TODO: make username be retrieved from a parameter
 
         TextView totalPoints = rootView.findViewById(R.id.history_total_points);
         TextView numCodes = rootView.findViewById(R.id.history_num_codes);
@@ -122,6 +120,35 @@ public class HistoryFragment extends Fragment {
             }
         });
 
+        data = new ArrayList<>();
+        // Code from Lab 5
+        db.collection("Users").document(username).collection("ScannedCodes")
+                .addSnapshotListener(new EventListener<QuerySnapshot>() {
+                    @Override
+                    public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable
+                            FirebaseFirestoreException error) {
+                        // Clear the old list
+                        data.clear();
+                        for (QueryDocumentSnapshot doc : queryDocumentSnapshots) {
+                            Log.d(TAG, String.valueOf(doc.getData().get("hash")));
+                            data.add(new HistoryItem(doc)); // Adding the cities and provinces from FireStore
+                        }
+                        sortDataSet();
+                        adapter.notifyDataSetChanged(); // Notifying the adapter to render any new data fetched from the cloud
+                    }
+                });
+
+        /*
+        https://youtu.be/17NbUcEts9c
+        YouTube, Author: Coding in Flow
+         */
+        recyclerView = rootView.findViewById(R.id.history_qr_recycler_view);
+        recyclerView.setHasFixedSize(true);
+        layoutManager = new GridLayoutManager(getContext(), 2);
+        recyclerView.setLayoutManager(layoutManager);
+        adapter = new HistoryAdapter(username, data);
+        recyclerView.setAdapter(adapter);
+
         createSortSheetDialog();
         FloatingActionButton fab = rootView.findViewById(R.id.sort_history_fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -131,21 +158,41 @@ public class HistoryFragment extends Fragment {
             }
         });
 
-        /*
-        https://youtu.be/17NbUcEts9c
-        YouTube, Author: Coding in Flow
-         */
-        ArrayList<HistoryItem> qrHistoryArray = new ArrayList<>();
-        recyclerView = rootView.findViewById(R.id.history_qr_recycler_view);
-        recyclerView.setHasFixedSize(true);
-        layoutManager = new GridLayoutManager(getContext(), 2);
-        adapter = new HistoryAdapter(username, qrHistoryArray);
-        recyclerView.setLayoutManager(layoutManager);
-        recyclerView.setAdapter(adapter);
-
         // Inflate the layout for this fragment
         return rootView;
     }
+
+     void sortDataSet() {
+        /*
+        https://www.geeksforgeeks.org/how-to-sort-an-arraylist-of-objects-by-property-in-java/
+        Article Contributed By: sparshgupta
+        https://youtu.be/Mguw_TQBExo
+        YouTube video, Author: RAJASEKHAR REDDY
+         */
+        if (currentSort.equals("points_ascend")) {
+            data.sort(new Comparator<HistoryItem>() {
+                @Override
+                public int compare(HistoryItem historyItem, HistoryItem t1) {
+                    return historyItem.getPoints()- t1.getPoints();
+                }
+            });
+        } else if (currentSort.equals("points_descend")) {
+            data.sort(new Comparator<HistoryItem>() {
+                @Override
+                public int compare(HistoryItem historyItem, HistoryItem t1) {
+                    return t1.getPoints()- historyItem.getPoints();
+                }
+            });
+        } else if (currentSort.equals("date_descend")) {
+            data.sort(new Comparator<HistoryItem>() {
+                @Override
+                public int compare(HistoryItem historyItem, HistoryItem t1) {
+                    return t1.getDate().compareTo(historyItem.getDate());
+                }
+            });
+        }
+        adapter.notifyDataSetChanged();
+     }
 
     private void createSortSheetDialog() {
         /*
@@ -165,6 +212,7 @@ public class HistoryFragment extends Fragment {
             @Override
             public void onClick(View view) {
                 currentSort = "points_ascend";
+                sortDataSet();
                 sortSheet.dismiss();
             }
         });
@@ -172,14 +220,15 @@ public class HistoryFragment extends Fragment {
             @Override
             public void onClick(View view) {
                 currentSort = "points_descend";
+                sortDataSet();
                 sortSheet.dismiss();
-
             }
         });
         byDateDescend.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 currentSort = "date_descend";
+                sortDataSet();
                 sortSheet.dismiss();
             }
         });
