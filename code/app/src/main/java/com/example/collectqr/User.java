@@ -19,7 +19,7 @@ public class User {
         stats.put("total_points", 0);
         this.stats = stats;
 
-        this.codes_scanned = new HashMap<String, HashMap<String, String>>();
+        this.codes_scanned = new HashMap<>();
     }
 
     public void addCode(String sha, Integer points, String latitude, String longitude,

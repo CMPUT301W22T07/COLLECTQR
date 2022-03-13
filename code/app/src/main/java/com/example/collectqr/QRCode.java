@@ -7,15 +7,15 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 public class QRCode {
-    private String sha256;
-    private Integer points;
-    private Double latitude;
-    private Double longitude;
-    private GeoLocation location;
-    private String qr_image;
-    private HashMap<String, String> scanned_by;
-    private HashMap<String, String> comments;
-    private ArrayList<String> all_images;
+    private final String sha256;
+    private final Integer points;
+    private final Double latitude;
+    private final Double longitude;
+    private final GeoLocation location;
+    private final String qr_image;
+    private final HashMap<String, String> scanned_by;
+    private final HashMap<String, String> comments;
+    private final ArrayList<String> all_images;
 
     public QRCode(String sha256, Double latitude, Double longitude) {
         this.sha256 = sha256;
@@ -52,7 +52,8 @@ public class QRCode {
     /**
      * Computes a GeoHash with a longitude and latitude.
      * <a href="https://firebase.google.com/docs/firestore/solutions/geoqueries#java">Source</a>
-     * @return  A string-representation of a GeoHash
+     *
+     * @return A string-representation of a GeoHash
      */
     public String getGeoHash() {
         return GeoFireUtils.getGeoHashForLocation(location);
@@ -60,7 +61,8 @@ public class QRCode {
 
     /**
      * Return a latitude, usually a Double, as a String.
-     * @return  The latitude of a location as a String.
+     *
+     * @return The latitude of a location as a String.
      */
     public String getLatitudeAsString() {
         return String.valueOf(latitude);
@@ -68,7 +70,8 @@ public class QRCode {
 
     /**
      * Return a longitude, usually a Double, as a String.
-     * @return  The longitude of a location as a String.
+     *
+     * @return The longitude of a location as a String.
      */
     public String getLongitudeAsString() {
         return String.valueOf(longitude);

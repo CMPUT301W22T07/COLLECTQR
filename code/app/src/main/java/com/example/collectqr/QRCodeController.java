@@ -4,10 +4,6 @@ import static android.content.ContentValues.TAG;
 
 import android.util.Log;
 
-import androidx.annotation.NonNull;
-
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 
@@ -31,18 +27,8 @@ public class QRCodeController {
         codeReference
                 .document(code.getSha256())
                 .set(data)
-                .addOnSuccessListener(new OnSuccessListener<Void>() {
-                    @Override
-                    public void onSuccess(Void aVoid) {
-                        Log.d(TAG, "Data has been added successfully!");
-                    }
-                })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        Log.d(TAG, "Data could not be added!" + e.toString());
-                    }
-                });
+                .addOnSuccessListener(aVoid -> Log.d(TAG, "Data has been added successfully!"))
+                .addOnFailureListener(e -> Log.d(TAG, "Data could not be added!" + e));
 
         final CollectionReference scannedByReference = db.collection("QRCodes").document(code.getSha256()).collection("ScannedBy");
 
@@ -55,18 +41,8 @@ public class QRCodeController {
             scannedByReference
                     .document(key)
                     .set(scannedBy)
-                    .addOnSuccessListener(new OnSuccessListener<Void>() {
-                        @Override
-                        public void onSuccess(Void aVoid) {
-                            Log.d(TAG, "Data has been added successfully!");
-                        }
-                    })
-                    .addOnFailureListener(new OnFailureListener() {
-                        @Override
-                        public void onFailure(@NonNull Exception e) {
-                            Log.d(TAG, "Data could not be added!" + e.toString());
-                        }
-                    });
+                    .addOnSuccessListener(aVoid -> Log.d(TAG, "Data has been added successfully!"))
+                    .addOnFailureListener(e -> Log.d(TAG, "Data could not be added!" + e));
         }
 
         final CollectionReference commentsReference = db.collection("QRCodes").document(code.getSha256()).collection("Comments");
@@ -80,18 +56,8 @@ public class QRCodeController {
             commentsReference
                     .document(key)
                     .set(comment)
-                    .addOnSuccessListener(new OnSuccessListener<Void>() {
-                        @Override
-                        public void onSuccess(Void aVoid) {
-                            Log.d(TAG, "Data has been added successfully!");
-                        }
-                    })
-                    .addOnFailureListener(new OnFailureListener() {
-                        @Override
-                        public void onFailure(@NonNull Exception e) {
-                            Log.d(TAG, "Data could not be added!" + e.toString());
-                        }
-                    });
+                    .addOnSuccessListener(aVoid -> Log.d(TAG, "Data has been added successfully!"))
+                    .addOnFailureListener(e -> Log.d(TAG, "Data could not be added!" + e));
         }
 
     }
