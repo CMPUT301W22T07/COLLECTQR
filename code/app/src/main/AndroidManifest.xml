@@ -32,6 +32,10 @@
         <activity
             android:name="com.example.collectqr.MainAppActivity"
             android:theme="@style/Theme.App.Starting"
+            android:name=".LoginActivity"
+            android:exported="false" />
+        <activity
+            android:name=".MainActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
