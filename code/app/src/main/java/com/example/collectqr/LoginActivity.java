@@ -5,12 +5,16 @@ import static android.content.ContentValues.TAG;
 import android.content.Context;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.github.javafaker.Faker;
+import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 public class LoginActivity extends AppCompatActivity {
@@ -23,7 +27,8 @@ public class LoginActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
-        Button loginButton = findViewById(R.id.loginButton);
+        ExtendedFloatingActionButton loginButton = findViewById(R.id.loginButton);
+        ExtendedFloatingActionButton shuffleButton = findViewById(R.id.shuffleButton);
         EditText usernameEditText = findViewById(R.id.usernameEditText);
         db = FirebaseFirestore.getInstance();
 
@@ -77,6 +82,12 @@ public class LoginActivity extends AppCompatActivity {
                             }
                         });
             }
+        });
+
+        shuffleButton.setOnClickListener(view -> {
+            Faker faker = new Faker();
+            String randomName = faker.superhero().prefix()+faker.name().firstName();
+            usernameEditText.setText(randomName);
         });
     }
 }
