@@ -6,6 +6,8 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.firebase.firestore.FirebaseFirestore;
 
+import java.util.Date;
+
 public class MainActivity extends AppCompatActivity {
 
     FirebaseFirestore db;
@@ -16,7 +18,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         User test = new User("testusername");
-        test.addCode("code1", 10, "fakelat", "fakelon", "fakegeohash", "fakedate", "fakeimage");
+        test.addCode("code1", 10, "fakelat", "fakelon", "fakegeohash", new Date(), "fakeimage");
         //test.addCode("code2", 20, "fakelat", "fakelon", "faksgeohash", "fakedate");
         //test.addCode("code3", 5000, "fakelat", "fakelon", "faksgeohash", "fakedate");
         UserController controller = new UserController();
