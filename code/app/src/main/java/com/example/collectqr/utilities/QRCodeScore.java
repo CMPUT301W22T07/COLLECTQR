@@ -1,6 +1,7 @@
 
-package com.example.collectqr;
+package com.example.collectqr.utilities;
 
+import com.example.collectqr.QRCode;
 import com.google.common.hash.Hashing;
 
 import java.nio.charset.StandardCharsets;
@@ -9,7 +10,7 @@ import java.nio.charset.StandardCharsets;
 /**
  * Calculates the score of a given QR code
  */
-public class QRCodeScore {
+public class QRCodeScore extends HashConversion {
 
     /**
      * Calculates the score of a given QR code
@@ -20,26 +21,10 @@ public class QRCodeScore {
      *      Score of the given QR Code (long)
      */
     public int calculateScore(QRCode qr) {
-        String sha256String = convertToSHA256(qr);
+        String sha256String = convertToSHA256(qr.toString());
         return scoreSystem(sha256String);
     }
 
-
-    /**
-     * Obtains the SHA-256 hash of a given QR code
-     *
-     * @param qr
-     *      QR Code object to obtain SHA-256 hash of
-     * @return
-     *      SHA-256 hash String of QR code
-     */
-    private String convertToSHA256(QRCode qr) {
-        String codeString = qr.toString();
-        // https://www.baeldung.com/sha-256-hashing-java
-        return Hashing.sha256()
-                .hashString(codeString, StandardCharsets.UTF_8)
-                .toString();
-    }
 
     /**
      * Calculates the score of a QR Code converted to SHA-256 hash following the scoring system

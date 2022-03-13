@@ -2,6 +2,8 @@ package com.example.collectqr;
 
 import static org.junit.Assert.assertEquals;
 
+import com.example.collectqr.utilities.QRCodeScore;
+
 import org.junit.Test;
 
 import java.util.Arrays;
