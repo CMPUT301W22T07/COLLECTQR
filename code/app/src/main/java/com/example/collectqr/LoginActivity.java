@@ -3,13 +3,16 @@ package com.example.collectqr;
 import static android.content.ContentValues.TAG;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import androidx.activity.OnBackPressedCallback;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.IntentCompat;
 
 import com.google.firebase.firestore.FirebaseFirestore;
 
@@ -63,7 +66,9 @@ public class LoginActivity extends AppCompatActivity {
                                     Preferences.savePreferences(context, username);
                                     // https://developer.android.com/guide/components/activities/tasks-and-back-stack
                                     //finishActivity(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                                    finish();
+                                    Intent intent = new Intent (this, MainAppActivity.class);
+                                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK |  Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                                    startActivity(intent);
                                 } else {
                                     //user already exists
                                     toast.cancel(); //cancel the old toast
@@ -78,5 +83,15 @@ public class LoginActivity extends AppCompatActivity {
                         });
             }
         });
+
+        // https://developer.android.com/guide/navigation/navigation-custom-back#java
+        // OnBackPressedCallback callback = new OnBackPressedCallback(true) {
+        //     @Override
+        //     public void handleOnBackPressed() {
+        //         // @see com.example.collectqr.MainAppActivity
+        //         finishAndRemoveTask();
+        //     }
+        // };
+        // this.getOnBackPressedDispatcher().addCallback(this, callback);
     }
 }
