@@ -1,6 +1,5 @@
 package com.example.collectqr;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.view.WindowManager;
 
@@ -25,25 +24,19 @@ public class MainActivity extends AppCompatActivity {
 
         setContentView(R.layout.activity_main);
 
-        //get reference to database
-        db = FirebaseFirestore.getInstance();
+        User test = new User("testusername");
+        test.addCode("code1", 10, "fakelat", "fakelon", "fakegeohash", new Date(), "fakeimage");
+        //test.addCode("code2", 20, "fakelat", "fakelon", "faksgeohash", "fakedate");
+        //test.addCode("code3", 5000, "fakelat", "fakelon", "faksgeohash", "fakedate");
+        UserController controller = new UserController();
+        controller.writeToFirestore(test);
 
-        //load username from SharedPreferences
+        //QRCode code = new QRCode("fakesha", 53.5261794, -113.5259656);
+        ////code.addComment("User1", "this is a comment");
+        //code.addScannedBy("User2", "scanned on this date");
 
-        //Preferences.savePreferences(this, "localusername");
-        Preferences.deletePreferences(this);
-        String username = Preferences.loadPreferences(this);
-
-        //if username is null, this is the user should be prompted to create a username
-        if(username == null) {
-            Intent intent = new Intent(this, LoginActivity.class);
-            startActivity(intent);
-        }
-
-        //if not null, the user can just be redirected to the main activity
-        //TODO: Intent to map activity
-        //Intent intent = new Intent(this, //TODO.class);
-        //startActivity(intent);
+        //QRCodeController controller1 = new QRCodeController();
+        //controller1.writeToFirestore(code);
 
     }
 
