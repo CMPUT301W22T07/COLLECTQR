@@ -11,6 +11,11 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class QRCodeController {
+    /**
+     * Takes a given QR code, and writes all its relevant contents to firestore.
+     *
+     * @param code the QR code to be stored to firestore
+     */
     public void writeToFirestore(QRCode code) {
         FirebaseFirestore db;
         db = FirebaseFirestore.getInstance();

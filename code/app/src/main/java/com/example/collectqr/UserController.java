@@ -11,6 +11,11 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class UserController {
+    /**
+     * Takes a given user, and writes all its relevant contents to firestore.
+     *
+     * @param user the user to be stored to firestore
+     */
     public void writeToFirestore(User user) {
         FirebaseFirestore db;
         db = FirebaseFirestore.getInstance();
