@@ -1,6 +1,7 @@
 <!--<item name="colorInversePrimary">@color/md_theme_dark_inversePrimary</item>-->
 <!--<item name="colorShadow">@color/md_theme_dark_shadow</item>-->
 <resources>
+
     <style name="Theme.COLLECTQR" parent="Theme.Material3.Dark">
         <item name="colorPrimary">@color/md_theme_dark_primary</item>
         <item name="colorOnPrimary">@color/md_theme_dark_onPrimary</item>
@@ -28,10 +29,12 @@
         <item name="colorOnSurfaceInverse">@color/md_theme_dark_inverseOnSurface</item>
         <item name="colorSurfaceInverse">@color/md_theme_dark_inverseSurface</item>
         <item name="colorPrimaryInverse">@color/md_theme_dark_primaryInverse</item>
+        <item name="android:statusBarColor">@android:color/transparent</item>
     </style>
 
     <style name="Theme.App.Starting" parent="Theme.SplashScreen">
         <item name="postSplashScreenTheme">@style/Theme.COLLECTQR</item>
         <item name="windowSplashScreenAnimatedIcon">@drawable/qrcode</item>
     </style>
+
 </resources>

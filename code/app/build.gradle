@@ -42,14 +42,15 @@ dependencies {
     implementation 'com.android.support:multidex:1.0.3'
 
     // Manually defined UI dependencies
-//    implementation 'com.mapbox.maps:android:10.3.0'
+    implementation 'com.google.android.material:material:1.6.0-alpha03'
+    implementation 'androidx.core:core-splashscreen:1.0.0-beta01'
+    // implementation 'com.mapbox.maps:android:10.3.0'
     implementation 'org.osmdroid:osmdroid-android:6.1.11'
     implementation 'org.osmdroid:osmdroid-mapsforge:6.0.1@aar'
     implementation 'org.mapsforge:mapsforge-map-android:0.8.0'
-    implementation 'org.mapsforge:mapsforge-map:0.8.0'
-    implementation 'org.mapsforge:mapsforge-themes:0.8.0'
-    implementation 'com.google.android.material:material:1.6.0-alpha03'
-    implementation 'androidx.core:core-splashscreen:1.0.0-beta01'
+    // Prep for maybe migrating to vector tiles
+    implementation 'org.mapsforge:mapsforge-map:0.17.0'
+    implementation 'org.mapsforge:mapsforge-themes:0.17.0'
 
     // Firebase dependencies
     implementation 'com.google.firebase:firebase-firestore:24.0.1'
@@ -59,6 +60,7 @@ dependencies {
     implementation 'androidmads.library.qrgenearator:QRGenearator:1.0.4'
     implementation('eu.livotov.labs.android:CAMView:2.0.1@aar') { transitive = true }
     implementation 'com.journeyapps:zxing-android-embedded:4.3.0'
+    implementation 'com.google.android.gms:play-services-location:19.0.1'
 
     // Test dependencies
     testImplementation 'junit:junit:4.13.2'

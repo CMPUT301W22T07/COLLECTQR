@@ -28,10 +28,12 @@
         <item name="colorOnSurfaceInverse">@color/md_theme_light_inverseOnSurface</item>
         <item name="colorSurfaceInverse">@color/md_theme_light_inverseSurface</item>
         <item name="colorPrimaryInverse">@color/md_theme_light_primaryInverse</item>
+        <item name="android:statusBarColor">@color/md_theme_light_primary</item>
     </style>
 
     <style name="Theme.App.Starting" parent="Theme.SplashScreen">
         <item name="postSplashScreenTheme">@style/Theme.COLLECTQR</item>
         <item name="windowSplashScreenAnimatedIcon">@drawable/qrcode</item>
     </style>
+
 </resources>
