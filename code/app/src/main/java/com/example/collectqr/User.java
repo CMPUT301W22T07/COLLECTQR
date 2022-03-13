@@ -22,7 +22,7 @@ public class User {
         this.codes_scanned = new HashMap<>();
     }
 
-    public void addCode(String sha, Integer points, String latitude, String longitude,
+    public void addCode(String hash, Integer points, String latitude, String longitude,
                         String geohash, String date, String image) {
         HashMap<String, String> inner = new HashMap<>();
         inner.put("points", points.toString());
@@ -31,7 +31,7 @@ public class User {
         inner.put("geohash", geohash);
         inner.put("date", date);
         inner.put("image", image);
-        this.codes_scanned.put(sha, inner);
+        this.codes_scanned.put(hash, inner);
     }
 
     public String getUsername() {
