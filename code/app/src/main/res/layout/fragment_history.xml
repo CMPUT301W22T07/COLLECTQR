@@ -53,10 +53,6 @@
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
-        <com.google.android.material.divider.MaterialDivider
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"/>
-
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/history_qr_recycler_view"
             android:layout_width="match_parent"
