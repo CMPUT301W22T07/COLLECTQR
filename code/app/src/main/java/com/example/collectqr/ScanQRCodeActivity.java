@@ -16,6 +16,10 @@ import android.widget.Toast;
 import eu.livotov.labs.android.camview.ScannerLiveView;
 import eu.livotov.labs.android.camview.scanner.decoder.zxing.ZXDecoder;
 
+/**
+ * An activity which deals with getting permissions for using the camera,
+ * along with opening the camera
+ */
 public class ScanQRCodeActivity extends AppCompatActivity {
 
     private ScannerLiveView scannerLiveView;
