@@ -12,9 +12,10 @@ import android.widget.TextView;
 import androidx.fragment.app.Fragment;
 
 import com.example.collectqr.R;
+import com.example.collectqr.Preferences;
+import com.example.collectqr.User;
 
 import java.util.ArrayList;
-import java.util.prefs.Preferences;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -64,6 +65,12 @@ public class LeaderboardFragment extends Fragment {
         return fragment;
     }
 
+    /**
+     * When the fragment is called to be created,
+     * use savedInstanceState to create the fragment
+     *
+     * @param savedInstanceState
+     */
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -73,6 +80,16 @@ public class LeaderboardFragment extends Fragment {
         }
     }
 
+    /**
+     * Creates the views for the UI elements,
+     * inflates fragment to proper container,
+     * and calls helper methods to get data into UI
+     *
+     * @param inflater
+     * @param container
+     * @param savedInstanceState
+     * @return leaderboardView
+     */
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -80,23 +97,35 @@ public class LeaderboardFragment extends Fragment {
         // Inflate the layout for this fragment
         View leaderboardView = inflater.inflate(R.layout.fragment_leaderboard, container, false);
 
+        // gets signed in user's username from shared preferences
         String username = Preferences.loadPreferences(leaderboardView.getContext());
 
+        // save views as variables
         leaderboardList = leaderboardView.findViewById(R.id.leaderboard_list);
         personalUsername = leaderboardView.findViewById(R.id.personal_username_text);
         personalScore = leaderboardView.findViewById(R.id.personal_score_text);
         personalRank = leaderboardView.findViewById(R.id.personal_rank_text);
 
+        // get ArrayList of users from Firestore
         usersList = leaderboardController.createLeaderboardArray(context);
 
+        // pass userList to CustomList for UI
         usersAdapter = new CustomList(context, usersList);
         leaderboardList.setAdapter(usersAdapter);
         usersAdapter.notifyDataSetChanged();
 
-        Integer score = leaderboardController.getPersonalScore(username);
-        Leaderboard leaderboard = new Leaderboard(username, score, usersList);
+        // set current user's username in UI
+        personalUsername.setText(username);
 
-        
+        // get current user's score
+        Integer score = leaderboardController.getPersonalScore(username);
+        personalScore.setText(score);
+
+        // get current user's rank
+        Integer rank = leaderboardController.getUserRank(username, usersList);
+        personalRank.setText(rank);
+
+        // Leaderboard leaderboard = new Leaderboard(username, score, usersList);
 
         return leaderboardView;
     }
