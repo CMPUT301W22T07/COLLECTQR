@@ -10,6 +10,10 @@ import com.google.firebase.firestore.GeoPoint;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * A class which contains information about map markers, which indicate possible QR codes
+ * to be scanned
+ */
 public class MapViewViewModel extends ViewModel {
     /*
      Sources:

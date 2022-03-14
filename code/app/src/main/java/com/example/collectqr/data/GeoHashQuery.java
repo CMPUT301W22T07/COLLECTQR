@@ -13,6 +13,9 @@ import com.google.firebase.firestore.QuerySnapshot;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * A class which contains methods needed to perform GeoHash-based location queries
+ */
 public class GeoHashQuery {
     public final Double MAX_RADIUS = 5000.0;    // 50KM search radius max
     /* Based off Geo queries sample at:
