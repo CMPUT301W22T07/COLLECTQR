@@ -26,7 +26,8 @@
                 android:layout_marginRight="10dp"
                 android:gravity="center"
                 android:text="15\nQR Codes"
-                android:textSize="20sp"
+                android:textSize="22sp"
+                android:textStyle="bold"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toStartOf="@+id/history_total_points"
                 app:layout_constraintHorizontal_bias="0.5"
@@ -42,7 +43,8 @@
                 android:layout_marginRight="20dp"
                 android:gravity="center"
                 android:text="4200\nTotal Points"
-                android:textSize="20sp"
+                android:textSize="22sp"
+                android:textStyle="bold"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0.5"
@@ -50,6 +52,10 @@
                 app:layout_constraintTop_toTopOf="parent" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <com.google.android.material.divider.MaterialDivider
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/history_qr_recycler_view"

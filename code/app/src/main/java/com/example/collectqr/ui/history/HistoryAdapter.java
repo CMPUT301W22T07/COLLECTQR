@@ -17,6 +17,9 @@ import java.util.ArrayList;
 
 // https://developer.android.com/guide/topics/ui/layout/recyclerview#implement-adapter
 
+/**
+ * Controls the RecyclerView displayed on the history screen
+ */
 public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.ViewHolder> {
 
     private ArrayList<QRCode> qrHistoryData;
@@ -61,7 +64,12 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.ViewHold
 
     }
 
-    // Create new views (invoked by the layout manager)
+    /**
+     * Creates new views (invoked by the layout manager)
+     * @param viewGroup
+     * @param viewType
+     * @return
+     */
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup viewGroup, int viewType) {
         // Create a new view, which defines the UI of the list item
@@ -71,7 +79,11 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.ViewHold
         return new ViewHolder(view);
     }
 
-    // Replace the contents of a view (invoked by the layout manager)
+    /**
+     * Replaces the contents of a view (invoked by the layout manager)
+     * @param viewHolder
+     * @param position
+     */
     @Override
     public void onBindViewHolder(ViewHolder viewHolder, final int position) {
         // Get element from your dataset at this position and replace the
@@ -91,7 +103,11 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.ViewHold
                 .into(viewHolder.getImageView());
     }
 
-    // Return the size of your dataset (invoked by the layout manager)
+    /**
+     * Returns the sizeof the whole dataset and the scroll limit
+     * (invoked by the layout manager)
+     * @return int: the size
+     */
     @Override
     public int getItemCount() {
         return qrHistoryData.size();

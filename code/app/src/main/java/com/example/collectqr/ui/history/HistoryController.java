@@ -21,6 +21,9 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Date;
 
+/**
+ * Controls and manages the data needed for HistoryFragement
+ */
 public class HistoryController {
     private String username;
     private FirebaseFirestore db;
@@ -36,10 +39,22 @@ public class HistoryController {
         this.startDataDownloader();
     }
 
+    /**
+     * Returns an adapter for a RecyclerView
+     * @return HistoryAdapter
+     *      THis is the adapter to be used to controll the RecyclerView on the HistoryFragment
+     */
     public HistoryAdapter getAdapter() {
         return adapter;
     }
 
+    /**
+     * Downloads the user's document from the database
+     * and sets up a snapshot listener to keep the data up to date
+     * Assigns data from total_points and num_codes fields to the TextViews provided
+     * @param totalPoints
+     * @param numCodes
+     */
     public void setStatsBarData(TextView totalPoints, TextView numCodes) {
         //https://firebase.google.com/docs/firestore/query-data/listen
         DocumentReference docRef = db.collection("Users").document(username);
@@ -63,6 +78,12 @@ public class HistoryController {
         });
     }
 
+    /**
+     * Downloads all the QR codes scanned by the user from the database
+     * and sets up a snapshot listener to keep the data up to date
+     * users this data to populate an ArrayList with elements of type QRCode
+     * Calls a function to sort the list and notifies the adapter using the list as its data
+     */
     private void startDataDownloader() {
         // Code from Lab 5
         HistoryController controller = this;
@@ -88,6 +109,11 @@ public class HistoryController {
                 });
     }
 
+    /**
+     * Sorts an ArrayList with elements of type QRCode into a specific order
+     * @param sortBy
+     *      This is the string representing the order in which the list should be sorted
+     */
     public void sortQrData(String sortBy) {
         /*
         https://www.geeksforgeeks.org/how-to-sort-an-arraylist-of-objects-by-property-in-java/
