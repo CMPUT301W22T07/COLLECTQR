@@ -83,7 +83,7 @@ public class MainAppActivity extends AppCompatActivity {
         if (ActivityManager.isUserAMonkey()) {
             new MaterialAlertDialogBuilder(this,
                     com.google.android.material.R.style.ThemeOverlay_Material3_Dialog)
-                    // https://stackoverflow.com/a/19064968 Singhak
+                    // https://stackoverflow.com/a/19064968 by Singhak
                     .setCancelable(false)
                     .setMessage("Cease your monkeying")
                     .setPositiveButton("Sorry, I'll leave", (dialogInterface, i) -> {
