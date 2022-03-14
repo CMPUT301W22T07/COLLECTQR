@@ -60,34 +60,26 @@ public class LeaderboardController {
      * @return ArrayList<User> users
      */
     public ArrayList<User> createLeaderboardArray(Context context) {
-        // https://stackoverflow.com/questions/46706433/firebase-firestore-get-data-from-collection
-        // Author: https://stackoverflow.com/users/1830590/slaven-petkovic
-        // answered by: https://stackoverflow.com/users/324977/sam-stern
         ArrayList<User> users = new ArrayList<User>();
-        db.collection("Users").get()
-                .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+        LeaderboardController controller = this;
+        db.collection("Users")
+                .addSnapshotListener(new EventListener<QuerySnapshot>() {
                     @Override
-                    public void onSuccess(QuerySnapshot documentSnapshots) {
-                        if (documentSnapshots.isEmpty()) {
-                            Log.d(TAG, "onSuccess: LIST EMPTY");
-                            return;
-                        } else {
-                            // Convert the whole Query Snapshot to a list
-                            // of objects directly! No need to fetch each
-                            // document.
-                            List<User> userObjectsList = documentSnapshots.toObjects(User.class);
-
-                            // Add all to your list
-                            users.addAll(userObjectsList);
-                            Log.d(TAG, "onSuccess: " + users);
+                    public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable
+                            FirebaseFirestoreException error) {
+                        // Clear the old list
+                        users.clear();
+                        for (QueryDocumentSnapshot doc : queryDocumentSnapshots) {
+                            Log.d(TAG, String.valueOf(doc.getData().get("username")));
+                            String name = String.valueOf(doc.getData().get("username"));
+                            Integer totalPoints = Integer.parseInt(String.valueOf(doc.get("total_points")));
+                            Integer numCodes = Integer.parseInt(String.valueOf(doc.get("num_codes")));
+                            User userObj = new User(name);
+                            userObj.updateScore(numCodes, totalPoints);
+                            users.add(userObj);
                         }
-                    }})
-                            .addOnFailureListener(new OnFailureListener() {
-                        @Override
-                        public void onFailure(@NonNull Exception e) {
-                            Toast.makeText(context, "Error getting data!!!", Toast.LENGTH_LONG).show();
-                        }
-                    });
+                    }
+                });
 
         // sort array list based on total points
         Collections.sort(users, Comparator.comparing(user -> user.getStats().get("total_points")));
@@ -99,12 +91,11 @@ public class LeaderboardController {
     /**
      * Using a username passed into the method, finds user in Firestore
      * and gets their score
-     * @param personalUsername
      * @return score
      */
-    public Integer getPersonalScore(String personalUsername) {
+    public void getPersonalScore(TextView score) {
         // https://firebase.google.com/docs/firestore/query-data/listen
-        final DocumentReference usersReference = db.collection("Users").document(personalUsername);
+        final DocumentReference usersReference = db.collection("Users").document(username);
         usersReference.addSnapshotListener(new EventListener<DocumentSnapshot>() {
             @Override
             public void onEvent(@Nullable DocumentSnapshot snapshot,
@@ -115,13 +106,12 @@ public class LeaderboardController {
                 }
                 if (snapshot != null && snapshot.exists()) {
                     Log.d(TAG, "Current data: " + snapshot.getData());
-                    score = (Integer) snapshot.get("total_points");
+                    score.setText(snapshot.get("total_points")+ " points");
                 } else {
                     Log.d(TAG, "Current data: null");
                 }
             }
         });
-        return score;
     }
 
     /**
@@ -132,17 +122,14 @@ public class LeaderboardController {
      * @param users
      * @return (i + 1) index + 1 of user in list
      */
-    public Integer getUserRank(String username, ArrayList<User> users){
+    public void getUserRank(String username, ArrayList<User> users, TextView rank){
         // find user in ArrayList and return their index in list + 1 (rank)
         for (int i = 0; i < users.size(); i++){
             if (users.get(i).getUsername() == username){
-                return i + 1;
+                rank.setText((i + 1));
             } else {
-
+                rank.setText("ERR");
             }
         }
-        // if user cannot be found in ArrayList, return rank of -999
-        Integer errorUserNotFound = -999;
-        return errorUserNotFound ;
     }
 }

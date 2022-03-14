@@ -99,6 +99,7 @@ public class LeaderboardFragment extends Fragment {
 
         // gets signed in user's username from shared preferences
         String username = Preferences.loadPreferences(leaderboardView.getContext());
+        leaderboardController = new LeaderboardController(username);
 
         // save views as variables
         leaderboardList = leaderboardView.findViewById(R.id.leaderboard_list);
@@ -110,7 +111,7 @@ public class LeaderboardFragment extends Fragment {
         usersList = leaderboardController.createLeaderboardArray(context);
 
         // pass userList to CustomList for UI
-        usersAdapter = new CustomList(context, usersList);
+        usersAdapter = new CustomList(getContext(), usersList);
         leaderboardList.setAdapter(usersAdapter);
         usersAdapter.notifyDataSetChanged();
 
@@ -118,12 +119,10 @@ public class LeaderboardFragment extends Fragment {
         personalUsername.setText(username);
 
         // get current user's score
-        Integer score = leaderboardController.getPersonalScore(username);
-        personalScore.setText(score);
+        leaderboardController.getPersonalScore(personalScore);
 
         // get current user's rank
-        Integer rank = leaderboardController.getUserRank(username, usersList);
-        personalRank.setText(rank);
+        leaderboardController.getUserRank(username, usersList, personalRank);
 
         // Leaderboard leaderboard = new Leaderboard(username, score, usersList);
 
