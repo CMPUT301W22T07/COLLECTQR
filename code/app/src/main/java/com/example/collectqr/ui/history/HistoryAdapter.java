@@ -18,8 +18,8 @@ import java.util.ArrayList;
 // https://developer.android.com/guide/topics/ui/layout/recyclerview#implement-adapter
 
 /**
- * A custom adapter, specifically for storing and displaying items from
- * the users QR code history
+ * A custom adapter, specifically for storing and displaying the views in the RecyclerView
+ * which represent the user's QR code history
  */
 public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.ViewHolder> {
 
