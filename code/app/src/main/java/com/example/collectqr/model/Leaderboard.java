@@ -1,7 +1,7 @@
-package com.example.collectqr.ui.leaderboard;
+package com.example.collectqr.model;
 
 
-import com.example.collectqr.User;
+import com.example.collectqr.model.User;
 
 import java.util.ArrayList;
 

@@ -1,6 +1,4 @@
-package com.example.collectqr.ui.leaderboard;
-
-import static com.google.common.collect.Iterables.size;
+package com.example.collectqr.adapters;
 
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -13,8 +11,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.example.collectqr.R;
-import com.example.collectqr.User;
-import com.google.firebase.firestore.FirebaseFirestore;
+import com.example.collectqr.model.User;
 
 
 import java.util.ArrayList;
@@ -24,7 +21,7 @@ import java.util.Comparator;
 /**
  * Custom list for leaderboard UI
  */
-public class CustomList extends ArrayAdapter<User> {
+public class LeaderboardAdapter extends ArrayAdapter<User> {
     private ArrayList<User> users;
     private Context context;
 
@@ -33,7 +30,7 @@ public class CustomList extends ArrayAdapter<User> {
      * @param context
      * @param users
      */
-    public CustomList(Context context, ArrayList<User> users){
+    public LeaderboardAdapter(Context context, ArrayList<User> users){
         super(context, 0, users);
         this.users = users;
         this.context = context;

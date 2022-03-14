@@ -1,10 +1,7 @@
 
 package com.example.collectqr.utilities;
 
-import com.example.collectqr.QRCode;
-import com.google.common.hash.Hashing;
-
-import java.nio.charset.StandardCharsets;
+import com.example.collectqr.model.QRCode;
 
 
 /**

@@ -4,18 +4,17 @@ import static android.content.ContentValues.TAG;
 
 import static org.junit.Assert.fail;
 
-import android.content.Intent;
 import android.util.Log;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 
+import com.example.collectqr.data.UserController;
+import com.example.collectqr.model.User;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import org.junit.After;
-import org.junit.Before;
 import org.junit.Test;
 
 import java.util.concurrent.TimeUnit;

@@ -1,4 +1,4 @@
-package com.example.collectqr.ui.leaderboard;
+package com.example.collectqr.ui;
 
 import android.content.Context;
 import android.os.Bundle;
@@ -12,8 +12,10 @@ import android.widget.TextView;
 import androidx.fragment.app.Fragment;
 
 import com.example.collectqr.R;
-import com.example.collectqr.Preferences;
-import com.example.collectqr.User;
+import com.example.collectqr.adapters.LeaderboardAdapter;
+import com.example.collectqr.data.LeaderboardController;
+import com.example.collectqr.utilities.Preferences;
+import com.example.collectqr.model.User;
 
 import java.util.ArrayList;
 
@@ -112,7 +114,7 @@ public class LeaderboardFragment extends Fragment {
         System.out.println(usersList);
 
         // pass userList to CustomList for UI
-        usersAdapter = new CustomList(getContext(), usersList);
+        usersAdapter = new LeaderboardAdapter(getContext(), usersList);
         leaderboardList.setAdapter(usersAdapter);
         usersAdapter.notifyDataSetChanged();
 

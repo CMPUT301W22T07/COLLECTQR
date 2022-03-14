@@ -1,9 +1,10 @@
-package com.example.collectqr;
+package com.example.collectqr.data;
 
 import static android.content.ContentValues.TAG;
 
 import android.util.Log;
 
+import com.example.collectqr.model.User;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 

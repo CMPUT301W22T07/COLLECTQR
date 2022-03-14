@@ -7,6 +7,7 @@ import android.util.Log;
 
 import androidx.annotation.NonNull;
 
+import com.example.collectqr.model.QRCode;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -14,7 +15,6 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import org.junit.After;
 import org.junit.Test;
 
-import java.util.Date;
 import java.util.concurrent.TimeUnit;
 
 public class QRCodeControllerTest {

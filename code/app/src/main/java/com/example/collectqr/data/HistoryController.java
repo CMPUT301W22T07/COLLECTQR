@@ -1,4 +1,4 @@
-package com.example.collectqr.ui.history;
+package com.example.collectqr.data;
 
 import static android.content.ContentValues.TAG;
 
@@ -7,7 +7,8 @@ import android.widget.TextView;
 
 import androidx.annotation.Nullable;
 
-import com.example.collectqr.QRCode;
+import com.example.collectqr.adapters.HistoryAdapter;
+import com.example.collectqr.model.QRCode;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;

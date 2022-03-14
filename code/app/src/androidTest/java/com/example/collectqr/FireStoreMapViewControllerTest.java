@@ -2,6 +2,9 @@ package com.example.collectqr;
 
 import android.util.Log;
 
+import com.example.collectqr.data.UserController;
+import com.example.collectqr.model.QRCode;
+import com.example.collectqr.model.User;
 import com.example.collectqr.utilities.HashConversion;
 import com.firebase.geofire.GeoFireUtils;
 import com.firebase.geofire.GeoLocation;
@@ -16,7 +19,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-public class FireStoreQueryGeoHashTest {
+public class FireStoreMapViewControllerTest {
     FirebaseFirestore db;
     //    User test;
     UserController userController;

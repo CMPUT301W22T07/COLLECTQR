@@ -1,4 +1,4 @@
-package com.example.collectqr.ui.map;
+package com.example.collectqr.ui;
 
 import android.Manifest;
 import android.content.Context;
@@ -26,8 +26,9 @@ import androidx.lifecycle.ViewModelProvider;
 
 import com.example.collectqr.R;
 import com.example.collectqr.ScanQRCodeActivity;
-import com.example.collectqr.data.QueryGeoHash;
+import com.example.collectqr.data.MapViewController;
 import com.example.collectqr.databinding.FragmentMapViewBinding;
+import com.example.collectqr.viewmodels.MapViewViewModel;
 import com.firebase.geofire.GeoLocation;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
@@ -99,7 +100,7 @@ public class MapViewFragment extends Fragment implements LocationListener {
 
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(requireContext());
 
-        new QueryGeoHash(new GeoLocation(53.5260000, -113.5250000), 500.0).makeQuery();
+        new MapViewController(new GeoLocation(53.5260000, -113.5250000), 500.0).makeQuery();
 
         setupMap();
         restoreViewState();

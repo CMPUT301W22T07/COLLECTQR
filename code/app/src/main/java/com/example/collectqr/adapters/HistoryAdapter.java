@@ -1,4 +1,4 @@
-package com.example.collectqr.ui.history;
+package com.example.collectqr.adapters;
 
 
 import android.view.LayoutInflater;
@@ -8,7 +8,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
-import com.example.collectqr.QRCode;
+import com.example.collectqr.model.QRCode;
 import com.example.collectqr.R;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;

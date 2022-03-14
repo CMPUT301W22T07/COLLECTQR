@@ -1,4 +1,4 @@
-package com.example.collectqr.ui.history;
+package com.example.collectqr.ui;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -10,12 +10,11 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.collectqr.Preferences;
+import com.example.collectqr.data.HistoryController;
+import com.example.collectqr.utilities.Preferences;
 import com.example.collectqr.R;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
-
-import java.util.ArrayList;
 
 /**
  * A simple {@link Fragment} subclass. Displays the history screen.

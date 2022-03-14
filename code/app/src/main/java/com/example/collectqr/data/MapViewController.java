@@ -16,7 +16,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class QueryGeoHash {
+public class MapViewController {
     public final Double MAX_RADIUS = 5000.0;    // 50KM search radius max
     /* Based off Geo queries sample at:
        https://firebase.google.com/docs/firestore/solutions/geoqueries#java */
@@ -32,7 +32,7 @@ public class QueryGeoHash {
      * @param currentLocation The player's current location
      * @param searchRadiusInM The radius that the player wants to search
      */
-    public QueryGeoHash(GeoLocation currentLocation, Double searchRadiusInM) {
+    public MapViewController(GeoLocation currentLocation, Double searchRadiusInM) {
         this.currentLocation = currentLocation;
         this.searchRadiusInM = searchRadiusInM;
     }

@@ -7,17 +7,17 @@
 
     <fragment
         android:id="@+id/navigation_leaderboard"
-        android:name="com.example.collectqr.ui.leaderboard.LeaderboardFragment"
+        android:name="com.example.collectqr.ui.LeaderboardFragment"
         android:label="@string/title_leaderboard"
         tools:layout="@layout/fragment_leaderboard" />
     <fragment
         android:id="@+id/navigation_map"
-        android:name="com.example.collectqr.ui.map.MapViewFragment"
+        android:name="com.example.collectqr.ui.MapViewFragment"
         android:label="@string/title_map"
         tools:layout="@layout/fragment_map_view" />
     <fragment
         android:id="@+id/navigation_history"
-        android:name="com.example.collectqr.ui.history.HistoryFragment"
+        android:name="com.example.collectqr.ui.HistoryFragment"
         android:label="@string/title_history"
         tools:layout="@layout/fragment_history" />
 </navigation>
