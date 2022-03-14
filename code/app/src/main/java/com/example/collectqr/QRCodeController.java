@@ -10,6 +10,10 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * A Controller which handles communications between the app and firebase, with special
+ * focus on the QRCode class
+ */
 public class QRCodeController {
     /**
      * Takes a given QR code, and writes all its relevant contents to firestore.

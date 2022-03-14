@@ -8,7 +8,8 @@ import java.nio.charset.StandardCharsets;
 
 
 /**
- * Calculates the score of a given QR code
+ * This class includes methods that help with calculating the
+ * score of a QR code
  */
 public class QRCodeScore extends HashConversion {
 
