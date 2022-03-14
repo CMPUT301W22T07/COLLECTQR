@@ -11,7 +11,6 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.util.DisplayMetrics;
 import android.util.Log;
-import android.view.InputDevice;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -29,7 +28,6 @@ import com.example.collectqr.ScanQRCodeActivity;
 import com.example.collectqr.databinding.FragmentMapViewBinding;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.snackbar.Snackbar;
 
@@ -64,7 +62,7 @@ public class MapViewFragment extends Fragment implements LocationListener {
     private GeoPoint userPosition;
 
     // Logging Tag
-    private String TAG = "MapViewFragment";
+    private final String TAG = "MapViewFragment";
 
     public static MapViewFragment newInstance() {
         return new MapViewFragment();
