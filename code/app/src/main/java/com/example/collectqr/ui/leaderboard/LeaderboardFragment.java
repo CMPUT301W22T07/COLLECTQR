@@ -1,13 +1,20 @@
 package com.example.collectqr.ui.leaderboard;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
+import android.widget.ListView;
+import android.widget.TextView;
 
 import androidx.fragment.app.Fragment;
 
 import com.example.collectqr.R;
+
+import java.util.ArrayList;
+import java.util.prefs.Preferences;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -24,6 +31,16 @@ public class LeaderboardFragment extends Fragment {
     // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
+
+    private LeaderboardController leaderboardController;
+    private ListView leaderboardList;
+    private ArrayList<User> usersList;
+    private ArrayAdapter<User> usersAdapter;
+    private TextView personalUsername;
+    private TextView personalScore;
+    private TextView personalRank;
+    private Context context;
+
 
     public LeaderboardFragment() {
         // Required empty public constructor
@@ -59,7 +76,28 @@ public class LeaderboardFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_leaderboard, container, false);
+        View leaderboardView = inflater.inflate(R.layout.fragment_leaderboard, container, false);
+
+        String username = Preferences.loadPreferences(leaderboardView.getContext());
+
+        leaderboardList = leaderboardView.findViewById(R.id.leaderboard_list);
+        personalUsername = leaderboardView.findViewById(R.id.personal_username_text);
+        personalScore = leaderboardView.findViewById(R.id.personal_score_text);
+        personalRank = leaderboardView.findViewById(R.id.personal_rank_text);
+
+        usersList = leaderboardController.createLeaderboardArray(context);
+
+        usersAdapter = new CustomList(context, usersList);
+        leaderboardList.setAdapter(usersAdapter);
+        usersAdapter.notifyDataSetChanged();
+
+        Integer score = leaderboardController.getPersonalScore(username);
+        Leaderboard leaderboard = new Leaderboard(username, score, usersList);
+
+        
+
+        return leaderboardView;
     }
 }

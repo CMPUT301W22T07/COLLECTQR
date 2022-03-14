@@ -11,4 +11,57 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"/>
 
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_gravity="bottom"
+        android:weightSum="1"
+        android:background="@drawable/leaderboard_personal_background"
+        android:layout_margin="10dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_weight="0.7">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/personal_username_text"
+                android:layout_weight="0.5"
+                android:textSize="20sp"
+                android:padding="6dp"
+                android:text="Username"/>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/personal_score_text"
+                android:layout_weight="0.5"
+                android:textSize="15sp"
+                android:padding="6dp"
+                android:text="Score"
+                />
+
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/personal_rank_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.3"
+            android:padding="15dp"
+            android:maxWidth="200dp"
+            android:minWidth="200dp"
+            android:text="Rank"
+            android:textSize="30sp"
+            android:textStyle="bold"
+            android:textAlignment="viewEnd">
+        </TextView>
+
+
+    </LinearLayout>
+
 </FrameLayout>
