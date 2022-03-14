@@ -25,7 +25,6 @@ public class MainAppActivity extends AppCompatActivity {
            https://developer.android.com/reference/androidx/core/splashscreen/SplashScreen
          */
         SplashScreen.installSplashScreen(this);
-        Preferences.deletePreferences(this);
         noMonkeys();
         doesUserExist();
 
