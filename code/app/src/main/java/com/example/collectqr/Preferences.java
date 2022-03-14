@@ -10,6 +10,10 @@ import com.google.gson.reflect.TypeToken;
 
 import java.lang.reflect.Type;
 
+/**
+ * A class which handles saving and loading from shared preferences,
+ * meant to make both processes easier
+ */
 public class Preferences {
     /**
      * Saves a given username to the users shared preferences

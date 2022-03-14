@@ -17,6 +17,12 @@ import com.google.android.material.floatingactionbutton.ExtendedFloatingActionBu
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.firestore.FirebaseFirestore;
 
+/**
+ * This activity handles the creation of a new user when first logging into
+ * the app. All the user has to do is enter a valid username, then their profile
+ * is created and added to both the firestore database and their shared preferences,
+ * for future logins
+ */
 public class LoginActivity extends AppCompatActivity {
 
     FirebaseFirestore db;

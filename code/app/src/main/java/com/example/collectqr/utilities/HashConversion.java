@@ -8,7 +8,7 @@ import org.osmdroid.util.GeoPoint;
 import java.nio.charset.StandardCharsets;
 
 /**
- * An abstract class to contain methods for hashing
+ * An abstract class which contains methods for hashing
  */
 public abstract class HashConversion {
 
