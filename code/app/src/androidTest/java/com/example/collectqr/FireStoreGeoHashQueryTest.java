@@ -52,15 +52,16 @@ public class FireStoreGeoHashQueryTest {
             GeoLocation testLocation = new GeoLocation(mutateLat, mutateLng);
 
             // Create user documents on the db instance
+            //TODO: TO TEST WRITER: THE ADDCODE CONSTRUCTOR NEEDS TO BE UPDATED
             int userScanCount = faker.number().numberBetween(0, 4);
-            for (int j = 0; j < userScanCount; j++) {
+            /*for (int j = 0; j < userScanCount; j++) {
                 testUser.addCode(faker.code().asin(),
                         faker.number().numberBetween(0, 1000),
                         String.valueOf(mutateLat),
                         String.valueOf(mutateLng),
                         GeoFireUtils.getGeoHashForLocation(testLocation),
                         faker.date().toString());
-            }
+            }*/
             userController.writeToFirestore(testUser);
 
             // Create QR code documents
