@@ -12,7 +12,7 @@ public class User {
     private final String username;
     private final String email;
     private final String phone;
-    private final HashMap<String, Integer> stats;
+    private HashMap<String, Integer> stats;
     private final HashMap<String, HashMap<String, Object>> codes_scanned; //sha : date scanned
 
     public User(String username) {
@@ -97,5 +97,18 @@ public class User {
      */
     public HashMap<String, HashMap<String, Object>> getCodes_scanned() {
         return codes_scanned;
+    }
+
+    /**
+     * Updates the users score hashmap with the given values
+     *
+     * @param  num_codes the number of codes the user has scanned
+     * @param  total_points the total_points the user has
+     */
+    public void updateScore(int num_codes, int total_points) {
+        HashMap<String, Integer> stats = new HashMap<>();
+        stats.put("num_codes", num_codes);
+        stats.put("total_points", total_points);
+        this.stats = stats;
     }
 }

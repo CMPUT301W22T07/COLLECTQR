@@ -3,6 +3,10 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="..\:/Users/Blaise/Documents/School/Winter 2022/CMPUT 301/Project/COLLECTQR/code/app/src/main/res/drawable/leaderboard_personal_background.xml" value="0.2765" />
+        <entry key="..\:/Users/Blaise/Documents/School/Winter 2022/CMPUT 301/Project/COLLECTQR/code/app/src/main/res/layout/content.xml" value="0.36666666666666664" />
+        <entry key="..\:/Users/Blaise/Documents/School/Winter 2022/CMPUT 301/Project/COLLECTQR/code/app/src/main/res/layout/fragment_leaderboard.xml" value="0.358695652173913" />
+        <entry key="..\:/Users/Blaise/Documents/School/Winter 2022/CMPUT 301/Project/COLLECTQR/code/app/src/main/res/layout/leaderboard_content.xml" value="0.36666666666666664" />
         <entry key="..\:/Users/daryn/AndroidStudioProjects/COLLECTQR/code/app/src/main/res/layout/activity_main.xml" value="0.11302083333333333" />
         <entry key="..\:/Users/daryn/AndroidStudioProjects/COLLECTQR/code/app/src/main/res/layout/content.xml" value="0.22826086956521738" />
         <entry key="..\:/Users/daryn/AndroidStudioProjects/COLLECTQR/code/app/src/main/res/layout/history_item.xml" value="0.22826086956521738" />

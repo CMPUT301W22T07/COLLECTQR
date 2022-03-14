@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:clickable="true"
+    android:descendantFocusability="blocksDescendants"
+    android:weightSum="1">
+    <!--
+    // disable list component focusability
+    // URL: https://stackoverflow.com/questions/7645880/listview-with-onitemclicklistener
+    // Author: https://stackoverflow.com/users/628090/shaista-naaz
+    -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:layout_weight="0.7">
+
+        <TextView
+            android:id="@+id/username_text"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="0.5"
+            android:padding="6dp"
+            android:text="Username"
+            android:textSize="20sp">
+        </TextView>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:id="@+id/score_text"
+            android:padding="6dp"
+            android:text="Score"
+            android:textSize="15sp"
+            android:layout_weight="0.5">
+
+        </TextView>
+
+
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/rank_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_weight="0.3"
+        android:padding="15dp"
+        android:maxWidth="200dp"
+        android:minWidth="200dp"
+        android:text="Rank"
+        android:textSize="30sp"
+        android:textStyle="bold"
+        android:textAlignment="viewEnd">
+    </TextView>
+
+</LinearLayout>
