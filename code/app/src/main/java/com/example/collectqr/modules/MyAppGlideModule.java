@@ -1,4 +1,4 @@
-package com.example.collectqr.ui.modules;
+package com.example.collectqr.modules;
 
 import android.content.Context;
 
