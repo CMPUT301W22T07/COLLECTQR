@@ -109,6 +109,7 @@ public class LeaderboardFragment extends Fragment {
 
         // get ArrayList of users from Firestore
         usersList = leaderboardController.createLeaderboardArray(context);
+        System.out.println(usersList);
 
         // pass userList to CustomList for UI
         usersAdapter = new CustomList(getContext(), usersList);

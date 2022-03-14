@@ -68,7 +68,7 @@ public class LeaderboardController {
                     public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable
                             FirebaseFirestoreException error) {
                         // Clear the old list
-                        users.clear();
+                        // users.clear();
                         for (QueryDocumentSnapshot doc : queryDocumentSnapshots) {
                             Log.d(TAG, String.valueOf(doc.getData().get("username")));
                             String name = String.valueOf(doc.getData().get("username"));
