@@ -41,6 +41,10 @@ import org.osmdroid.views.overlay.TilesOverlay;
 import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider;
 import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay;
 
+/**
+ * A class for displaying the main map, specifically with configuring it, and
+ * setting it to be centered around the users location
+ */
 public class MapViewFragment extends Fragment implements LocationListener {
 
     final private int LOCATION_REQUEST_CODE = 1;

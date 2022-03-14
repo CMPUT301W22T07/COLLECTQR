@@ -19,6 +19,9 @@ import com.google.zxing.WriterException;
 import com.google.zxing.common.BitMatrix;
 import com.journeyapps.barcodescanner.BarcodeEncoder;
 
+/**
+ * A class which generates QR codes for the app
+ */
 public class GenerateQRCodeActivity extends AppCompatActivity {
 
     private TextView qrCodeTextView;

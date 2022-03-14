@@ -10,7 +10,16 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * A Controller which handles communications between the app and firebase, with special
+ * focus on the user class
+ */
 public class UserController {
+    /**
+     * Takes a given user, and writes all its relevant contents to firestore.
+     *
+     * @param user the user to be stored to firestore
+     */
     public void writeToFirestore(User user) {
         FirebaseFirestore db;
         db = FirebaseFirestore.getInstance();

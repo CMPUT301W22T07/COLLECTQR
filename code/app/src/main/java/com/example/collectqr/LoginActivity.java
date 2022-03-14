@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
@@ -14,8 +15,17 @@ import androidx.activity.OnBackPressedCallback;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.IntentCompat;
 
+import com.github.javafaker.Faker;
+import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.firestore.FirebaseFirestore;
 
+/**
+ * This activity handles the creation of a new user when first logging into
+ * the app. All the user has to do is enter a valid username, then their profile
+ * is created and added to both the firestore database and their shared preferences,
+ * for future logins
+ */
 public class LoginActivity extends AppCompatActivity {
 
     FirebaseFirestore db;
@@ -26,7 +36,8 @@ public class LoginActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
-        Button loginButton = findViewById(R.id.loginButton);
+        ExtendedFloatingActionButton loginButton = findViewById(R.id.loginButton);
+        ExtendedFloatingActionButton shuffleButton = findViewById(R.id.shuffleButton);
         EditText usernameEditText = findViewById(R.id.usernameEditText);
         db = FirebaseFirestore.getInstance();
 
@@ -84,14 +95,10 @@ public class LoginActivity extends AppCompatActivity {
             }
         });
 
-        // https://developer.android.com/guide/navigation/navigation-custom-back#java
-        // OnBackPressedCallback callback = new OnBackPressedCallback(true) {
-        //     @Override
-        //     public void handleOnBackPressed() {
-        //         // @see com.example.collectqr.MainAppActivity
-        //         finishAndRemoveTask();
-        //     }
-        // };
-        // this.getOnBackPressedDispatcher().addCallback(this, callback);
+        shuffleButton.setOnClickListener(view -> {
+            Faker faker = new Faker();
+            String randomName = faker.superhero().prefix()+faker.name().firstName();
+            usernameEditText.setText(randomName);
+        });
     }
 }

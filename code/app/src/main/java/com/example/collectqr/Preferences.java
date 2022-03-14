@@ -10,7 +10,17 @@ import com.google.gson.reflect.TypeToken;
 
 import java.lang.reflect.Type;
 
+/**
+ * A class which handles saving and loading from shared preferences,
+ * meant to make both processes easier
+ */
 public class Preferences {
+    /**
+     * Saves a given username to the users shared preferences
+     *
+     * @param  context
+     * @param  username the username to be saved
+     */
     public static void savePreferences(Context context, String username) {
         SharedPreferences sharedPreferences = context.getSharedPreferences("sharedPreferences", MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
@@ -20,6 +30,12 @@ public class Preferences {
         editor.apply();
     }
 
+    /**
+     * Loads a username stores in the users shared preferences
+     *
+     * @param  context
+     * @return the username stored in shared preferences
+     */
     public static String loadPreferences(Context context) {
         SharedPreferences sharedPreferences = context.getSharedPreferences("sharedPreferences", MODE_PRIVATE);
         Gson gson = new Gson();
@@ -29,6 +45,11 @@ public class Preferences {
         return username;
     }
 
+    /**
+     * Deletes all of the users shared preferences
+     *
+     * @param  context
+     */
     public static void deletePreferences(Context context) {
         SharedPreferences sharedPreferences = context.getSharedPreferences("sharedPreferences", MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();

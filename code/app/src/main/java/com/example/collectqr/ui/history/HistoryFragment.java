@@ -4,15 +4,16 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.collectqr.Preferences;
 import com.example.collectqr.R;
-import com.google.firebase.firestore.CollectionReference;
-import com.google.firebase.firestore.DocumentReference;
-import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.android.material.bottomsheet.BottomSheetDialog;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.util.ArrayList;
 
@@ -32,9 +33,11 @@ public class HistoryFragment extends Fragment {
     private String mParam1;
     private String mParam2;
 
+    private View rootView;
+    private HistoryController controller;
     private RecyclerView recyclerView;
-    private RecyclerView.Adapter adapter;
     private RecyclerView.LayoutManager layoutManager;
+    private BottomSheetDialog sortSheet;
 
     public HistoryFragment() {
         // Required empty public constructor
@@ -65,32 +68,80 @@ public class HistoryFragment extends Fragment {
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
-
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
-        // TODO: get user stats from firestore
         /*
         https://stackoverflow.com/a/31096444
         StackOverflow, Author: The Dude
          */
+        rootView = inflater.inflate(R.layout.fragment_history, container, false);
+        String username = Preferences.loadPreferences(rootView.getContext());
+        controller = new HistoryController(username);
+
+        TextView totalPoints = rootView.findViewById(R.id.history_total_points);
+        TextView numCodes = rootView.findViewById(R.id.history_num_codes);
+        controller.setStatsBarData(totalPoints, numCodes);
+
         /*
         https://youtu.be/17NbUcEts9c
         YouTube, Author: Coding in Flow
          */
-        View rootView = inflater.inflate(R.layout.fragment_history, container, false);
         recyclerView = rootView.findViewById(R.id.history_qr_recycler_view);
         recyclerView.setHasFixedSize(true);
         layoutManager = new GridLayoutManager(getContext(), 2);
-        adapter = new HistoryAdapter();
         recyclerView.setLayoutManager(layoutManager);
-        recyclerView.setAdapter(adapter);
+        recyclerView.setAdapter(controller.getAdapter());
 
-        // Inflate the layout for this fragment
+        createSortSheetDialog();
+        FloatingActionButton fab = rootView.findViewById(R.id.sort_history_fab);
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                sortSheet.show();
+            }
+        });
+
         return rootView;
+    }
 
+    private void createSortSheetDialog() {
+        /*
+        YouTube video
+        Author: Code Vendanam
+        https://youtu.be/sODN0SMiUhk
+
+        Author: Joseph Chege
+        https://www.section.io/engineering-education/bottom-sheet-dialogs-using-android-studio/
+         */
+        sortSheet = new BottomSheetDialog(rootView.getContext());
+        sortSheet.setContentView(R.layout.history_sort_fragment);
+        TextView byPointsDescend = sortSheet.findViewById(R.id.history_sort_points_descend);
+        TextView byPointsAscend = sortSheet.findViewById(R.id.history_sort_points_ascend);
+        TextView byDateDescend = sortSheet.findViewById(R.id.history_sort_date_descend);
+        byPointsAscend.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                controller.sortQrData("points_ascend");
+                sortSheet.dismiss();
+            }
+        });
+        byPointsDescend.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                controller.sortQrData("points_descend");
+                sortSheet.dismiss();
+            }
+        });
+        byDateDescend.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                controller.sortQrData("date_descend");
+                sortSheet.dismiss();
+            }
+        });
     }
 }

@@ -16,6 +16,10 @@ import com.example.collectqr.databinding.ActivityAppBinding;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.firebase.firestore.FirebaseFirestore;
 
+/**
+ * The main page of the app, through the use of various fragments,
+ * it displays pieces of the UI, such as the map, and bottom bar
+ */
 public class MainAppActivity extends AppCompatActivity {
     private FirebaseFirestore db;
     private ActivityAppBinding binding;
