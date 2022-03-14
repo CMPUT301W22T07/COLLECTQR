@@ -101,47 +101,47 @@ public class MapViewFragment extends Fragment implements LocationListener {
         //  mMapView = binding.mapView;
         //  mMapView.setTileSource(TileSourceFactory.MAPNIK);
 
+        // Setup map
+        mMapView = binding.mapView;
+        mMapView.setDestroyMode(false);
+        mMapView.setTag("mapView");
+        mMapView.setTileSource(TileSourceFactory.MAPNIK);
+        mMapView.getZoomController().setVisibility(CustomZoomButtonsController.Visibility.NEVER);
+        mMapView.getOverlayManager().getTilesOverlay().setVerticalWrapEnabled(false);
+        mMapView.setMultiTouchControls(true);
+
+        // Set map default start point
+        mapController = mMapView.getController();
+        // mapController.setZoom(9.5);
+        // GeoPoint startPoint = new GeoPoint(48.8583, 2.2944);
+        // mapController.setCenter(startPoint);
+
+        /*
+         * Location button functions and more based off osmdroid example, Apache-2.0 License
+         * https://github.com/osmdroid/osmdroid
+         */
+
+        // Enable Location Overlay
+        this.mLocationOverlay = new MyLocationNewOverlay(new GpsMyLocationProvider(requireContext()), mMapView);
+        this.mLocationOverlay.enableMyLocation();
+        this.mLocationOverlay.enableFollowLocation();
+        mapController.setZoom(17.0);
+        mMapView.setTilesScaledToDpi(true);
+        mMapView.getOverlays().add(this.mLocationOverlay);
+
+        // Adding scale bar
+        final DisplayMetrics dm = requireContext().getResources().getDisplayMetrics();
+        mScaleBarOverlay = new ScaleBarOverlay(mMapView);
+        mScaleBarOverlay.setCentred(true);
+        mScaleBarOverlay.setScaleBarOffset(dm.widthPixels / 2, 10);
+        mMapView.getOverlays().add(this.mScaleBarOverlay);
+
         if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION)
                 == PackageManager.PERMISSION_GRANTED
                 && ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_COARSE_LOCATION)
                 == PackageManager.PERMISSION_GRANTED
                 && ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.WRITE_EXTERNAL_STORAGE)
                 == PackageManager.PERMISSION_GRANTED) {
-
-            // Setup map
-            mMapView = binding.mapView;
-            mMapView.setDestroyMode(false);
-            mMapView.setTag("mapView");
-            mMapView.setTileSource(TileSourceFactory.MAPNIK);
-            mMapView.getZoomController().setVisibility(CustomZoomButtonsController.Visibility.NEVER);
-            mMapView.getOverlayManager().getTilesOverlay().setVerticalWrapEnabled(false);
-            mMapView.setMultiTouchControls(true);
-
-            // Set map default start point
-            mapController = mMapView.getController();
-            // mapController.setZoom(9.5);
-            // GeoPoint startPoint = new GeoPoint(48.8583, 2.2944);
-            // mapController.setCenter(startPoint);
-
-            /*
-             * Location button functions and more based off osmdroid example, Apache-2.0 License
-             * https://github.com/osmdroid/osmdroid
-             */
-
-            // Enable Location Overlay
-            this.mLocationOverlay = new MyLocationNewOverlay(new GpsMyLocationProvider(requireContext()), mMapView);
-            this.mLocationOverlay.enableMyLocation();
-            this.mLocationOverlay.enableFollowLocation();
-            mapController.setZoom(17.0);
-            mMapView.setTilesScaledToDpi(true);
-            mMapView.getOverlays().add(this.mLocationOverlay);
-
-            // Adding scale bar
-            final DisplayMetrics dm = requireContext().getResources().getDisplayMetrics();
-            mScaleBarOverlay = new ScaleBarOverlay(mMapView);
-            mScaleBarOverlay.setCentred(true);
-            mScaleBarOverlay.setScaleBarOffset(dm.widthPixels / 2, 10);
-            mMapView.getOverlays().add(this.mScaleBarOverlay);
         } else {
             requestPermissions(
                     new String[]{Manifest.permission.ACCESS_FINE_LOCATION,
