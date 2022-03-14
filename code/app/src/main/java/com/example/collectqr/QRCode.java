@@ -4,6 +4,7 @@ import com.firebase.geofire.GeoFireUtils;
 import com.firebase.geofire.GeoLocation;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 
 /**
@@ -19,6 +20,7 @@ public class QRCode {
     private final Double longitude;
     private final GeoLocation location;
     private final String qr_image;
+    private final Date date;
     private final HashMap<String, String> scanned_by;
     private final HashMap<String, String> comments;
     private final ArrayList<String> all_images;
@@ -33,7 +35,28 @@ public class QRCode {
         this.scanned_by = new HashMap<>();
         this.comments = new HashMap<>();
         this.all_images = new ArrayList<>();
+        this.date = null;
     }
+
+    public QRCode(String sha256, Integer points, Date date, String qr_image) {
+        this.sha256 = sha256;
+        this.points = points;
+        this.date = date;
+        this.qr_image = qr_image;
+        this.latitude = null;
+        this.longitude = null;
+        this.location = null;
+        this.scanned_by = null;
+        this.comments = null;
+        this.all_images = null;
+    }
+
+    /**
+     * Returns the date when the user scanned the QR code
+     *
+     * @return the date when the user scanned the QR code
+     */
+    public Date getDate() { return date; }
 
     /**
      * Returns the number of points a QR code is worth, based on its sha256 hash

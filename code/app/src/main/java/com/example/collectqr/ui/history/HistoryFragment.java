@@ -10,6 +10,7 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.collectqr.Preferences;
 import com.example.collectqr.R;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -33,14 +34,9 @@ public class HistoryFragment extends Fragment {
     private String mParam2;
 
     private View rootView;
-
-    private String username = "realishUser"; // TODO: make username be retrieved from a parameter
-
     private HistoryController controller;
     private RecyclerView recyclerView;
     private RecyclerView.LayoutManager layoutManager;
-    private HistoryAdapter adapter;
-    private ArrayList<HistoryItem> data;
     private BottomSheetDialog sortSheet;
 
     public HistoryFragment() {
@@ -83,6 +79,7 @@ public class HistoryFragment extends Fragment {
         StackOverflow, Author: The Dude
          */
         rootView = inflater.inflate(R.layout.fragment_history, container, false);
+        String username = Preferences.loadPreferences(rootView.getContext());
         controller = new HistoryController(username);
 
         TextView totalPoints = rootView.findViewById(R.id.history_total_points);

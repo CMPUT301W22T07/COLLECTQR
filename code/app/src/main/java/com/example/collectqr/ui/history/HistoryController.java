@@ -7,6 +7,7 @@ import android.widget.TextView;
 
 import androidx.annotation.Nullable;
 
+import com.example.collectqr.QRCode;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
@@ -18,11 +19,12 @@ import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.Date;
 
 public class HistoryController {
     private String username;
     private FirebaseFirestore db;
-    private ArrayList<HistoryItem> qrData;
+    private ArrayList<QRCode> qrData;
     private String currentSort = "date_descend";
     private HistoryAdapter adapter;
 
@@ -73,7 +75,11 @@ public class HistoryController {
                         qrData.clear();
                         for (QueryDocumentSnapshot doc : queryDocumentSnapshots) {
                             Log.d(TAG, String.valueOf(doc.getData().get("hash")));
-                            qrData.add(new HistoryItem(doc)); // Adding the cities and provinces from FireStore
+                            String imageName = doc.getString("image");
+                            Integer points = Integer.parseInt(doc.get("points").toString());
+                            String sha = doc.getString("hash");
+                            Date date = doc.getDate("date");
+                            qrData.add(new QRCode(sha, points, date, imageName)); // Adding the cities and provinces from FireStore
                         }
                         controller.sortQrData(currentSort);
                         adapter.notifyDataSetChanged();
@@ -90,24 +96,24 @@ public class HistoryController {
         YouTube video, Author: RAJASEKHAR REDDY
          */
         if (sortBy.equals("points_ascend")) {
-            qrData.sort(new Comparator<HistoryItem>() {
+            qrData.sort(new Comparator<QRCode>() {
                 @Override
-                public int compare(HistoryItem historyItem, HistoryItem t1) {
-                    return historyItem.getPoints() - t1.getPoints();
+                public int compare(QRCode qrcode1, QRCode qrcode2) {
+                    return qrcode1.getPoints() - qrcode2.getPoints();
                 }
             });
         } else if (sortBy.equals("points_descend")) {
-            qrData.sort(new Comparator<HistoryItem>() {
+            qrData.sort(new Comparator<QRCode>() {
                 @Override
-                public int compare(HistoryItem historyItem, HistoryItem t1) {
-                    return t1.getPoints() - historyItem.getPoints();
+                public int compare(QRCode qrcode1, QRCode qrcode2) {
+                    return qrcode2.getPoints() - qrcode1.getPoints();
                 }
             });
         } else if (sortBy.equals("date_descend")) {
-            qrData.sort(new Comparator<HistoryItem>() {
+            qrData.sort(new Comparator<QRCode>() {
                 @Override
-                public int compare(HistoryItem historyItem, HistoryItem t1) {
-                    return t1.getDate().compareTo(historyItem.getDate());
+                public int compare(QRCode qrcode1, QRCode qrcode2) {
+                    return qrcode2.getDate().compareTo(qrcode1.getDate());
                 }
             });
         }

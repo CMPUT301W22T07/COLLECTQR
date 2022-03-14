@@ -2,6 +2,7 @@ package com.example.collectqr.ui.history;
 
 import static android.content.ContentValues.TAG;
 
+import android.content.Context;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -13,15 +14,23 @@ import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.Registry;
+import com.bumptech.glide.annotation.GlideModule;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.bumptech.glide.module.AppGlideModule;
 import com.bumptech.glide.request.RequestOptions;
+import com.example.collectqr.QRCode;
 import com.example.collectqr.R;
+import com.firebase.ui.storage.images.FirebaseImageLoader;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Comparator;
 
@@ -30,7 +39,7 @@ import java.util.Comparator;
 
 public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.ViewHolder> {
 
-    private ArrayList<HistoryItem> qrHistoryData;
+    private ArrayList<QRCode> qrHistoryData;
     private ViewGroup viewGroup;
 
     /**
@@ -67,8 +76,9 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.ViewHold
     /**
      * Initialize the dataset of the Adapter.
      */
-    public HistoryAdapter(ArrayList<HistoryItem> qrHistoryData) {
+    public HistoryAdapter(ArrayList<QRCode> qrHistoryData) {
         this.qrHistoryData = qrHistoryData;
+
     }
 
     // Create new views (invoked by the layout manager)
@@ -86,7 +96,7 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.ViewHold
     public void onBindViewHolder(ViewHolder viewHolder, final int position) {
         // Get element from your dataset at this position and replace the
         // contents of the view with that element
-        HistoryItem currentItem = qrHistoryData.get(position);
+        QRCode currentItem = qrHistoryData.get(position);
         viewHolder.getPointsView().setText(currentItem.getPoints() + " points");
         String scannedOn = currentItem.getDate().toString();
         viewHolder.getDateView().setText(String.format("%s %s %s",
@@ -94,8 +104,10 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.ViewHold
                 scannedOn.substring(4, 10),
                 scannedOn.substring(23)));
         // https://firebase.google.com/docs/storage/android/download-files#downloading_images_with_firebaseui
+        FirebaseStorage storage = FirebaseStorage.getInstance("gs://collectqr7.appspot.com");
+        StorageReference storageReference = storage.getReferenceFromUrl("gs://collectqr7.appspot.com/"+currentItem.getQr_image());
         Glide.with(viewGroup.getContext())
-                .load("https://firebasestorage.googleapis.com/v0/b/collectqr7.appspot.com/o/test.jpg?alt=media&token=ed2687e8-daaf-4bdd-b04c-c36b10141a1f")
+                .load(storageReference)
                 .into(viewHolder.getImageView());
     }
 
