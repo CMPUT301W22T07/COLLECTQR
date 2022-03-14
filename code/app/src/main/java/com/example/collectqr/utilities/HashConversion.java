@@ -8,9 +8,9 @@ import org.osmdroid.util.GeoPoint;
 import java.nio.charset.StandardCharsets;
 
 /**
- * An abstract class which contains methods for hashing
+ * A class that contains methods for hashing and hashing-related tasks
  */
-public abstract class HashConversion {
+public class HashConversion {
 
     /**
      * Returns the SHA-256 hash of a given object
