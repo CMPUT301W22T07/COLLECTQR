@@ -1,17 +1,29 @@
 package com.example.collectqr.ui.history;
 
+import static android.content.ContentValues.TAG;
+
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+
+import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.request.RequestOptions;
 import com.example.collectqr.R;
+import com.google.firebase.firestore.EventListener;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.FirebaseFirestoreException;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
+
 import java.util.ArrayList;
+import java.util.Comparator;
 
 
 // https://developer.android.com/guide/topics/ui/layout/recyclerview#implement-adapter
@@ -19,7 +31,6 @@ import java.util.ArrayList;
 public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.ViewHolder> {
 
     private ArrayList<HistoryItem> qrHistoryData;
-    final private String username;
     private ViewGroup viewGroup;
 
     /**
@@ -40,21 +51,24 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.ViewHold
             dateView = view.findViewById(R.id.history_card_date);
         }
 
-        public TextView getPointsView() {return pointsView;}
-        public TextView getDateView() {return dateView;}
-        public ImageView getImageView() {return  imageView;}
+        public TextView getPointsView() {
+            return pointsView;
+        }
+
+        public TextView getDateView() {
+            return dateView;
+        }
+
+        public ImageView getImageView() {
+            return imageView;
+        }
     }
 
     /**
      * Initialize the dataset of the Adapter.
-     *
-     * @param username String the username of the user whose history will be retrieved
-     * @param qrHistoryList ArrayList<HistoryItem> containing the data to populate views to be used
-     * by RecyclerView.
      */
-    public HistoryAdapter(String username, ArrayList<HistoryItem> qrHistoryList) {
-        qrHistoryData = qrHistoryList;
-        this.username = username;
+    public HistoryAdapter(ArrayList<HistoryItem> qrHistoryData) {
+        this.qrHistoryData = qrHistoryData;
     }
 
     // Create new views (invoked by the layout manager)
@@ -73,11 +87,11 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.ViewHold
         // Get element from your dataset at this position and replace the
         // contents of the view with that element
         HistoryItem currentItem = qrHistoryData.get(position);
-        viewHolder.getPointsView().setText(currentItem.getPoints()+" points");
+        viewHolder.getPointsView().setText(currentItem.getPoints() + " points");
         String scannedOn = currentItem.getDate().toString();
         viewHolder.getDateView().setText(String.format("%s %s %s",
-                scannedOn.substring(11,16),
-                scannedOn.substring(4,10),
+                scannedOn.substring(11, 16),
+                scannedOn.substring(4, 10),
                 scannedOn.substring(23)));
         // https://firebase.google.com/docs/storage/android/download-files#downloading_images_with_firebaseui
         Glide.with(viewGroup.getContext())
