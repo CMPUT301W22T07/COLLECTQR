@@ -8,6 +8,7 @@ import android.widget.TextView;
 
 import androidx.annotation.Nullable;
 
+import com.example.collectqr.adapters.LeaderboardAdapter;
 import com.example.collectqr.model.Leaderboard;
 import com.example.collectqr.model.User;
 import com.google.firebase.firestore.DocumentReference;
@@ -45,84 +46,50 @@ public class LeaderboardController {
     }
 
     /**
-     * Takes app context and creates an ArrayList of User objects
-     * to be used by the leaderboard for getting info and stats.
-     * Saves all "Users" documents as User objects
+     * Takes an empty ArrayList and the adapter of the ListView
+     * Downloads the data into the ArrayList sorts it and notifies the adapter
+     * Updates the views that represent the current users rank and points based on the updates in the data
      *
-     * @param context
-     * @return ArrayList<User> users
+     * @param users
+     * @param adapter
+     * @param personalScore
+     * @param personalRank
      */
-    public ArrayList<User> createLeaderboardArray(Context context) {
-        ArrayList<User> users = new ArrayList<User>();
-        LeaderboardController controller = this;
+    public void downloadData(ArrayList<User> users, LeaderboardAdapter adapter, TextView personalScore, TextView personalRank) {
         db.collection("Users")
                 .addSnapshotListener(new EventListener<QuerySnapshot>() {
                     @Override
                     public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable
                             FirebaseFirestoreException error) {
-                        // Clear the old list
-                        // users.clear();
                         for (QueryDocumentSnapshot doc : queryDocumentSnapshots) {
                             Log.d(TAG, String.valueOf(doc.getData().get("username")));
                             String name = String.valueOf(doc.getData().get("username"));
                             Integer totalPoints = Integer.parseInt(String.valueOf(doc.get("total_points")));
                             Integer numCodes = Integer.parseInt(String.valueOf(doc.get("num_codes")));
+                            for (int i=0; i< users.size(); i++) {
+                                if (users.get(i).getUsername().equals(name)) {
+                                    users.remove(i);
+                                }
+                            }
                             User userObj = new User(name);
                             userObj.updateScore(numCodes, totalPoints);
                             users.add(userObj);
+
+                        }
+                        users.sort(new Comparator<User>() {
+                            @Override
+                            public int compare(User user, User t1) {
+                                return t1.getStats().get("total_points")-user.getStats().get("total_points");
+                            }
+                        });
+                        adapter.notifyDataSetChanged();
+                        for (int i=0;i<users.size();i++) {
+                            if (users.get(i).getUsername().equals(username)) {
+                                personalScore.setText(users.get(i).getStats().get("total_points").toString());
+                                personalRank.setText(Integer.toString(i+1));
+                            }
                         }
                     }
                 });
-
-        // sort array list based on total points
-        Collections.sort(users, Comparator.comparing(user -> user.getStats().get("total_points")));
-        // reverse to decreasing order (most points first)
-        Collections.reverse(users);
-        return users;
-    }
-
-    /**
-     * Using a username passed into the method, finds user in Firestore
-     * and gets their score
-     * @return score
-     */
-    public void getPersonalScore(TextView score) {
-        // https://firebase.google.com/docs/firestore/query-data/listen
-        final DocumentReference usersReference = db.collection("Users").document(username);
-        usersReference.addSnapshotListener(new EventListener<DocumentSnapshot>() {
-            @Override
-            public void onEvent(@Nullable DocumentSnapshot snapshot,
-                                @Nullable FirebaseFirestoreException e) {
-                if (e != null) {
-                    Log.w(TAG, "Listen failed.", e);
-                    return;
-                }
-                if (snapshot != null && snapshot.exists()) {
-                    Log.d(TAG, "Current data: " + snapshot.getData());
-                    score.setText(snapshot.get("total_points")+ " points");
-                } else {
-                    Log.d(TAG, "Current data: null");
-                }
-            }
-        });
-    }
-
-    /**
-     * Using a username passed into the method, finds User object in
-     * ArrayList also passed to the method, and returns their rank/index
-     * in the sorted list
-     * @param username
-     * @param users
-     * @return (i + 1) index + 1 of user in list
-     */
-    public void getUserRank(String username, ArrayList<User> users, TextView rank){
-        // find user in ArrayList and return their index in list + 1 (rank)
-        for (int i = 0; i < users.size(); i++){
-            if (users.get(i).getUsername() == username){
-                rank.setText((i + 1));
-            } else {
-                rank.setText("ERR");
-            }
-        }
     }
 }

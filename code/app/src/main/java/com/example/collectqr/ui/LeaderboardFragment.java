@@ -1,11 +1,9 @@
 package com.example.collectqr.ui;
 
-import android.content.Context;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -38,11 +36,10 @@ public class LeaderboardFragment extends Fragment {
     private LeaderboardController leaderboardController;
     private ListView leaderboardList;
     private ArrayList<User> usersList;
-    private ArrayAdapter<User> usersAdapter;
+    private LeaderboardAdapter usersAdapter;
     private TextView personalUsername;
     private TextView personalScore;
     private TextView personalRank;
-    private Context context;
 
 
     public LeaderboardFragment() {
@@ -109,25 +106,11 @@ public class LeaderboardFragment extends Fragment {
         personalScore = leaderboardView.findViewById(R.id.personal_score_text);
         personalRank = leaderboardView.findViewById(R.id.personal_rank_text);
 
-        // get ArrayList of users from Firestore
-        usersList = leaderboardController.createLeaderboardArray(context);
-        System.out.println(usersList);
-
-        // pass userList to CustomList for UI
-        usersAdapter = new LeaderboardAdapter(getContext(), usersList);
+        usersList = new ArrayList<>();
+        usersAdapter = new LeaderboardAdapter(container.getContext(), usersList);
         leaderboardList.setAdapter(usersAdapter);
-        usersAdapter.notifyDataSetChanged();
-
-        // set current user's username in UI
+        leaderboardController.downloadData(usersList, usersAdapter, personalScore, personalRank);
         personalUsername.setText(username);
-
-        // get current user's score
-        leaderboardController.getPersonalScore(personalScore);
-
-        // get current user's rank
-        leaderboardController.getUserRank(username, usersList, personalRank);
-
-        // Leaderboard leaderboard = new Leaderboard(username, score, usersList);
 
         return leaderboardView;
     }

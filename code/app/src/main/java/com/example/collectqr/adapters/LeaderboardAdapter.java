@@ -15,8 +15,6 @@ import com.example.collectqr.model.User;
 
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 
 /**
  * Custom list for leaderboard UI
@@ -53,11 +51,6 @@ public class LeaderboardAdapter extends ArrayAdapter<User> {
             view = LayoutInflater.from(context).inflate(R.layout.content, parent, false);
         }
 
-        // sort array list based on total points
-        Collections.sort(users, Comparator.comparing(user -> user.getStats().get("total_points")));
-        // reverse to decreasing order (most points first)
-        Collections.reverse(users);
-
         User user = users.get(position);
 
         // set TextView for each list element
@@ -66,9 +59,9 @@ public class LeaderboardAdapter extends ArrayAdapter<User> {
         TextView userRank = view.findViewById(R.id.rank_text);
 
         userName.setText(user.getUsername());
-        userScore.setText(user.getStats().get("total_points") + "points");
+        userScore.setText(user.getStats().get("total_points") + " points");
         // index of user in sorted list plus 1 = rank
-        userRank.setText("#" + users.indexOf(user)+1);
+        userRank.setText("#" + Integer.toString(users.indexOf(user)+1));
 
         return view;
     }
