@@ -10,6 +10,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import androidx.fragment.app.Fragment;
+import androidx.test.core.app.ApplicationProvider;
 
 import com.example.collectqr.R;
 import com.example.collectqr.Preferences;

@@ -125,7 +125,7 @@ public class LeaderboardController {
     public void getUserRank(String username, ArrayList<User> users, TextView rank){
         // find user in ArrayList and return their index in list + 1 (rank)
         for (int i = 0; i < users.size(); i++){
-            if (users.get(i).getUsername() == username){
+            if (users.get(i).getUsername().equals(username)){
                 rank.setText((i + 1));
             } else {
                 rank.setText("ERR");
