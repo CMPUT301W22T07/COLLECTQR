@@ -23,6 +23,7 @@ public class User {
         HashMap<String, Integer> stats = new HashMap<>();
         stats.put("num_codes", 0);
         stats.put("total_points", 0);
+        stats.put("best_code", 0);
         this.stats = stats;
 
         this.codes_scanned = new HashMap<>();
@@ -105,8 +106,9 @@ public class User {
      * @param  num_codes the number of codes the user has scanned
      * @param  total_points the total_points the user has
      */
-    public void updateScore(int num_codes, int total_points) {
+    public void updateScore(int num_codes, int total_points, int best_code) {
         stats.replace("num_codes", num_codes);
         stats.replace("total_points", total_points);
+        stats.replace("best_code", best_code);
     }
 }
