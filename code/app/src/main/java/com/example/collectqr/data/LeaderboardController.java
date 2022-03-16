@@ -66,13 +66,14 @@ public class LeaderboardController {
                             String name = String.valueOf(doc.getData().get("username"));
                             Integer totalPoints = Integer.parseInt(String.valueOf(doc.get("total_points")));
                             Integer numCodes = Integer.parseInt(String.valueOf(doc.get("num_codes")));
+                            Integer bestCode = Integer.parseInt(String.valueOf(doc.get("best_code")));
                             for (int i=0; i< users.size(); i++) {
                                 if (users.get(i).getUsername().equals(name)) {
                                     users.remove(i);
                                 }
                             }
                             User userObj = new User(name);
-                            userObj.updateScore(numCodes, totalPoints);
+                            userObj.updateScore(numCodes, totalPoints, bestCode);
                             users.add(userObj);
 
                         }
