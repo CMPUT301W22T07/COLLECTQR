@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context=".ui.leaderboard.LeaderboardFragment">
+    tools:context=".ui.LeaderboardFragment">
 
     <ListView
         android:id="@+id/leaderboard_list"

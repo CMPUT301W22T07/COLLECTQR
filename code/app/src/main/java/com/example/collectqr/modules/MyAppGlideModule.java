@@ -1,4 +1,4 @@
-package com.example.collectqr.ui.history;
+package com.example.collectqr.modules;
 
 import android.content.Context;
 

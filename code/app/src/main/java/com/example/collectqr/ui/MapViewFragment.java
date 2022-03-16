@@ -1,8 +1,9 @@
-package com.example.collectqr.ui.map;
+package com.example.collectqr.ui;
 
 import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.location.Location;
@@ -11,7 +12,6 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.util.DisplayMetrics;
 import android.util.Log;
-import android.view.InputDevice;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -26,10 +26,12 @@ import androidx.lifecycle.ViewModelProvider;
 
 import com.example.collectqr.R;
 import com.example.collectqr.ScanQRCodeActivity;
+import com.example.collectqr.data.MapViewController;
 import com.example.collectqr.databinding.FragmentMapViewBinding;
+import com.example.collectqr.viewmodels.MapViewViewModel;
+import com.firebase.geofire.GeoLocation;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.snackbar.Snackbar;
 
@@ -49,26 +51,32 @@ import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay;
  */
 public class MapViewFragment extends Fragment implements LocationListener {
 
+    private static final String PREFS_TILE_SOURCE = "tilesource";
+    private static final String PREFS_LATITUDE_STRING = "latitudeString";
+    private static final String PREFS_LONGITUDE_STRING = "longitudeString";
+    private static final String PREFS_ORIENTATION = "orientation";
+    private static final String PREFS_ZOOM_LEVEL_DOUBLE = "zoomLevelDouble";
     final private int LOCATION_REQUEST_CODE = 1;
+    // From osmdroid example under Apache 2.0 License
+    // https://github.com/osmdroid/osmdroid
+    // Constants
+    private final String TAG = "MapViewFragment";
+    private final String PREFS_NAME = "com.example.collectqr.prefs";
     // TODO: Test cases for the map bounds
     private MapViewViewModel mViewModel;
+    private SharedPreferences mPrefs;
     private FragmentMapViewBinding binding;
-
     // Map vars
     private MapView mMapView;
     private IMapController mapController;
     private MyLocationNewOverlay mLocationOverlay;
     private ScaleBarOverlay mScaleBarOverlay;
-
     // Location Vars
     private FusedLocationProviderClient fusedLocationClient;
     private Boolean locationPermissionsGranted;
     private Location lastKnownLocation;
     private Location currentLocation;
     private GeoPoint userPosition;
-
-    // Logging Tag
-    private String TAG = "MapViewFragment";
 
     public static MapViewFragment newInstance() {
         return new MapViewFragment();
@@ -83,6 +91,7 @@ public class MapViewFragment extends Fragment implements LocationListener {
          * https://developer.android.com/training/location/retrieve-current#java
          */
 
+        mPrefs = requireContext().getSharedPreferences("", Context.MODE_PRIVATE);
         org.osmdroid.config.Configuration.getInstance().load(requireContext(),
                 PreferenceManager.getDefaultSharedPreferences(requireContext()));
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(requireContext());
@@ -91,7 +100,10 @@ public class MapViewFragment extends Fragment implements LocationListener {
 
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(requireContext());
 
+        new MapViewController(new GeoLocation(53.5260000, -113.5250000), 500.0).makeQuery();
+
         setupMap();
+        restoreViewState();
         return view;
     }
 
@@ -103,47 +115,47 @@ public class MapViewFragment extends Fragment implements LocationListener {
         //  mMapView = binding.mapView;
         //  mMapView.setTileSource(TileSourceFactory.MAPNIK);
 
+        // Setup map
+        mMapView = binding.mapView;
+        mMapView.setDestroyMode(false);
+        mMapView.setTag("mapView");
+        mMapView.setTileSource(TileSourceFactory.MAPNIK);
+        mMapView.getZoomController().setVisibility(CustomZoomButtonsController.Visibility.NEVER);
+        mMapView.getOverlayManager().getTilesOverlay().setVerticalWrapEnabled(false);
+        mMapView.setMultiTouchControls(true);
+
+        // Set map default start point
+        mapController = mMapView.getController();
+        // mapController.setZoom(9.5);
+        // GeoPoint startPoint = new GeoPoint(48.8583, 2.2944);
+        // mapController.setCenter(startPoint);
+
+        /*
+         * Location button functions and more based off osmdroid example, Apache-2.0 License
+         * https://github.com/osmdroid/osmdroid
+         */
+
+        // Enable Location Overlay
+        this.mLocationOverlay = new MyLocationNewOverlay(new GpsMyLocationProvider(requireContext()), mMapView);
+        this.mLocationOverlay.enableMyLocation();
+        this.mLocationOverlay.enableFollowLocation();
+        mapController.setZoom(17.0);
+        mMapView.setTilesScaledToDpi(true);
+        mMapView.getOverlays().add(this.mLocationOverlay);
+
+        // Adding scale bar
+        final DisplayMetrics dm = requireContext().getResources().getDisplayMetrics();
+        mScaleBarOverlay = new ScaleBarOverlay(mMapView);
+        mScaleBarOverlay.setCentred(true);
+        mScaleBarOverlay.setScaleBarOffset(dm.widthPixels / 2, 10);
+        mMapView.getOverlays().add(this.mScaleBarOverlay);
+
         if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION)
                 == PackageManager.PERMISSION_GRANTED
                 && ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_COARSE_LOCATION)
                 == PackageManager.PERMISSION_GRANTED
                 && ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.WRITE_EXTERNAL_STORAGE)
                 == PackageManager.PERMISSION_GRANTED) {
-
-            // Setup map
-            mMapView = binding.mapView;
-            mMapView.setDestroyMode(false);
-            mMapView.setTag("mapView");
-            mMapView.setTileSource(TileSourceFactory.MAPNIK);
-            mMapView.getZoomController().setVisibility(CustomZoomButtonsController.Visibility.NEVER);
-            mMapView.getOverlayManager().getTilesOverlay().setVerticalWrapEnabled(false);
-            mMapView.setMultiTouchControls(true);
-
-            // Set map default start point
-            mapController = mMapView.getController();
-            // mapController.setZoom(9.5);
-            // GeoPoint startPoint = new GeoPoint(48.8583, 2.2944);
-            // mapController.setCenter(startPoint);
-
-            /*
-             * Location button functions and more based off osmdroid example, Apache-2.0 License
-             * https://github.com/osmdroid/osmdroid
-             */
-
-            // Enable Location Overlay
-            this.mLocationOverlay = new MyLocationNewOverlay(new GpsMyLocationProvider(requireContext()), mMapView);
-            this.mLocationOverlay.enableMyLocation();
-            this.mLocationOverlay.enableFollowLocation();
-            mapController.setZoom(17.0);
-            mMapView.setTilesScaledToDpi(true);
-            mMapView.getOverlays().add(this.mLocationOverlay);
-
-            // Adding scale bar
-            final DisplayMetrics dm = requireContext().getResources().getDisplayMetrics();
-            mScaleBarOverlay = new ScaleBarOverlay(mMapView);
-            mScaleBarOverlay.setCentred(true);
-            mScaleBarOverlay.setScaleBarOffset(dm.widthPixels / 2, 10);
-            mMapView.getOverlays().add(this.mScaleBarOverlay);
         } else {
             requestPermissions(
                     new String[]{Manifest.permission.ACCESS_FINE_LOCATION,
@@ -239,7 +251,8 @@ public class MapViewFragment extends Fragment implements LocationListener {
             Snackbar.make(requireView(), "Cannot access location", Snackbar.LENGTH_LONG)
                     .setAction("Enable Location", view -> requestPermissions(
                             new String[]{Manifest.permission.ACCESS_FINE_LOCATION,
-                                    Manifest.permission.ACCESS_COARSE_LOCATION},
+                                    Manifest.permission.ACCESS_COARSE_LOCATION,
+                                    Manifest.permission.WRITE_EXTERNAL_STORAGE},
                             LOCATION_REQUEST_CODE
                     )).show();
         }
@@ -253,11 +266,36 @@ public class MapViewFragment extends Fragment implements LocationListener {
         startActivity(intent);
     }
 
+    /**
+     * Restore the view to the last-saved state when reconstructing the fragment
+     */
+    private void restoreViewState() {
+        final double latitude = Double.parseDouble(mPrefs.getString(PREFS_LATITUDE_STRING, "50"));
+        final double longitude = Double.parseDouble(mPrefs.getString(PREFS_LONGITUDE_STRING, "100"));
+        final float orientation = mPrefs.getFloat(PREFS_ORIENTATION, 0);
+        final float zoom = mPrefs.getFloat(PREFS_ZOOM_LEVEL_DOUBLE, 9);
+
+        // No animateTo(). Go instantly.
+        mMapView.setExpectedCenter(new GeoPoint(latitude, longitude));
+        mMapView.getController().setZoom(zoom);
+        mMapView.setMapOrientation(orientation, false);
+    }
+
 
     @Override
     public void onPause() {
-        super.onPause();
+        // https://github.com/osmdroid/osmdroid From the example application.
+        final SharedPreferences.Editor edit = mPrefs.edit();
+        edit.putString(PREFS_TILE_SOURCE, mMapView.getTileProvider().getTileSource().name());
+        edit.putFloat(PREFS_ORIENTATION, mMapView.getMapOrientation());
+        // Perhaps geohash this instead
+        edit.putString(PREFS_LATITUDE_STRING, String.valueOf(mMapView.getMapCenter().getLatitude()));
+        edit.putString(PREFS_LONGITUDE_STRING, String.valueOf(mMapView.getMapCenter().getLongitude()));
+        edit.putFloat(PREFS_ZOOM_LEVEL_DOUBLE, (float) mMapView.getZoomLevelDouble());
+        edit.apply();
+
         mMapView.onPause();
+        super.onPause();
     }
 
     @Override

@@ -1,4 +1,4 @@
-package com.example.collectqr;
+package com.example.collectqr.model;
 
 import java.util.Date;
 import java.util.HashMap;
@@ -106,9 +106,7 @@ public class User {
      * @param  total_points the total_points the user has
      */
     public void updateScore(int num_codes, int total_points) {
-        HashMap<String, Integer> stats = new HashMap<>();
-        stats.put("num_codes", num_codes);
-        stats.put("total_points", total_points);
-        this.stats = stats;
+        stats.replace("num_codes", num_codes);
+        stats.replace("total_points", total_points);
     }
 }

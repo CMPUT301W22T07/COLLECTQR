@@ -1,4 +1,4 @@
-package com.example.collectqr;
+package com.example.collectqr.utilities;
 
 import static android.content.Context.MODE_PRIVATE;
 

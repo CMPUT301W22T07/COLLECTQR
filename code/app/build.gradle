@@ -74,7 +74,7 @@ dependencies {
 
     // Test dependencies
     implementation 'com.github.javafaker:javafaker:1.0.2'
-    implementation 'com.google.firebase:firebase-firestore:24.0.1'
+    implementation 'com.google.firebase:firebase-firestore:24.0.2'
     implementation 'com.firebase:geofire-android-common:3.1.0'
     implementation 'com.google.code.gson:gson:2.8.9'
     testImplementation 'junit:junit:4.13.2'
