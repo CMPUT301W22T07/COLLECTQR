@@ -1,67 +1,103 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
     tools:context=".ui.LeaderboardFragment">
 
-    <ListView
-        android:id="@+id/leaderboard_list"
+    <com.google.android.material.tabs.TabLayout
+        android:id="@+id/leaderboard_tabs"
+        app:tabContentStart="56dp"
+        app:tabMode="fixed"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
+        android:layout_height="wrap_content">
 
-    <LinearLayout
+        <com.google.android.material.tabs.TabItem
+            android:id="@+id/leaderboard_tab_most_points"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Most Points" />
+
+        <com.google.android.material.tabs.TabItem
+            android:id="@+id/leaderboard_tab_most_codes"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Most Codes" />
+
+        <com.google.android.material.tabs.TabItem
+            android:id="@+id/leaderboard_tab_best_code"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Best Code" />
+
+
+    </com.google.android.material.tabs.TabLayout>
+
+
+    <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:layout_gravity="bottom"
-        android:weightSum="1"
-        android:background="@drawable/leaderboard_personal_background"
-        android:layout_margin="10dp">
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/leaderboard_list"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:layout_weight="0.7">
+            android:layout_gravity="bottom"
+            android:paddingStart="10dp"
+            android:layout_margin="10dp"
+            android:background="@drawable/leaderboard_personal_background"
+            android:orientation="horizontal"
+            android:weightSum="1"
+            android:visibility="visible">
 
-            <TextView
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:id="@+id/personal_username_text"
-                android:layout_weight="0.5"
-                android:textSize="20sp"
-                android:padding="6dp"
-                android:text="Username"/>
+                android:layout_weight="0.7"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/personal_username_text"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="0.5"
+                    android:padding="6dp"
+                    android:text="Username"
+                    android:textSize="20sp" />
+
+                <TextView
+                    android:id="@+id/personal_score_text"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="0.5"
+                    android:padding="6dp"
+                    android:text="Score"
+                    android:textSize="15sp" />
+
+            </LinearLayout>
 
             <TextView
-                android:layout_width="match_parent"
+                android:id="@+id/personal_rank_text"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:id="@+id/personal_score_text"
-                android:layout_weight="0.5"
-                android:textSize="15sp"
-                android:padding="6dp"
-                android:text="Score"
-                />
+                android:layout_weight="0.3"
+                android:maxWidth="200dp"
+                android:minWidth="200dp"
+                android:padding="15dp"
+                android:text="Rank"
+                android:textAlignment="viewEnd"
+                android:textSize="30sp"
+                android:textStyle="bold"/>
 
         </LinearLayout>
 
-        <TextView
-            android:id="@+id/personal_rank_text"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_weight="0.3"
-            android:padding="15dp"
-            android:maxWidth="200dp"
-            android:minWidth="200dp"
-            android:text="Rank"
-            android:textSize="30sp"
-            android:textStyle="bold"
-            android:textAlignment="viewEnd">
-        </TextView>
+    </FrameLayout>
 
-
-    </LinearLayout>
-
-</FrameLayout>
+</LinearLayout>
