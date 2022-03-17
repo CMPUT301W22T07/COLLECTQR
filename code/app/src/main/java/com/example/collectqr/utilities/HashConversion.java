@@ -2,8 +2,7 @@ package com.example.collectqr.utilities;
 
 import com.firebase.geofire.GeoLocation;
 import com.google.common.hash.Hashing;
-
-import org.osmdroid.util.GeoPoint;
+import com.google.firebase.firestore.GeoPoint;
 
 import java.nio.charset.StandardCharsets;
 
@@ -27,8 +26,9 @@ public class HashConversion {
 
     /**
      * Convert a Firebase GeoLocation to an osmdroid GeoPoint
-     * @param geolocation   A location with a latitude and longitude
-     * @return              A location as a point
+     *
+     * @param geolocation A location with a latitude and longitude
+     * @return A location as a point
      */
     public GeoPoint convertLocationToOSMPoint(GeoLocation geolocation) {
         return new GeoPoint(geolocation.latitude, geolocation.longitude);
@@ -37,31 +37,12 @@ public class HashConversion {
 
     /**
      * Convert a Firebase GeoLocation to a Firebase GeoPoint
-     * @param location   A location with a latitude and longitude
-     * @return           A location as a point
+     *
+     * @param location A location with a latitude and longitude
+     * @return A location as a point
      */
     public com.google.firebase.firestore.GeoPoint convertLocationToFBPoint(GeoLocation location) {
         return new com.google.firebase.firestore.GeoPoint(location.latitude, location.longitude);
-    }
-
-
-    /**
-     * Convert an osmdroid GeoPoint to a Firebase GeoLocation
-     * @param geoPoint      A location with a latitude and longitude
-     * @return              A location as a GeoLocation
-     */
-    public GeoLocation convertPointToLocation(GeoPoint geoPoint) {
-        return new GeoLocation(geoPoint.getLatitude(), geoPoint.getLongitude());
-    }
-
-
-    /**
-     * Convert a Firebase GeoPoint to a Firebase GeoLocation
-     * @param geoPoint      A location with a latitude and longitude
-     * @return              A location as a GeoLocation
-     */
-    public GeoLocation convertPointToLocation(com.google.firebase.firestore.GeoPoint geoPoint) {
-        return new GeoLocation(geoPoint.getLatitude(), geoPoint.getLongitude());
     }
 
 }
