@@ -16,6 +16,7 @@ import com.google.firebase.storage.StorageReference;
 
 import java.util.ArrayList;
 
+// https://developer.android.com/guide/topics/ui/layout/recyclerview#implement-adapter
 /**
  * A custom RecyclerView.Adapter for the leaderboard screen
  */
