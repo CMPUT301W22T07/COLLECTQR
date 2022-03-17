@@ -70,9 +70,9 @@ public class LeaderboardController {
                         for (QueryDocumentSnapshot doc : queryDocumentSnapshots) {
                             Log.d(TAG, String.valueOf(doc.getData().get("username")));
                             String name = String.valueOf(doc.getData().get("username"));
-                            Integer totalPoints = Integer.parseInt(String.valueOf(doc.get("total_points")));
-                            Integer numCodes = Integer.parseInt(String.valueOf(doc.get("num_codes")));
-                            Integer bestCode = Integer.parseInt(String.valueOf(doc.get("best_code")));
+                            Integer totalPoints = Integer.parseInt(doc.get("total_points").toString());
+                            Integer numCodes = Integer.parseInt(doc.get("num_codes").toString());
+                            Integer bestCode = Integer.parseInt(doc.get("best_code").toString());
                             User userObj = new User(name);
                             userObj.updateScore(numCodes, totalPoints, bestCode);
                             dataLists.get("most_points").add(userObj);
