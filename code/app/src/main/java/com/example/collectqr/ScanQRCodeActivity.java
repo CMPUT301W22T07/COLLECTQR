@@ -8,10 +8,13 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.example.collectqr.utilities.HashConversion;
 
 import eu.livotov.labs.android.camview.ScannerLiveView;
 import eu.livotov.labs.android.camview.scanner.decoder.zxing.ZXDecoder;
@@ -58,10 +61,14 @@ public class ScanQRCodeActivity extends AppCompatActivity {
             @Override
             public void onCodeScanned(String data) {
                 scannedTextView.setText(data);
+                String sha = new HashConversion().convertToSHA256(data);
+                Intent intent = new Intent();
+                intent.putExtra("sha", sha);
+                // https://www.tutorialspoint.com/how-to-send-data-to-previous-activity-in-android
+                setResult(RESULT_OK, intent);
+                finish();
             }
         });
-
-
     }
 
     private boolean checkPermission(){

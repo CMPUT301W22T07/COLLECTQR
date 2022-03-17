@@ -1,6 +1,7 @@
 package com.example.collectqr.ui;
 
 import android.Manifest;
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -17,6 +18,10 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
+import androidx.activity.result.ActivityResult;
+import androidx.activity.result.ActivityResultCallback;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
@@ -24,10 +29,13 @@ import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
+import com.example.collectqr.EnterQrInfoActivity;
+import com.example.collectqr.MainAppActivity;
 import com.example.collectqr.R;
 import com.example.collectqr.ScanQRCodeActivity;
 import com.example.collectqr.data.MapViewController;
 import com.example.collectqr.databinding.FragmentMapViewBinding;
+import com.example.collectqr.utilities.Preferences;
 import com.example.collectqr.viewmodels.MapViewViewModel;
 import com.firebase.geofire.GeoLocation;
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -78,6 +86,8 @@ public class MapViewFragment extends Fragment implements LocationListener {
     private Location currentLocation;
     private GeoPoint userPosition;
 
+    private String username;
+
     public static MapViewFragment newInstance() {
         return new MapViewFragment();
     }
@@ -91,6 +101,7 @@ public class MapViewFragment extends Fragment implements LocationListener {
          * https://developer.android.com/training/location/retrieve-current#java
          */
 
+        username = Preferences.loadPreferences(container.getContext());
         mPrefs = requireContext().getSharedPreferences("", Context.MODE_PRIVATE);
         org.osmdroid.config.Configuration.getInstance().load(requireContext(),
                 PreferenceManager.getDefaultSharedPreferences(requireContext()));
@@ -263,7 +274,30 @@ public class MapViewFragment extends Fragment implements LocationListener {
      */
     private void startScanner() {
         Intent intent = new Intent(this.getActivity(), ScanQRCodeActivity.class);
-        startActivity(intent);
+        startActivityForResult(intent, 1);
+    }
+
+    // https://www.tutorialspoint.com/how-to-send-data-to-previous-activity-in-android
+
+    /**
+     * Handles returning from the scanner activity and send to enter qr info activity
+     * @param requestCode
+     * @param resultCode
+     * @param data
+     */
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (resultCode == Activity.RESULT_OK) {
+            if (requestCode == 1) {
+                if (data != null){
+                    Intent intent = new Intent(this.getActivity(), EnterQrInfoActivity.class);
+                    intent.putExtra("sha", data.getStringExtra("sha"));
+                    intent.putExtra("username", username);
+                    startActivity(intent);
+                }
+            }
+        }
     }
 
     /**
