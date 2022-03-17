@@ -109,11 +109,8 @@ public class LeaderboardFragment extends Fragment {
         // save views as variables
         leaderboardList = leaderboardView.findViewById(R.id.leaderboard_list);
         personalUsername = leaderboardView.findViewById(R.id.personal_username_text);
-        personalUsername.setTextColor(Color.WHITE);
         personalScore = leaderboardView.findViewById(R.id.personal_score_text);
-        personalScore.setTextColor(Color.WHITE);
         personalRank = leaderboardView.findViewById(R.id.personal_rank_text);
-        personalRank.setTextColor(Color.WHITE);
         tabs = leaderboardView.findViewById(R.id.leaderboard_tabs);
 
         dataLists = new ArrayMap<>();
