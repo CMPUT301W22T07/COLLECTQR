@@ -23,6 +23,9 @@
             android:name="com.example.collectqr.ScanQRCodeActivity"
             android:exported="true" />
         <activity
+            android:name="com.example.collectqr.EnterQrInfoActivity"
+            android:exported="true" />
+        <activity
             android:name="com.example.collectqr.GenerateQRCodeActivity"
             android:exported="true" />
         <activity

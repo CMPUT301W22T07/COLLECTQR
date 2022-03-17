@@ -70,6 +70,7 @@
                     android:layout_weight="0.5"
                     android:padding="6dp"
                     android:text="Username"
+                    android:textColor="@color/white"
                     android:textSize="20sp" />
 
                 <TextView
@@ -79,6 +80,7 @@
                     android:layout_weight="0.5"
                     android:padding="6dp"
                     android:text="Score"
+                    android:textColor="@color/white"
                     android:textSize="15sp" />
 
             </LinearLayout>
@@ -91,6 +93,7 @@
                 android:maxWidth="200dp"
                 android:minWidth="200dp"
                 android:padding="15dp"
+                android:textColor="@color/white"
                 android:text="Rank"
                 android:textAlignment="viewEnd"
                 android:textSize="30sp"
