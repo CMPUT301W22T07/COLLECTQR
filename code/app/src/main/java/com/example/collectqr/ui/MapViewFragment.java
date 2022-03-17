@@ -13,11 +13,9 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.content.res.AppCompatResources;
 import androidx.fragment.app.Fragment;
 
-import com.example.collectqr.LocationPermissionHelper;
+import com.example.collectqr.utilities.LocationPermissionHelper;
 import com.example.collectqr.ScanQRCodeActivity;
 import com.example.collectqr.databinding.FragmentMapViewBinding;
-import com.google.android.gms.location.FusedLocationProviderClient;
-import com.google.android.gms.location.LocationServices;
 import com.mapbox.android.gestures.MoveGestureDetector;
 import com.mapbox.geojson.Point;
 import com.mapbox.maps.CameraOptions;
@@ -28,7 +26,6 @@ import com.mapbox.maps.plugin.Plugin;
 import com.mapbox.maps.plugin.gestures.GesturesPlugin;
 import com.mapbox.maps.plugin.gestures.OnMoveListener;
 import com.mapbox.maps.plugin.locationcomponent.LocationComponentPlugin;
-import com.mapbox.maps.plugin.locationcomponent.OnIndicatorBearingChangedListener;
 import com.mapbox.maps.plugin.locationcomponent.OnIndicatorPositionChangedListener;
 
 import java.lang.ref.WeakReference;
@@ -42,9 +39,27 @@ public class MapViewFragment extends Fragment {
 
     private final String TAG = "MapViewFragment";
     private FragmentMapViewBinding binding;
+
+    /*
+        Mapping Variables
+     */
     private MapView mapView;
-    private FusedLocationProviderClient fusedLocationClient;
+    private GesturesPlugin gesturesPlugin;
+    private LocationComponentPlugin locationComponentPlugin;
     private LocationPermissionHelper locationPermissionHelper;
+
+    private final OnIndicatorPositionChangedListener posChangedListener =
+            new OnIndicatorPositionChangedListener() {
+                @Override
+                public void onIndicatorPositionChanged(@NonNull Point point) {
+                    mapView.getMapboxMap().setCamera(new CameraOptions.Builder()
+                            .center(point).build());
+                    GesturesPlugin gestures = mapView.getPlugin(Plugin.Mapbox.MAPBOX_GESTURES_PLUGIN_ID);
+                    assert gestures != null;
+                    gestures.setFocalPoint(mapView.getMapboxMap().pixelForCoordinate(point));
+                }
+            };
+
     private final OnMoveListener onMoveListener = new OnMoveListener() {
         @Override
         public void onMoveBegin(@NonNull MoveGestureDetector moveGestureDetector) {
@@ -60,41 +75,9 @@ public class MapViewFragment extends Fragment {
         public void onMoveEnd(@NonNull MoveGestureDetector moveGestureDetector) {
         }
     };
-    private final OnIndicatorBearingChangedListener onIndicatorBearingChangedListener =
-            new OnIndicatorBearingChangedListener() {
-                @Override
-                public void onIndicatorBearingChanged(double v) {
-                    mapView.getMapboxMap().setCamera(new CameraOptions.Builder()
-                            .bearing(v).build());
-                }
-            };
-    private final OnIndicatorPositionChangedListener onIndicatorPositionChangedListener =
-            new OnIndicatorPositionChangedListener() {
-                @Override
-                public void onIndicatorPositionChanged(@NonNull Point point) {
-                    mapView.getMapboxMap().setCamera(new CameraOptions.Builder()
-                            .center(point).build());
-                    GesturesPlugin gestures = mapView.getPlugin(Plugin.Mapbox.MAPBOX_GESTURES_PLUGIN_ID);
-                    assert gestures != null;
-                    gestures.setFocalPoint(mapView.getMapboxMap().pixelForCoordinate(point));
-                }
-            };
 
     public static MapViewFragment newInstance() {
         return new MapViewFragment();
-    }
-
-    private void onCameraTrackingDismissed() {
-        Toast.makeText(requireContext(), "onCameraTrackingDismissed", Toast.LENGTH_SHORT).show();
-        GesturesPlugin gesturesPlugin = mapView.getPlugin(Plugin.MAPBOX_GESTURES_PLUGIN_ID);
-        LocationComponentPlugin locationComponentPlugin = mapView.getPlugin(Plugin.Mapbox.MAPBOX_LOCATION_COMPONENT_PLUGIN_ID);
-
-        assert gesturesPlugin != null;
-        assert locationComponentPlugin != null;
-
-        locationComponentPlugin.removeOnIndicatorBearingChangedListener(onIndicatorBearingChangedListener);
-        locationComponentPlugin.removeOnIndicatorPositionChangedListener(onIndicatorPositionChangedListener);
-        gesturesPlugin.removeOnMoveListener(onMoveListener);
     }
 
     @Override
@@ -107,11 +90,11 @@ public class MapViewFragment extends Fragment {
          */
         super.onCreateView(inflater, container, savedInstanceState);
 
-        fusedLocationClient = LocationServices.getFusedLocationProviderClient(requireContext());
         binding = FragmentMapViewBinding.inflate(inflater, container, false);
         View view = binding.getRoot();
         mapView = binding.mapView;
-        locationPermissionHelper = new LocationPermissionHelper(new WeakReference<Activity>(requireActivity()));
+
+        locationPermissionHelper = new LocationPermissionHelper(new WeakReference<>(requireActivity()));
         locationPermissionHelper.checkPermissions(() -> {
             mapView.getMapboxMap().setCamera(
                     new CameraOptions.Builder().zoom(14.0).build()
@@ -129,15 +112,16 @@ public class MapViewFragment extends Fragment {
     }
 
     private void setupGesturesListener() {
-        GesturesPlugin gesturesPlugin = mapView.getPlugin(Plugin.Mapbox.MAPBOX_GESTURES_PLUGIN_ID);
+        gesturesPlugin = mapView.getPlugin(Plugin.Mapbox.MAPBOX_GESTURES_PLUGIN_ID);
         assert gesturesPlugin != null;
         gesturesPlugin.addOnMoveListener(onMoveListener);
     }
 
     private void initLocationComponent() {
-        LocationComponentPlugin locationComponentPlugin =
+        locationComponentPlugin =
                 mapView.getPlugin(Plugin.Mapbox.MAPBOX_LOCATION_COMPONENT_PLUGIN_ID);
 
+        assert locationComponentPlugin != null;
         locationComponentPlugin.updateSettings(
                 locationComponentSettings -> {
                     locationComponentSettings.setEnabled(true);
@@ -158,8 +142,7 @@ public class MapViewFragment extends Fragment {
                     return null;
                 }
         );
-        locationComponentPlugin.addOnIndicatorBearingChangedListener(onIndicatorBearingChangedListener);
-        locationComponentPlugin.addOnIndicatorPositionChangedListener(onIndicatorPositionChangedListener);
+        locationComponentPlugin.addOnIndicatorPositionChangedListener(posChangedListener);
     }
 
     /**
@@ -179,6 +162,23 @@ public class MapViewFragment extends Fragment {
         startActivity(intent);
     }
 
+
+    /**
+     * When the map camera moves, stop the camera from tracking the player's movement.
+     */
+    private void onCameraTrackingDismissed() {
+        Toast.makeText(requireContext(), "onCameraTrackingDismissed", Toast.LENGTH_SHORT).show();
+        GesturesPlugin gesturesPlugin = mapView.getPlugin(Plugin.MAPBOX_GESTURES_PLUGIN_ID);
+        LocationComponentPlugin locationComponentPlugin = mapView.getPlugin(Plugin.Mapbox.MAPBOX_LOCATION_COMPONENT_PLUGIN_ID);
+
+        assert gesturesPlugin != null;
+        assert locationComponentPlugin != null;
+
+        locationComponentPlugin.removeOnIndicatorPositionChangedListener(posChangedListener);
+        gesturesPlugin.removeOnMoveListener(onMoveListener);
+    }
+
+
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
@@ -195,8 +195,7 @@ public class MapViewFragment extends Fragment {
         assert gesturesPlugin != null;
         assert locationComponentPlugin != null;
 
-        locationComponentPlugin.removeOnIndicatorBearingChangedListener(onIndicatorBearingChangedListener);
-        locationComponentPlugin.removeOnIndicatorPositionChangedListener(onIndicatorPositionChangedListener);
+        locationComponentPlugin.removeOnIndicatorPositionChangedListener(posChangedListener);
         gesturesPlugin.removeOnMoveListener(onMoveListener);
     }
 
