@@ -1,8 +1,6 @@
 package com.example.collectqr.ui;
 
-import android.Manifest;
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -10,20 +8,17 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
-import androidx.activity.result.ActivityResult;
-import androidx.activity.result.ActivityResultCallback;
-import androidx.activity.result.ActivityResultLauncher;
-import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.content.res.AppCompatResources;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
 
 import com.example.collectqr.EnterQrInfoActivity;
-import com.example.collectqr.MainAppActivity;
-import com.example.collectqr.R;
 import com.example.collectqr.ScanQRCodeActivity;
 import com.example.collectqr.databinding.FragmentMapViewBinding;
+import com.example.collectqr.utilities.Preferences;
+import com.example.collectqr.viewmodels.MapViewViewModel;
 import com.mapbox.android.core.permissions.PermissionsListener;
 import com.mapbox.android.core.permissions.PermissionsManager;
 import com.mapbox.android.gestures.MoveGestureDetector;
@@ -37,13 +32,6 @@ import com.mapbox.maps.plugin.gestures.GesturesPlugin;
 import com.mapbox.maps.plugin.gestures.OnMoveListener;
 import com.mapbox.maps.plugin.locationcomponent.LocationComponentPlugin;
 import com.mapbox.maps.plugin.locationcomponent.OnIndicatorPositionChangedListener;
-import com.example.collectqr.utilities.Preferences;
-import com.example.collectqr.viewmodels.MapViewViewModel;
-import com.firebase.geofire.GeoLocation;
-import com.google.android.gms.location.FusedLocationProviderClient;
-import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.tasks.Task;
-import com.google.android.material.snackbar.Snackbar;
 
 import java.util.List;
 
@@ -57,6 +45,8 @@ public class MapViewFragment extends Fragment {
 
     private final String TAG = "MapViewFragment";
     private FragmentMapViewBinding binding;
+
+    // Map Variables
     private MapView mapView;
     // Store reference and override the position listener
     private final OnIndicatorPositionChangedListener posChangedListener =
@@ -82,15 +72,15 @@ public class MapViewFragment extends Fragment {
             return false;
         }
 
-    private String username;
-
         @Override
         public void onMoveEnd(@NonNull MoveGestureDetector moveGestureDetector) {
         }
     };
     private GesturesPlugin gesturesPlugin;
     private LocationComponentPlugin locationComponentPlugin;
+    private MapViewViewModel mViewModel;
     private PermissionsManager permManager;
+    private String username;
 
     /**
      * Constructor for a MapViewFragment.
@@ -115,11 +105,7 @@ public class MapViewFragment extends Fragment {
                              @Nullable Bundle savedInstanceState) {
 
         super.onCreateView(inflater, container, savedInstanceState);
-        username = Preferences.loadPreferences(container.getContext());
-        mPrefs = requireContext().getSharedPreferences("", Context.MODE_PRIVATE);
-        org.osmdroid.config.Configuration.getInstance().load(requireContext(),
-                PreferenceManager.getDefaultSharedPreferences(requireContext()));
-        fusedLocationClient = LocationServices.getFusedLocationProviderClient(requireContext());
+        username = Preferences.loadPreferences(requireContext());
         binding = FragmentMapViewBinding.inflate(inflater, container, false);
         View view = binding.getRoot();
         mapView = binding.mapView;
@@ -236,6 +222,7 @@ public class MapViewFragment extends Fragment {
 
     /**
      * Handles returning from the scanner activity and send to enter qr info activity
+     *
      * @param requestCode
      * @param resultCode
      * @param data
@@ -245,7 +232,7 @@ public class MapViewFragment extends Fragment {
         super.onActivityResult(requestCode, resultCode, data);
         if (resultCode == Activity.RESULT_OK) {
             if (requestCode == 1) {
-                if (data != null){
+                if (data != null) {
                     Intent intent = new Intent(this.getActivity(), EnterQrInfoActivity.class);
                     intent.putExtra("sha", data.getStringExtra("sha"));
                     intent.putExtra("username", username);
@@ -292,6 +279,11 @@ public class MapViewFragment extends Fragment {
     }
 
 
+    private void drawMarkers() {
+
+    }
+
+
     /**
      * Setup the interactive elements of the fragment, like buttons.
      *
@@ -301,8 +293,15 @@ public class MapViewFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        mViewModel = new ViewModelProvider(this).get(MapViewViewModel.class);
+        mViewModel.getGeoLocations().observe(getViewLifecycleOwner(), geoLocations -> {
+            addMapMarkers();
+        });
         // TODO: Use the ViewModel
         setButtonsActions();
+    }
+
+    private void addMapMarkers() {
     }
 
 
@@ -340,8 +339,4 @@ public class MapViewFragment extends Fragment {
         permManager.onRequestPermissionsResult(requestCode, permissions, grantResults);
     }
 
-    @Override
-    public void onLocationChanged(@NonNull Location location) {
-
-    }
 }

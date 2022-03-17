@@ -30,7 +30,7 @@ public class HashConversion {
      * @param geolocation A location with a latitude and longitude
      * @return A location as a point
      */
-    public GeoPoint convertLocationToOSMPoint(GeoLocation geolocation) {
+    public GeoPoint convertLocationToPoint(GeoLocation geolocation) {
         return new GeoPoint(geolocation.latitude, geolocation.longitude);
     }
 
