@@ -90,7 +90,7 @@ public class QRCodeController {
      */
     public void writeToUserFirestore(QRCode qrCode, String username) {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
-        DocumentReference docRef = db.collection("QRCodes").document(qrCode.getSha256());
+        DocumentReference docRef = db.collection("Users").document(username).collection("scannedCodes").document(qrCode.getSha256());
         docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
             @Override
             public void onComplete(@NonNull Task<DocumentSnapshot> task) {
