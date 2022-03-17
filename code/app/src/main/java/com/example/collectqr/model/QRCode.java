@@ -3,7 +3,6 @@ package com.example.collectqr.model;
 import com.firebase.geofire.GeoFireUtils;
 import com.firebase.geofire.GeoLocation;
 
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 
@@ -15,16 +14,26 @@ import java.util.HashMap;
  */
 public class QRCode {
     private final String sha256;
-    private final Integer points;
-    private final Double latitude;
-    private final Double longitude;
-    private final GeoLocation location;
-    private final String qr_image;
-    private final Date date;
+    private Integer points;
+    private Double latitude;
+    private Double longitude;
+    private GeoLocation location;
+    private String qr_image;
+    private Date date;
     private final HashMap<String, String> scanned_by;
     private final HashMap<String, String> comments;
-    private final ArrayList<String> all_images;
 
+    public QRCode(String sha256) {
+        this.sha256 = sha256;
+        this.points = 0; //this needs to be updated immediately
+        this.latitude = null;
+        this.longitude = null;
+        this.location = null;
+        this.qr_image = "";
+        this.scanned_by = new HashMap<>();
+        this.comments = new HashMap<>();
+        this.date = null;
+    }
     public QRCode(String sha256, Double latitude, Double longitude) {
         this.sha256 = sha256;
         this.points = 0; //this needs to be updated immediately
@@ -34,7 +43,6 @@ public class QRCode {
         this.qr_image = "";
         this.scanned_by = new HashMap<>();
         this.comments = new HashMap<>();
-        this.all_images = new ArrayList<>();
         this.date = null;
     }
 
@@ -48,7 +56,6 @@ public class QRCode {
         this.location = null;
         this.scanned_by = null;
         this.comments = null;
-        this.all_images = null;
     }
 
     /**
@@ -87,15 +94,6 @@ public class QRCode {
      */
     public void addComment(String user, String comment) {
         this.comments.put(user, comment);
-    }
-
-    /**
-     * Adds the directory of an image into the list of all images
-     *
-     * @param  image the directory of the image
-     */
-    public void addImage(String image) {
-        this.all_images.add(image);
     }
 
     /**
@@ -183,15 +181,6 @@ public class QRCode {
     }
 
     /**
-     * Returns a list containing all the image paths of the QR Code
-     *
-     * @return A list of all image paths of the QR Code
-     */
-    public ArrayList<String> getAll_images() {
-        return all_images;
-    }
-
-    /**
      * Returns the geolocation of the QR Code
      *
      * @return the geolocation of the QR code
@@ -199,4 +188,22 @@ public class QRCode {
     public GeoLocation getLocation() {
         return location;
     }
+
+    /**
+     * Sets the points of the QR Code
+     * @param points
+     */
+    public void setPoints(Integer points) { this.points = points; }
+
+    /**
+     * Returns the date when the QR code was scanned
+     * @param date the date when the QR code was scanned
+     */
+    public void setDate(Date date) { this.date = date; }
+
+    /**
+     * Sets the name of the image of the code
+     * @param image
+     */
+    public void setQr_image(String image) { this.qr_image=image;}
 }

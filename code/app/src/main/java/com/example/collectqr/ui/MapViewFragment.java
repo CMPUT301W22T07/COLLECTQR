@@ -1,5 +1,8 @@
 package com.example.collectqr.ui;
 
+import android.Manifest;
+import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -7,11 +10,18 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
+import androidx.activity.result.ActivityResult;
+import androidx.activity.result.ActivityResultCallback;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.content.res.AppCompatResources;
 import androidx.fragment.app.Fragment;
 
+import com.example.collectqr.EnterQrInfoActivity;
+import com.example.collectqr.MainAppActivity;
+import com.example.collectqr.R;
 import com.example.collectqr.ScanQRCodeActivity;
 import com.example.collectqr.databinding.FragmentMapViewBinding;
 import com.mapbox.android.core.permissions.PermissionsListener;
@@ -27,6 +37,13 @@ import com.mapbox.maps.plugin.gestures.GesturesPlugin;
 import com.mapbox.maps.plugin.gestures.OnMoveListener;
 import com.mapbox.maps.plugin.locationcomponent.LocationComponentPlugin;
 import com.mapbox.maps.plugin.locationcomponent.OnIndicatorPositionChangedListener;
+import com.example.collectqr.utilities.Preferences;
+import com.example.collectqr.viewmodels.MapViewViewModel;
+import com.firebase.geofire.GeoLocation;
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.tasks.Task;
+import com.google.android.material.snackbar.Snackbar;
 
 import java.util.List;
 
@@ -65,6 +82,8 @@ public class MapViewFragment extends Fragment {
             return false;
         }
 
+    private String username;
+
         @Override
         public void onMoveEnd(@NonNull MoveGestureDetector moveGestureDetector) {
         }
@@ -96,6 +115,11 @@ public class MapViewFragment extends Fragment {
                              @Nullable Bundle savedInstanceState) {
 
         super.onCreateView(inflater, container, savedInstanceState);
+        username = Preferences.loadPreferences(container.getContext());
+        mPrefs = requireContext().getSharedPreferences("", Context.MODE_PRIVATE);
+        org.osmdroid.config.Configuration.getInstance().load(requireContext(),
+                PreferenceManager.getDefaultSharedPreferences(requireContext()));
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(requireContext());
         binding = FragmentMapViewBinding.inflate(inflater, container, false);
         View view = binding.getRoot();
         mapView = binding.mapView;
@@ -205,7 +229,30 @@ public class MapViewFragment extends Fragment {
      */
     private void startScanner() {
         Intent intent = new Intent(this.getActivity(), ScanQRCodeActivity.class);
-        startActivity(intent);
+        startActivityForResult(intent, 1);
+    }
+
+    // https://www.tutorialspoint.com/how-to-send-data-to-previous-activity-in-android
+
+    /**
+     * Handles returning from the scanner activity and send to enter qr info activity
+     * @param requestCode
+     * @param resultCode
+     * @param data
+     */
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (resultCode == Activity.RESULT_OK) {
+            if (requestCode == 1) {
+                if (data != null){
+                    Intent intent = new Intent(this.getActivity(), EnterQrInfoActivity.class);
+                    intent.putExtra("sha", data.getStringExtra("sha"));
+                    intent.putExtra("username", username);
+                    startActivity(intent);
+                }
+            }
+        }
     }
 
 
@@ -293,5 +340,8 @@ public class MapViewFragment extends Fragment {
         permManager.onRequestPermissionsResult(requestCode, permissions, grantResults);
     }
 
+    @Override
+    public void onLocationChanged(@NonNull Location location) {
 
+    }
 }

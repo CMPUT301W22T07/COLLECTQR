@@ -1,21 +1,23 @@
 package com.example.collectqr.ui;
 
-import android.content.Context;
+import android.graphics.Color;
 import android.os.Bundle;
+import android.util.ArrayMap;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
-import android.widget.ListView;
 import android.widget.TextView;
 
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.collectqr.R;
-import com.example.collectqr.adapters.LeaderboardAdapter;
+import com.example.collectqr.adapters.LeaderboardRecyclerAdapter;
 import com.example.collectqr.data.LeaderboardController;
 import com.example.collectqr.utilities.Preferences;
 import com.example.collectqr.model.User;
+import com.google.android.material.tabs.TabLayout;
 
 import java.util.ArrayList;
 
@@ -36,13 +38,14 @@ public class LeaderboardFragment extends Fragment {
     private String mParam2;
 
     private LeaderboardController leaderboardController;
-    private ListView leaderboardList;
-    private ArrayList<User> usersList;
-    private ArrayAdapter<User> usersAdapter;
+    private RecyclerView leaderboardList;
+    private String username;
+    private ArrayMap<String, ArrayList<User>> dataLists;
+    private ArrayMap<String, LeaderboardRecyclerAdapter> adapterLists;
     private TextView personalUsername;
     private TextView personalScore;
     private TextView personalRank;
-    private Context context;
+    private TabLayout tabs;
 
 
     public LeaderboardFragment() {
@@ -100,7 +103,7 @@ public class LeaderboardFragment extends Fragment {
         View leaderboardView = inflater.inflate(R.layout.fragment_leaderboard, container, false);
 
         // gets signed in user's username from shared preferences
-        String username = Preferences.loadPreferences(leaderboardView.getContext());
+        username = Preferences.loadPreferences(leaderboardView.getContext());
         leaderboardController = new LeaderboardController(username);
 
         // save views as variables
@@ -108,27 +111,76 @@ public class LeaderboardFragment extends Fragment {
         personalUsername = leaderboardView.findViewById(R.id.personal_username_text);
         personalScore = leaderboardView.findViewById(R.id.personal_score_text);
         personalRank = leaderboardView.findViewById(R.id.personal_rank_text);
+        tabs = leaderboardView.findViewById(R.id.leaderboard_tabs);
 
-        // get ArrayList of users from Firestore
-        usersList = leaderboardController.createLeaderboardArray(context);
-        System.out.println(usersList);
+        dataLists = new ArrayMap<>();
+        dataLists.put("most_points", new ArrayList<>());
+        dataLists.put("most_codes", new ArrayList<>());
+        dataLists.put("best_code", new ArrayList<>());
 
-        // pass userList to CustomList for UI
-        usersAdapter = new LeaderboardAdapter(getContext(), usersList);
-        leaderboardList.setAdapter(usersAdapter);
-        usersAdapter.notifyDataSetChanged();
+        adapterLists = new ArrayMap<>();
+        adapterLists.put("most_points", new LeaderboardRecyclerAdapter(dataLists.get("most_points"), "most_points"));
+        adapterLists.put("most_codes", new LeaderboardRecyclerAdapter(dataLists.get("most_codes"), "most_codes"));
+        adapterLists.put("best_code", new LeaderboardRecyclerAdapter(dataLists.get("best_code"), "best_code"));
 
-        // set current user's username in UI
+        RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getContext());
+        leaderboardList.setLayoutManager(layoutManager);
+        leaderboardList.setAdapter(adapterLists.get("most_points"));
+
+        leaderboardController.downloadData(dataLists, adapterLists, personalScore, personalRank);
+
+        setTabListeners();
+
         personalUsername.setText(username);
 
-        // get current user's score
-        leaderboardController.getPersonalScore(personalScore);
-
-        // get current user's rank
-        leaderboardController.getUserRank(username, usersList, personalRank);
-
-        // Leaderboard leaderboard = new Leaderboard(username, score, usersList);
-
         return leaderboardView;
+    }
+
+    public void updatePersonalCard(String currentCategory) {
+        for (int i=0; i<dataLists.get(currentCategory).size(); i++) {
+            User item = dataLists.get(currentCategory).get(i);
+            if (item.getUsername().equals(username)) {
+                if (currentCategory.equals("most_points")) {
+                    personalScore.setText(item.getStats().get("total_points") + " points");
+                    personalRank.setText(Integer.toString(i+1));
+                } else if (currentCategory.equals("most_codes")) {
+                    personalScore.setText(item.getStats().get("num_codes") + " codes");
+                    personalRank.setText(Integer.toString(i+1));
+                } else {
+                    personalScore.setText(item.getStats().get("best_code") + " points");
+                    personalRank.setText(Integer.toString(i+1));
+                }
+            }
+        }
+    }
+
+    /**
+     * Sets listeners on the tabs and handles the events
+     */
+    private void setTabListeners() {
+        tabs.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
+            @Override
+            public void onTabSelected(TabLayout.Tab tab) {
+                if (tab.getPosition()==0) {
+                    leaderboardList.setAdapter(adapterLists.get("most_points"));
+                    leaderboardController.setCurrentCategory("most_points");
+                    updatePersonalCard("most_points");
+                } else if (tab.getPosition()==1) {
+                    leaderboardList.setAdapter(adapterLists.get("most_codes"));
+                    leaderboardController.setCurrentCategory("most_codes");
+                    updatePersonalCard("most_codes");
+                } else if (tab.getPosition()==2) {
+                    leaderboardList.setAdapter(adapterLists.get("best_code"));
+                    leaderboardController.setCurrentCategory("best_code");
+                    updatePersonalCard("best_code");
+                }
+            }
+            @Override
+            public void onTabUnselected(TabLayout.Tab tab) {}
+            @Override
+            public void onTabReselected(TabLayout.Tab tab) {
+                onTabSelected(tab);
+            }
+        });
     }
 }
