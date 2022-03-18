@@ -2,6 +2,8 @@ package com.example.collectqr.data;
 
 import static android.content.ContentValues.TAG;
 
+import static java.util.Objects.isNull;
+
 import android.util.ArrayMap;
 import android.util.Log;
 import android.widget.TextView;
@@ -70,9 +72,10 @@ public class LeaderboardController {
                         for (QueryDocumentSnapshot doc : queryDocumentSnapshots) {
                             Log.d(TAG, String.valueOf(doc.getData().get("username")));
                             String name = String.valueOf(doc.getData().get("username"));
-                            Integer totalPoints = Integer.parseInt(doc.get("total_points").toString());
-                            Integer numCodes = Integer.parseInt(doc.get("num_codes").toString());
-                            Integer bestCode = Integer.parseInt(doc.get("best_code").toString());
+                            int totalPoints = Integer.parseInt(String.valueOf(doc.getData().get("total_points")));
+                            int numCodes = Integer.parseInt(String.valueOf(doc.getData().get("num_codes")));
+                            int bestCode = Integer.parseInt(String.valueOf(doc.getData().get("best_code")));
+
                             User userObj = new User(name);
                             userObj.updateScore(numCodes, totalPoints, bestCode);
                             dataLists.get("most_points").add(userObj);
