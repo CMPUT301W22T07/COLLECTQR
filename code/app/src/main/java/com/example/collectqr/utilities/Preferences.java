@@ -21,7 +21,7 @@ public class Preferences {
      * @param  context
      * @param  username the username to be saved
      */
-    public static void savePreferences(Context context, String username) {
+    public static void saveUserName(Context context, String username) {
         SharedPreferences sharedPreferences = context.getSharedPreferences("sharedPreferences", MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
         Gson gson = new Gson();
@@ -36,13 +36,12 @@ public class Preferences {
      * @param  context
      * @return the username stored in shared preferences
      */
-    public static String loadPreferences(Context context) {
+    public static String loadUserName(Context context) {
         SharedPreferences sharedPreferences = context.getSharedPreferences("sharedPreferences", MODE_PRIVATE);
         Gson gson = new Gson();
         String json = sharedPreferences.getString("username", null);
         Type type = new TypeToken<String>() {}.getType();
-        String username = gson.fromJson(json, type);
-        return username;
+        return gson.fromJson(json, type);
     }
 
     /**

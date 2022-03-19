@@ -103,7 +103,7 @@ public class LeaderboardFragment extends Fragment {
         View leaderboardView = inflater.inflate(R.layout.fragment_leaderboard, container, false);
 
         // gets signed in user's username from shared preferences
-        username = Preferences.loadPreferences(leaderboardView.getContext());
+        username = Preferences.loadUserName(leaderboardView.getContext());
         leaderboardController = new LeaderboardController(username);
 
         // save views as variables

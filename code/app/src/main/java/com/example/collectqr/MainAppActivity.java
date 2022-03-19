@@ -59,12 +59,9 @@ public class MainAppActivity extends AppCompatActivity {
      */
     public void doesUserExist() {
         //load username from SharedPreferences
-        //Preferences.savePreferences(this, "localusername");
+        String username = Preferences.loadUserName(this);
 
-        // Preferences.deletePreferences(this);
-        String username = Preferences.loadPreferences(this);
-
-        //if username is null, this is the user should be prompted to create a username
+        //if username is null, the user should be prompted to create a username
         if (username == null) {
             Intent intent = new Intent(this, LoginActivity.class);
             /*

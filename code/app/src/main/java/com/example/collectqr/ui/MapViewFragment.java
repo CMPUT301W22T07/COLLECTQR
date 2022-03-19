@@ -105,7 +105,7 @@ public class MapViewFragment extends Fragment {
                              @Nullable Bundle savedInstanceState) {
 
         super.onCreateView(inflater, container, savedInstanceState);
-        username = Preferences.loadPreferences(requireContext());
+        username = Preferences.loadUserName(requireContext());
         binding = FragmentMapViewBinding.inflate(inflater, container, false);
         View view = binding.getRoot();
         mapView = binding.mapView;

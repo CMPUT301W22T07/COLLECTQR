@@ -72,7 +72,7 @@ public class LoginActivity extends AppCompatActivity {
                                     controller.writeToFirestore(user);
 
                                     //write the user to shared preferences
-                                    Preferences.savePreferences(context, username);
+                                    Preferences.saveUserName(context, username);
                                     // https://developer.android.com/guide/components/activities/tasks-and-back-stack
                                     //finishActivity(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                                     Intent intent = new Intent (this, MainAppActivity.class);

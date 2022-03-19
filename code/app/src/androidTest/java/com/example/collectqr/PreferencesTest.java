@@ -22,8 +22,8 @@ public class PreferencesTest {
 
     @Test
     public void testPreferences() {
-        Preferences.savePreferences(context, "teststring1000");
-        String pref = Preferences.loadPreferences(context);
+        Preferences.saveUserName(context, "teststring1000");
+        String pref = Preferences.loadUserName(context);
         assertEquals("teststring1000", pref);
     }
 
