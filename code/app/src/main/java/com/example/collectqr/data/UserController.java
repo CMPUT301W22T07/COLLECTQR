@@ -30,6 +30,7 @@ public class UserController {
         data.put("username", user.getUsername());
         data.put("email", user.getEmail());
         data.put("phone", user.getPhone());
+        data.put("devices", user.getDevices());
 
         //Move stats from HashMap to db
         for (Map.Entry<String, Integer> stats : user.getStats().entrySet()) {
