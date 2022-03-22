@@ -1,5 +1,6 @@
 package com.example.collectqr.viewmodels;
 
+import android.location.Location;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
@@ -10,14 +11,13 @@ import androidx.lifecycle.ViewModel;
 import com.firebase.geofire.GeoFireUtils;
 import com.firebase.geofire.GeoLocation;
 import com.firebase.geofire.GeoQueryBounds;
-import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
-import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
+import com.mapbox.geojson.Point;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -30,13 +30,16 @@ import java.util.List;
 public class MapViewViewModel extends ViewModel {
     /*
      Sources:
-     https://docs.mapbox.com/android/maps/guides/annotations/annotations/
+     https://docs.mapbox.com/android/maps/guides/annotations/annotations/ for creating map markers
      https://developer.android.com/topic/libraries/architecture/viewmodel for the architecture
      https://firebase.google.com/docs/firestore/solutions/geoqueries#java_1 for geo queries
+     https://developer.android.com/training/location/retrieve-current#java for location
      */
-    private FirebaseFirestore db = FirebaseFirestore.getInstance();
-    private MutableLiveData<List<GeoLocation>> qrGeoLocations;
-    public LiveData<List<GeoLocation>> getGeoLocations() {
+    private final FirebaseFirestore db = FirebaseFirestore.getInstance();
+    private final List<Point> POIList = new ArrayList<>();
+    private MutableLiveData<List<Point>> qrGeoLocations;
+
+    public LiveData<List<Point>> getGeoLocations() {
         if (qrGeoLocations == null) {
             qrGeoLocations = new MutableLiveData<>();
             loadGeoLocations();
@@ -45,11 +48,11 @@ public class MapViewViewModel extends ViewModel {
     }
 
     private void loadGeoLocations() {
-        //qrGeoLocations.getValue().add(new GeoLocation(53.5260000, -113.5250000));
-        GeoLocation location = new GeoLocation(53.260, -113.525);
-        String hash = GeoFireUtils.getGeoHashForLocation(location);
+        GeoLocation searchLocation = new GeoLocation(53.260, -113.525);
+
+        String hash = GeoFireUtils.getGeoHashForLocation(searchLocation);
         double radiusInM = 50 * 1000;
-        List<GeoQueryBounds> bounds = GeoFireUtils.getGeoHashQueryBounds(location, radiusInM);
+        List<GeoQueryBounds> bounds = GeoFireUtils.getGeoHashQueryBounds(searchLocation, radiusInM);
         List<Task<QuerySnapshot>> tasks = new ArrayList<>();
         for (GeoQueryBounds b : bounds) {
             Query q = db.collection("QRCodes")
@@ -60,35 +63,51 @@ public class MapViewViewModel extends ViewModel {
         }
 
         Tasks.whenAllComplete(tasks)
-                .addOnCompleteListener(new OnCompleteListener<List<Task<?>>>() {
-                    @Override
-                    public void onComplete(@NonNull Task<List<Task<?>>> t) {
-                        List<DocumentSnapshot> matchingDocs = new ArrayList<>();
+                .addOnCompleteListener(t -> {
+                    List<DocumentSnapshot> matchingDocs = new ArrayList<>();
 
-                        for (Task<QuerySnapshot> task : tasks) {
-                            QuerySnapshot snap = task.getResult();
-                            for (DocumentSnapshot doc : snap.getDocuments()) {
-                                String lat_str = doc.getString("latitude");
-                                String lng_str = doc.getString("longitude");
-
-                                assert lat_str != null;
-                                assert lng_str != null;
-
-                                if (!lat_str.equals("") && !lng_str.equals("")) {
-                                    double lat = Double.parseDouble(lat_str);
-                                    double lng = Double.parseDouble(lng_str);
-
-                                    matchingDocs.add(doc);
-                                }
-                            }
-                        }
-                        generatePoints(matchingDocs);
+                    for (Task<QuerySnapshot> task : tasks) {
+                        QuerySnapshot snap = task.getResult();
+                        matchingDocs.addAll(snap.getDocuments());
                     }
+                    Log.d("BRUH", Arrays.toString(matchingDocs.toArray()));
+                    generatePoints(matchingDocs);
                 });
     }
 
-    private void generatePoints(List<DocumentSnapshot> matchingDocs) {
+    private void generatePoints(@NonNull List<DocumentSnapshot> matchingDocs) {
+        for (DocumentSnapshot doc : matchingDocs) {
+            String lat_str = doc.getString("latitude");
+            String lng_str = doc.getString("longitude");
+            double lat;
+            double lng;
+
+            assert lat_str != null;
+            assert lng_str != null;
+
+            if (!lat_str.equals("") && !lng_str.equals("")) {
+                lat = Double.parseDouble(lat_str);
+                lng = Double.parseDouble(lng_str);
+
+                Point e = Point.fromLngLat(lng, lat);
+                // Create points to add here
+                POIList.add(e);
+                qrGeoLocations.setValue(POIList);
+                Log.d("BRUH", e.toString());
+            }
+        }
     }
 
+    private void clearPoints(@NonNull List<Point> POIList) {
+        POIList.clear();
+    }
 
+    /**
+     *
+     */
+    @Override
+    protected void onCleared() {
+        super.onCleared();
+        clearPoints(POIList);
+    }
 }
