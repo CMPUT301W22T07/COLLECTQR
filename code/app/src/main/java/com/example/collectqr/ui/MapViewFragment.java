@@ -1,7 +1,6 @@
 package com.example.collectqr.ui;
 
 import android.Manifest;
-import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
@@ -22,7 +21,6 @@ import androidx.appcompat.content.res.AppCompatResources;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.LiveData;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.example.collectqr.EnterQrInfoActivity;
@@ -41,6 +39,7 @@ import com.mapbox.maps.CameraOptions;
 import com.mapbox.maps.CameraState;
 import com.mapbox.maps.MapView;
 import com.mapbox.maps.Style;
+import com.mapbox.maps.extension.style.layers.generated.SymbolLayer;
 import com.mapbox.maps.plugin.LocationPuck2D;
 import com.mapbox.maps.plugin.Plugin;
 import com.mapbox.maps.plugin.annotation.AnnotationConfig;
@@ -49,6 +48,7 @@ import com.mapbox.maps.plugin.annotation.AnnotationType;
 import com.mapbox.maps.plugin.annotation.generated.CircleAnnotationManager;
 import com.mapbox.maps.plugin.annotation.generated.CircleAnnotationOptions;
 import com.mapbox.maps.plugin.gestures.GesturesPlugin;
+import com.mapbox.maps.plugin.gestures.OnMapClickListener;
 import com.mapbox.maps.plugin.gestures.OnMoveListener;
 import com.mapbox.maps.plugin.locationcomponent.LocationComponentPlugin;
 import com.mapbox.maps.plugin.locationcomponent.OnIndicatorPositionChangedListener;
@@ -105,6 +105,18 @@ public class MapViewFragment extends Fragment {
         public void onMoveEnd(@NonNull MoveGestureDetector moveGestureDetector) {
         }
     };
+    // Store reference for the on-click listener
+    private final OnMapClickListener onMapClickListener = new OnMapClickListener() {
+        @Override
+        public boolean onMapClick(@NonNull Point point) {
+            Style style =  mapView.getMapboxMap().getStyle();
+            if (style != null) {
+                //TODO
+            }
+            return false;
+        }
+    };
+
     private Location lastKnownLocation;
     private FusedLocationProviderClient fusedLocationProviderClient;
     private GesturesPlugin gesturesPlugin;
@@ -431,8 +443,9 @@ public class MapViewFragment extends Fragment {
 
         for (Point point : POIList) {
             CircleAnnotationOptions circleAnnotationOptions =
-                    new CircleAnnotationOptions().
-                            withPoint(point)
+                    new CircleAnnotationOptions()
+                            .withPoint(point)
+                            .withDraggable(true)
                             .withCircleRadius(8.0)
                             .withCircleColor("#ee4e8b")
                             .withCircleStrokeWidth(2.0)

@@ -11,6 +11,7 @@ import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
 import com.example.collectqr.data.LocationRepository;
+import com.example.collectqr.data.MapViewController;
 import com.firebase.geofire.GeoFireUtils;
 import com.firebase.geofire.GeoLocation;
 import com.firebase.geofire.GeoQueryBounds;
@@ -38,11 +39,20 @@ public class MapViewViewModel extends AndroidViewModel {
      https://firebase.google.com/docs/firestore/solutions/geoqueries#java_1 for geo queries
      https://developer.android.com/training/location/retrieve-current#java for location
      */
-    private final FirebaseFirestore db = FirebaseFirestore.getInstance();
 
-    private LiveData<Location> locationLiveData;
-    private MutableLiveData<List<Point>> qrGeoLocations;
+    // Constants
+    public final Double MAX_RADIUS = 5000.0;    // 50KM search radius max
+    public final String COLLECTION = "QRCodes"; // Collection to query
+    public final String ORDERING = "geohash"; // How to order the documents
+    public final String LOGGER_TAG = "MapViewController";
+
+    // Class Variables
+    private final FirebaseFirestore db = FirebaseFirestore.getInstance();
     private final List<Point> POIList = new ArrayList<>();
+
+    private MapViewController mMapController;
+    private MutableLiveData<List<Point>> qrGeoLocations;
+    private final LiveData<Location> locationLiveData;
 
 
     public MapViewViewModel(@NonNull Application application) {
@@ -52,26 +62,33 @@ public class MapViewViewModel extends AndroidViewModel {
 
 
     public LiveData<List<Point>> getGeoLocations(Location location) {
-        if (qrGeoLocations == null && location != null) {
-            Log.d("BRUH", location.toString());
+        if (qrGeoLocations == null && mMapController == null && location != null) {
+            // Instantiate mutable live data and the controller for database requests
+            // qrGeoLocations = new MutableLiveData<>();
+            // mMapController = new MapViewController();
+
+            // Make a list of Points observable to observers
+            // qrGeoLocations.setValue(mMapController.getNearbyQRCodes(location));
+
             qrGeoLocations = new MutableLiveData<>();
             loadGeoLocations(location);
         }
+
         return qrGeoLocations;
     }
 
 
     private void loadGeoLocations(Location location) {
-//        GeoLocation searchLocation = new GeoLocation(53.260, -113.525);
         GeoLocation searchLocation = new GeoLocation(location.getLatitude(), location.getLongitude());
-
         String hash = GeoFireUtils.getGeoHashForLocation(searchLocation);
-        double radiusInM = 50 * 1000;
+        double radiusInM = MAX_RADIUS;
+
         List<GeoQueryBounds> bounds = GeoFireUtils.getGeoHashQueryBounds(searchLocation, radiusInM);
         List<Task<QuerySnapshot>> tasks = new ArrayList<>();
+
         for (GeoQueryBounds b : bounds) {
-            Query q = db.collection("QRCodes")
-                    .orderBy("geohash")
+            Query q = db.collection(COLLECTION)
+                    .orderBy(ORDERING)
                     .startAt(b.startHash)
                     .endAt(b.endHash);
             tasks.add(q.get());
@@ -85,7 +102,7 @@ public class MapViewViewModel extends AndroidViewModel {
                         QuerySnapshot snap = task.getResult();
                         matchingDocs.addAll(snap.getDocuments());
                     }
-                    Log.d("BRUH", Arrays.toString(matchingDocs.toArray()));
+                    Log.d(LOGGER_TAG, Arrays.toString(matchingDocs.toArray()));
                     generatePoints(matchingDocs);
                 });
     }
@@ -109,7 +126,7 @@ public class MapViewViewModel extends AndroidViewModel {
                 // Create points to add here
                 POIList.add(e);
                 qrGeoLocations.setValue(POIList);
-                Log.d("BRUH", e.toString());
+                Log.d(LOGGER_TAG, e.toString());
             }
         }
     }
