@@ -36,6 +36,10 @@ public class LoginActivity extends AppCompatActivity {
 
         ExtendedFloatingActionButton loginButton = findViewById(R.id.loginButton);
         ExtendedFloatingActionButton shuffleButton = findViewById(R.id.shuffleButton);
+
+        // QR Code Generate -----------------------------------------------------------------------------
+        ExtendedFloatingActionButton qrGenerate = findViewById(R.id.qrGenerate);
+
         EditText usernameEditText = findViewById(R.id.usernameEditText);
         db = FirebaseFirestore.getInstance();
 
@@ -97,6 +101,12 @@ public class LoginActivity extends AppCompatActivity {
             Faker faker = new Faker();
             String randomName = faker.superhero().prefix()+faker.name().firstName();
             usernameEditText.setText(randomName);
+        });
+
+        // Generate QR Code -----------------------------------------------------------------------------
+        qrGenerate.setOnClickListener(view -> {
+            Intent intent = new Intent (this, GenerateQRCodeActivity.class);
+            startActivity(intent);
         });
     }
 }

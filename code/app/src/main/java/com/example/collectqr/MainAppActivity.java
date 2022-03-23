@@ -62,7 +62,7 @@ public class MainAppActivity extends AppCompatActivity {
         String username = Preferences.loadUserName(this);
 
         //if username is null, the user should be prompted to create a username
-        if (username == null) {
+        //////if (username == null) { --------------------------------------------------------------------- this was done on purpose
             Intent intent = new Intent(this, LoginActivity.class);
             /*
                 Launch the login activity as the base of the stack
@@ -70,7 +70,7 @@ public class MainAppActivity extends AppCompatActivity {
              */
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK |  Intent.FLAG_ACTIVITY_CLEAR_TASK);
             startActivity(intent);
-        }
+        //////} --------------------------------------------------------------------- fix later
     }
 
 
