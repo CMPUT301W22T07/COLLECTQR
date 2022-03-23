@@ -1,13 +1,16 @@
 package com.example.collectqr.viewmodels;
 
+import android.app.Application;
 import android.location.Location;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
+import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
+import com.example.collectqr.data.LocationRepository;
 import com.firebase.geofire.GeoFireUtils;
 import com.firebase.geofire.GeoLocation;
 import com.firebase.geofire.GeoQueryBounds;
@@ -27,7 +30,7 @@ import java.util.List;
  * A class which contains information about map markers, which indicate possible QR codes
  * to be scanned
  */
-public class MapViewViewModel extends ViewModel {
+public class MapViewViewModel extends AndroidViewModel {
     /*
      Sources:
      https://docs.mapbox.com/android/maps/guides/annotations/annotations/ for creating map markers
@@ -36,19 +39,31 @@ public class MapViewViewModel extends ViewModel {
      https://developer.android.com/training/location/retrieve-current#java for location
      */
     private final FirebaseFirestore db = FirebaseFirestore.getInstance();
-    private final List<Point> POIList = new ArrayList<>();
-    private MutableLiveData<List<Point>> qrGeoLocations;
 
-    public LiveData<List<Point>> getGeoLocations() {
-        if (qrGeoLocations == null) {
+    private LiveData<Location> locationLiveData;
+    private MutableLiveData<List<Point>> qrGeoLocations;
+    private final List<Point> POIList = new ArrayList<>();
+
+
+    public MapViewViewModel(@NonNull Application application) {
+        super(application);
+        locationLiveData = new LocationRepository(application);
+    }
+
+
+    public LiveData<List<Point>> getGeoLocations(Location location) {
+        if (qrGeoLocations == null && location != null) {
+            Log.d("BRUH", location.toString());
             qrGeoLocations = new MutableLiveData<>();
-            loadGeoLocations();
+            loadGeoLocations(location);
         }
         return qrGeoLocations;
     }
 
-    private void loadGeoLocations() {
-        GeoLocation searchLocation = new GeoLocation(53.260, -113.525);
+
+    private void loadGeoLocations(Location location) {
+//        GeoLocation searchLocation = new GeoLocation(53.260, -113.525);
+        GeoLocation searchLocation = new GeoLocation(location.getLatitude(), location.getLongitude());
 
         String hash = GeoFireUtils.getGeoHashForLocation(searchLocation);
         double radiusInM = 50 * 1000;
@@ -75,6 +90,7 @@ public class MapViewViewModel extends ViewModel {
                 });
     }
 
+
     private void generatePoints(@NonNull List<DocumentSnapshot> matchingDocs) {
         for (DocumentSnapshot doc : matchingDocs) {
             String lat_str = doc.getString("latitude");
@@ -98,13 +114,17 @@ public class MapViewViewModel extends ViewModel {
         }
     }
 
+
     private void clearPoints(@NonNull List<Point> POIList) {
         POIList.clear();
     }
 
-    /**
-     *
-     */
+
+    public LiveData<Location> getLocationLiveData() {
+        return locationLiveData;
+    }
+
+
     @Override
     protected void onCleared() {
         super.onCleared();

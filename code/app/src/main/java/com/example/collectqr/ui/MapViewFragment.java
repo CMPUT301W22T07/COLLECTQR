@@ -20,7 +20,9 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.content.res.AppCompatResources;
 import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.LiveData;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.example.collectqr.EnterQrInfoActivity;
@@ -140,6 +142,25 @@ public class MapViewFragment extends Fragment {
         checkPermissions();
         return view;
 
+    }
+
+    private void getLocation() {
+        String locationFinePermission = Manifest.permission.ACCESS_FINE_LOCATION;
+        String locationCoarsePermission = Manifest.permission.ACCESS_COARSE_LOCATION;
+
+        if (ContextCompat.checkSelfPermission(requireContext(), locationFinePermission)
+        == PackageManager.PERMISSION_GRANTED
+            || ContextCompat.checkSelfPermission(requireContext(), locationCoarsePermission)
+        == PackageManager.PERMISSION_GRANTED) {
+            requestLocationUpdates();
+        } else {
+            permManager.requestLocationPermissions(requireActivity());
+        }
+    }
+
+    private void requestLocationUpdates() {
+        mViewModel.getLocationLiveData().observe(getViewLifecycleOwner(),
+                location -> lastKnownLocation = location);
     }
 
 
@@ -351,8 +372,12 @@ public class MapViewFragment extends Fragment {
             );
         }
         mViewModel = new ViewModelProvider(this).get(MapViewViewModel.class);
-        mViewModel.getGeoLocations()
-                .observe(getViewLifecycleOwner(), this::addMapMarkers);
+        mViewModel.getLocationLiveData().observe(getViewLifecycleOwner(), location -> {
+            mViewModel.getGeoLocations(location).observe(
+                    getViewLifecycleOwner(), this::addMapMarkers);
+        });
+//        mViewModel.getGeoLocations()
+//                .observe(getViewLifecycleOwner(), this::addMapMarkers);
         setButtonsActions();
     }
 
