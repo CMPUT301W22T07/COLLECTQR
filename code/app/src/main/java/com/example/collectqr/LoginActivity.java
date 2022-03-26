@@ -39,6 +39,7 @@ public class LoginActivity extends AppCompatActivity {
 
         // QR Code Generate -----------------------------------------------------------------------------
         ExtendedFloatingActionButton qrGenerate = findViewById(R.id.qrGenerate);
+        ExtendedFloatingActionButton qrScanner = findViewById(R.id.qrScanner);
 
         EditText usernameEditText = findViewById(R.id.usernameEditText);
         db = FirebaseFirestore.getInstance();
@@ -108,5 +109,12 @@ public class LoginActivity extends AppCompatActivity {
             Intent intent = new Intent (this, GenerateQRCodeActivity.class);
             startActivity(intent);
         });
+
+        // Scanner QR Code -----------------------------------------------------------------------------
+        qrScanner.setOnClickListener(view -> {
+            Intent intent = new Intent (this, ScanQRCodeLoginActivity.class);
+            startActivity(intent);
+        });
+
     }
 }
