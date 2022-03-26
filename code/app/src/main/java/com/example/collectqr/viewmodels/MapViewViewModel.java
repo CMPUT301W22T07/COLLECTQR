@@ -8,7 +8,6 @@ import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
-import androidx.lifecycle.ViewModel;
 
 import com.example.collectqr.data.LocationRepository;
 import com.example.collectqr.data.MapViewController;
@@ -53,7 +52,7 @@ public class MapViewViewModel extends AndroidViewModel {
     private MapViewController mMapController;
     private MutableLiveData<List<Point>> qrGeoLocations;
     private final LiveData<Location> locationLiveData;
-
+    public int lastPOILen = 0;
 
     public MapViewViewModel(@NonNull Application application) {
         super(application);
@@ -62,18 +61,10 @@ public class MapViewViewModel extends AndroidViewModel {
 
 
     public LiveData<List<Point>> getGeoLocations(Location location) {
-        if (qrGeoLocations == null && mMapController == null && location != null) {
-            // Instantiate mutable live data and the controller for database requests
-            // qrGeoLocations = new MutableLiveData<>();
-            // mMapController = new MapViewController();
-
-            // Make a list of Points observable to observers
-            // qrGeoLocations.setValue(mMapController.getNearbyQRCodes(location));
-
+        if (qrGeoLocations == null && location != null) {
             qrGeoLocations = new MutableLiveData<>();
             loadGeoLocations(location);
         }
-
         return qrGeoLocations;
     }
 
@@ -109,6 +100,10 @@ public class MapViewViewModel extends AndroidViewModel {
 
 
     private void generatePoints(@NonNull List<DocumentSnapshot> matchingDocs) {
+        int listSize = matchingDocs.size();
+
+        clearPoints(POIList);
+
         for (DocumentSnapshot doc : matchingDocs) {
             String lat_str = doc.getString("latitude");
             String lng_str = doc.getString("longitude");
@@ -125,10 +120,11 @@ public class MapViewViewModel extends AndroidViewModel {
                 Point e = Point.fromLngLat(lng, lat);
                 // Create points to add here
                 POIList.add(e);
-                qrGeoLocations.setValue(POIList);
                 Log.d(LOGGER_TAG, e.toString());
             }
         }
+        qrGeoLocations.setValue(POIList);
+        lastPOILen = listSize;
     }
 
 

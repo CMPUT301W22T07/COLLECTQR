@@ -2,7 +2,6 @@ package com.example.collectqr.ui;
 
 import android.Manifest;
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
@@ -18,7 +17,6 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.content.res.AppCompatResources;
-import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
@@ -29,8 +27,6 @@ import com.example.collectqr.databinding.FragmentMapViewBinding;
 import com.example.collectqr.utilities.Preferences;
 import com.example.collectqr.viewmodels.MapViewViewModel;
 import com.google.android.gms.location.FusedLocationProviderClient;
-import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.tasks.Task;
 import com.mapbox.android.core.permissions.PermissionsListener;
 import com.mapbox.android.core.permissions.PermissionsManager;
 import com.mapbox.android.gestures.MoveGestureDetector;
@@ -39,7 +35,6 @@ import com.mapbox.maps.CameraOptions;
 import com.mapbox.maps.CameraState;
 import com.mapbox.maps.MapView;
 import com.mapbox.maps.Style;
-import com.mapbox.maps.extension.style.layers.generated.SymbolLayer;
 import com.mapbox.maps.plugin.LocationPuck2D;
 import com.mapbox.maps.plugin.Plugin;
 import com.mapbox.maps.plugin.annotation.AnnotationConfig;
@@ -54,7 +49,6 @@ import com.mapbox.maps.plugin.locationcomponent.LocationComponentPlugin;
 import com.mapbox.maps.plugin.locationcomponent.OnIndicatorPositionChangedListener;
 
 import java.util.List;
-import java.util.concurrent.atomic.AtomicReference;
 
 
 /**
@@ -109,7 +103,7 @@ public class MapViewFragment extends Fragment {
     private final OnMapClickListener onMapClickListener = new OnMapClickListener() {
         @Override
         public boolean onMapClick(@NonNull Point point) {
-            Style style =  mapView.getMapboxMap().getStyle();
+            Style style = mapView.getMapboxMap().getStyle();
             if (style != null) {
                 //TODO
             }
@@ -161,9 +155,9 @@ public class MapViewFragment extends Fragment {
         String locationCoarsePermission = Manifest.permission.ACCESS_COARSE_LOCATION;
 
         if (ContextCompat.checkSelfPermission(requireContext(), locationFinePermission)
-        == PackageManager.PERMISSION_GRANTED
-            || ContextCompat.checkSelfPermission(requireContext(), locationCoarsePermission)
-        == PackageManager.PERMISSION_GRANTED) {
+                == PackageManager.PERMISSION_GRANTED
+                || ContextCompat.checkSelfPermission(requireContext(), locationCoarsePermission)
+                == PackageManager.PERMISSION_GRANTED) {
             requestLocationUpdates();
         } else {
             permManager.requestLocationPermissions(requireActivity());
@@ -388,72 +382,39 @@ public class MapViewFragment extends Fragment {
             mViewModel.getGeoLocations(location).observe(
                     getViewLifecycleOwner(), this::addMapMarkers);
         });
-//        mViewModel.getGeoLocations()
-//                .observe(getViewLifecycleOwner(), this::addMapMarkers);
         setButtonsActions();
     }
 
 
-    /**
-     * Gets the last known location of the device using Google Play Service's Fused Location
-     * Provider Client.
-     *
-     * @return A Location
-     * @deprecated Use LocationRepository instead (TODO: Work in progress)
-     */
-    @Deprecated
-    public Location getLastKnownLocation() {
-        Context context = requireContext();
-        AtomicReference<Location> location = new AtomicReference<>();
+    private void addMapMarkers(@NonNull List<Point> POIList) {
 
-        /* https://developer.android.com/training/location/retrieve-current#java
-           https://stackoverflow.com/a/57237566 by rivaldi */
-        if (ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION)
-                == PackageManager.PERMISSION_GRANTED
-                && ActivityCompat.checkSelfPermission(context,
-                Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+        if (mViewModel.lastPOILen != POIList.size()) {
 
-            fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(context);
-            Task<Location> locationResult = fusedLocationProviderClient.getLastLocation();
+            AnnotationPlugin annotationPlugin = mapView.getPlugin(Plugin.MAPBOX_ANNOTATION_PLUGIN_ID);
+            assert annotationPlugin != null;
+            CircleAnnotationManager circleAnnotationManager =
+                    (CircleAnnotationManager) annotationPlugin.createAnnotationManager(
+                            AnnotationType.CircleAnnotation,
+                            new AnnotationConfig()
+                    );
 
-            locationResult.addOnCompleteListener(requireActivity(), task -> {
+            for (Point point : POIList) {
+                CircleAnnotationOptions circleAnnotationOptions =
+                        new CircleAnnotationOptions()
+                                .withPoint(point)
+                                .withDraggable(true)
+                                .withCircleRadius(8.0)
+                                .withCircleColor("#ee4e8b")
+                                .withCircleStrokeWidth(2.0)
+                                .withCircleStrokeColor("#ffffff");
 
-                if (task.isSuccessful()) {
-                    location.set(task.getResult());
-                    Log.d(TAG, location.get().toString());
-                } else {
-                    location.set(null);
-                    Log.e(TAG,"FusedLocationProviderClient Failed to get Location");
-                }
-
-            });
+                circleAnnotationManager.create(circleAnnotationOptions);
+            }
+            Log.d(TAG, "Points drawn ");
+            return;
         }
 
-        return location.get();
-    }
-
-    private void addMapMarkers(List<Point> POIList) {
-        AnnotationPlugin annotationPlugin = mapView.getPlugin(Plugin.MAPBOX_ANNOTATION_PLUGIN_ID);
-        assert annotationPlugin != null;
-        CircleAnnotationManager circleAnnotationManager =
-                (CircleAnnotationManager) annotationPlugin.createAnnotationManager(
-                        AnnotationType.CircleAnnotation,
-                        new AnnotationConfig()
-                );
-
-        for (Point point : POIList) {
-            CircleAnnotationOptions circleAnnotationOptions =
-                    new CircleAnnotationOptions()
-                            .withPoint(point)
-                            .withDraggable(true)
-                            .withCircleRadius(8.0)
-                            .withCircleColor("#ee4e8b")
-                            .withCircleStrokeWidth(2.0)
-                            .withCircleStrokeColor("#ffffff");
-
-            circleAnnotationManager.create(circleAnnotationOptions);
-        }
-
+        Log.d(TAG, "Didn't draw the points");
     }
 
 
@@ -506,8 +467,8 @@ public class MapViewFragment extends Fragment {
     @Override
     public void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
+        mViewModel.lastPOILen = 0;
         CameraState cameraState = mapView.getMapboxMap().getCameraState();
-
         outState.putDouble(PREFS_CAM_LAT, cameraState.getCenter().latitude());
         outState.putDouble(PREFS_CAM_LON, cameraState.getCenter().longitude());
         outState.putDouble(PREFS_CAM_ZOOM, cameraState.getZoom());
