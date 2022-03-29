@@ -2,21 +2,30 @@ package com.example.collectqr;
 
 import static android.content.ContentValues.TAG;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.util.Log;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.collectqr.data.UserController;
 import com.example.collectqr.model.User;
 import com.example.collectqr.utilities.Preferences;
 import com.github.javafaker.Faker;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
+
+import java.util.Arrays;
 
 /**
  * This activity handles the creation of a new user when first logging into
@@ -68,6 +77,11 @@ public class LoginActivity extends AppCompatActivity {
 
                                     //create user, and store to db
                                     User user = new User(username);
+
+                                    //get the device id
+                                    @SuppressLint("HardwareIds") String device_id = Settings.Secure.getString(this.getContentResolver(), Settings.Secure.ANDROID_ID);
+                                    user.addDevice(device_id);
+
                                     UserController controller = new UserController();
                                     controller.writeToFirestore(user);
 
