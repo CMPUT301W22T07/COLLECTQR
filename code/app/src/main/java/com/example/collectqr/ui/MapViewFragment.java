@@ -1,6 +1,9 @@
 package com.example.collectqr.ui;
 
+<<<<<<< HEAD
+=======
 import android.app.Activity;
+>>>>>>> 58e87cbda2cb5be5be61cc812ad75537fa83982b
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -12,13 +15,17 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.content.res.AppCompatResources;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.ViewModelProvider;
 
+<<<<<<< HEAD
+import com.example.collectqr.ScanQRCodeActivity;
+import com.example.collectqr.databinding.FragmentMapViewBinding;
+=======
 import com.example.collectqr.EnterQrInfoActivity;
 import com.example.collectqr.ScanQRCodeActivity;
 import com.example.collectqr.databinding.FragmentMapViewBinding;
 import com.example.collectqr.utilities.Preferences;
 import com.example.collectqr.viewmodels.MapViewViewModel;
+>>>>>>> 58e87cbda2cb5be5be61cc812ad75537fa83982b
 import com.mapbox.android.core.permissions.PermissionsListener;
 import com.mapbox.android.core.permissions.PermissionsManager;
 import com.mapbox.android.gestures.MoveGestureDetector;
@@ -45,6 +52,28 @@ public class MapViewFragment extends Fragment {
 
     private final String TAG = "MapViewFragment";
     private FragmentMapViewBinding binding;
+<<<<<<< HEAD
+    private MapView mapView;
+    // Store reference and override the position listener
+    private final OnIndicatorPositionChangedListener posChangedListener =
+            new OnIndicatorPositionChangedListener() {
+                @Override
+                public void onIndicatorPositionChanged(@NonNull Point point) {
+                    mapView.getMapboxMap().setCamera(new CameraOptions.Builder()
+                            .center(point).build());
+                    GesturesPlugin gestures = mapView.getPlugin(Plugin.Mapbox.MAPBOX_GESTURES_PLUGIN_ID);
+                    assert gestures != null;
+                    gestures.setFocalPoint(mapView.getMapboxMap().pixelForCoordinate(point));
+                }
+            };
+    // Store reference and override the on-move listener
+    private final OnMoveListener onMoveListener = new OnMoveListener() {
+        @Override
+        public void onMoveBegin(@NonNull MoveGestureDetector moveGestureDetector) {
+            onCameraTrackingDismissed();
+        }
+
+=======
 
     // Map Variables
     private MapView mapView;
@@ -67,6 +96,7 @@ public class MapViewFragment extends Fragment {
             onCameraTrackingDismissed();
         }
 
+>>>>>>> 58e87cbda2cb5be5be61cc812ad75537fa83982b
         @Override
         public boolean onMove(@NonNull MoveGestureDetector moveGestureDetector) {
             return false;
@@ -78,9 +108,13 @@ public class MapViewFragment extends Fragment {
     };
     private GesturesPlugin gesturesPlugin;
     private LocationComponentPlugin locationComponentPlugin;
+<<<<<<< HEAD
+    private PermissionsManager permManager;
+=======
     private MapViewViewModel mViewModel;
     private PermissionsManager permManager;
     private String username;
+>>>>>>> 58e87cbda2cb5be5be61cc812ad75537fa83982b
 
     /**
      * Constructor for a MapViewFragment.
@@ -105,7 +139,10 @@ public class MapViewFragment extends Fragment {
                              @Nullable Bundle savedInstanceState) {
 
         super.onCreateView(inflater, container, savedInstanceState);
+<<<<<<< HEAD
+=======
         username = Preferences.loadUserName(requireContext());
+>>>>>>> 58e87cbda2cb5be5be61cc812ad75537fa83982b
         binding = FragmentMapViewBinding.inflate(inflater, container, false);
         View view = binding.getRoot();
         mapView = binding.mapView;
@@ -159,9 +196,56 @@ public class MapViewFragment extends Fragment {
     }
 
 
+<<<<<<< HEAD
+=======
     /**
      * Add a onMoveListener for when the player manually moves the map camera.
      */
+    private void setupGesturesListener() {
+        gesturesPlugin = mapView.getPlugin(Plugin.Mapbox.MAPBOX_GESTURES_PLUGIN_ID);
+        assert gesturesPlugin != null;
+        gesturesPlugin.addOnMoveListener(onMoveListener);
+    }
+
+
+    /**
+     * Setup the location indicator on the map and add a listener for changes to the player's
+     * position.
+     */
+    private void initLocationComponent() {
+        locationComponentPlugin =
+                mapView.getPlugin(Plugin.Mapbox.MAPBOX_LOCATION_COMPONENT_PLUGIN_ID);
+
+        assert locationComponentPlugin != null;
+        locationComponentPlugin.updateSettings(
+                locationComponentSettings -> {
+                    locationComponentSettings.setEnabled(true);
+                    locationComponentSettings.setLocationPuck(
+                            new LocationPuck2D(
+                                    null,
+                                    AppCompatResources.getDrawable(
+                                            MapViewFragment.this.requireContext(),
+                                            com.mapbox.maps.R.drawable.mapbox_user_icon
+                                    ),
+                                    AppCompatResources.getDrawable(
+                                            MapViewFragment.this.requireContext(),
+                                            com.mapbox.maps.R.drawable.mapbox_user_icon_shadow
+                                    ),
+                                    null
+                            )
+                    );
+                    return null;
+                }
+        );
+        locationComponentPlugin.addOnIndicatorPositionChangedListener(posChangedListener);
+    }
+
+
+>>>>>>> 58e87cbda2cb5be5be61cc812ad75537fa83982b
+    /**
+     * Add a onMoveListener for when the player manually moves the map camera.
+     */
+<<<<<<< HEAD
     private void setupGesturesListener() {
         gesturesPlugin = mapView.getPlugin(Plugin.Mapbox.MAPBOX_GESTURES_PLUGIN_ID);
         assert gesturesPlugin != null;
@@ -208,6 +292,10 @@ public class MapViewFragment extends Fragment {
     private void setButtonsActions() {
         binding.fabLaunchQRScanner.setOnClickListener(view -> startScanner());
         binding.fabGpsLockLocation.setOnClickListener(view -> onCameraTrackingRequested());
+=======
+    private void setButtonsActions() {
+        binding.fabLaunchQRScanner.setOnClickListener(view -> startScanner());
+        binding.fabGpsLockLocation.setOnClickListener(view -> onCameraTrackingRequested());
     }
 
     /**
@@ -240,6 +328,7 @@ public class MapViewFragment extends Fragment {
                 }
             }
         }
+>>>>>>> 58e87cbda2cb5be5be61cc812ad75537fa83982b
     }
 
 
@@ -262,6 +351,32 @@ public class MapViewFragment extends Fragment {
 
 
     /**
+<<<<<<< HEAD
+     * Move the map's camera to the player's current location.
+     */
+    private void onCameraTrackingRequested() {
+        Toast.makeText(requireContext(), "Moving to your location", Toast.LENGTH_SHORT).show();
+=======
+     * When the map camera moves, stop the camera from tracking the player's movement.
+     */
+    private void onCameraTrackingDismissed() {
+        Toast.makeText(requireContext(), "onCameraTrackingDismissed", Toast.LENGTH_SHORT).show();
+>>>>>>> 58e87cbda2cb5be5be61cc812ad75537fa83982b
+
+        GesturesPlugin gesturesPlugin = mapView.getPlugin(Plugin.MAPBOX_GESTURES_PLUGIN_ID);
+        LocationComponentPlugin locationComponentPlugin =
+                mapView.getPlugin(Plugin.Mapbox.MAPBOX_LOCATION_COMPONENT_PLUGIN_ID);
+
+        assert gesturesPlugin != null;
+        assert locationComponentPlugin != null;
+
+<<<<<<< HEAD
+        locationComponentPlugin.addOnIndicatorPositionChangedListener(posChangedListener);
+        gesturesPlugin.addOnMoveListener(onMoveListener);
+    }
+
+
+    /**
      * When the map camera moves, stop the camera from tracking the player's movement.
      */
     private void onCameraTrackingDismissed() {
@@ -276,11 +391,15 @@ public class MapViewFragment extends Fragment {
 
         locationComponentPlugin.removeOnIndicatorPositionChangedListener(posChangedListener);
         gesturesPlugin.removeOnMoveListener(onMoveListener);
+=======
+        locationComponentPlugin.removeOnIndicatorPositionChangedListener(posChangedListener);
+        gesturesPlugin.removeOnMoveListener(onMoveListener);
     }
 
 
     private void drawMarkers() {
 
+>>>>>>> 58e87cbda2cb5be5be61cc812ad75537fa83982b
     }
 
 
@@ -293,19 +412,59 @@ public class MapViewFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+<<<<<<< HEAD
+=======
         mViewModel = new ViewModelProvider(this).get(MapViewViewModel.class);
         mViewModel.getGeoLocations().observe(getViewLifecycleOwner(), geoLocations -> {
             addMapMarkers();
         });
+>>>>>>> 58e87cbda2cb5be5be61cc812ad75537fa83982b
         // TODO: Use the ViewModel
         setButtonsActions();
     }
 
+<<<<<<< HEAD
+
+    /**
+     * Stop all defined listeners from listening, such as location and gestures.
+     */
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        GesturesPlugin gesturesPlugin = mapView.getPlugin(Plugin.MAPBOX_GESTURES_PLUGIN_ID);
+        LocationComponentPlugin locationComponentPlugin = mapView.getPlugin(Plugin.Mapbox.MAPBOX_LOCATION_COMPONENT_PLUGIN_ID);
+
+        assert gesturesPlugin != null;
+        assert locationComponentPlugin != null;
+
+        locationComponentPlugin.removeOnIndicatorPositionChangedListener(posChangedListener);
+        gesturesPlugin.removeOnMoveListener(onMoveListener);
+=======
     private void addMapMarkers() {
+>>>>>>> 58e87cbda2cb5be5be61cc812ad75537fa83982b
     }
 
 
     /**
+<<<<<<< HEAD
+     * Responds to the player's granting or rejecting the requested permission. Namely
+     * move the map's camera when the user accepts the permissions.
+     *
+     * @param requestCode  The code assigned to set of permissions requested
+     * @param permissions  String array of all permissions requested
+     * @param grantResults Integer array of the status of the requested permissions
+     * @deprecated
+     */
+    @Override
+    public void onRequestPermissionsResult(int requestCode,
+                                           @NonNull String[] permissions,
+                                           @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        permManager.onRequestPermissionsResult(requestCode, permissions, grantResults);
+    }
+
+
+=======
      * Stop all defined listeners from listening, such as location and gestures.
      */
     @Override
@@ -339,4 +498,5 @@ public class MapViewFragment extends Fragment {
         permManager.onRequestPermissionsResult(requestCode, permissions, grantResults);
     }
 
+>>>>>>> 58e87cbda2cb5be5be61cc812ad75537fa83982b
 }
