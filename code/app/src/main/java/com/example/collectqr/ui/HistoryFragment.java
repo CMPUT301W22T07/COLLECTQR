@@ -54,7 +54,7 @@ public class HistoryFragment extends Fragment {
         StackOverflow, Author: The Dude
          */
         rootView = inflater.inflate(R.layout.fragment_history, container, false);
-        String username = Preferences.loadPreferences(rootView.getContext());
+        String username = Preferences.loadUserName(rootView.getContext());
         controller = new HistoryController(username);
 
         TextView totalPoints = rootView.findViewById(R.id.history_total_points);

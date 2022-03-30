@@ -1,5 +1,6 @@
 package com.example.collectqr.model;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 
@@ -10,8 +11,9 @@ import java.util.HashMap;
  */
 public class User {
     private final String username;
-    private final String email;
-    private final String phone;
+    private String email;
+    private String phone;
+    private ArrayList<String> devices;
     private HashMap<String, Integer> stats;
     private final HashMap<String, HashMap<String, Object>> codes_scanned; //sha : date scanned
 
@@ -19,6 +21,7 @@ public class User {
         this.username = username;
         this.email = "";
         this.phone = "";
+        this.devices = new ArrayList<>();
 
         HashMap<String, Integer> stats = new HashMap<>();
         stats.put("num_codes", 0);
@@ -71,12 +74,48 @@ public class User {
     }
 
     /**
+     * Sets the user's email to the given email
+     *
+     * @param email the user's new email
+     */
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    /**
      * Returns the user's phone number
      *
      * @return The user's phone number
      */
     public String getPhone() {
         return phone;
+    }
+
+    /**
+     * Sets the user's phone number to the given phone number
+     *
+     * @param phone the user's new phone number
+     */
+    public void setPhone(String phone) {
+        this.phone = phone;
+    }
+
+    /**
+     * Returns the list of all the user's devices
+     *
+     * @return A list of all the user's devices
+     */
+    public ArrayList<String> getDevices() {
+        return devices;
+    }
+
+    /**
+     * Adds the given device to the user's list of devices
+     *
+     * @param device another device belonging to the user
+     */
+    public void addDevice(String device) {
+        this.devices.add(device);
     }
 
     /**

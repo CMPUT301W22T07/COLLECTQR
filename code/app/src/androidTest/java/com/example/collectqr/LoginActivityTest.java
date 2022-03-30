@@ -51,7 +51,7 @@ public class LoginActivityTest {
         solo.enterText((EditText) solo.getView(R.id.usernameEditText), "111testinguser111");
         solo.clickOnButton("Login");
         solo.sleep(10000); //wait 10 seconds for firebase and sharedpreferences to update
-        String addedName = Preferences.loadPreferences(rule.getActivity());
+        String addedName = Preferences.loadUserName(rule.getActivity());
         assertEquals("111testinguser111", addedName);
     }
 
@@ -62,7 +62,7 @@ public class LoginActivityTest {
         solo.enterText((EditText) solo.getView(R.id.usernameEditText), "GeneralEd");
         solo.clickOnButton("Login");
         solo.sleep(10000); //wait 10 seconds for firebase and sharedpreferences to update
-        String addedName = Preferences.loadPreferences(rule.getActivity());
+        String addedName = Preferences.loadUserName(rule.getActivity());
         //user already in db, so it shouldn't be added to shared preferences
         assertNotEquals("GeneralEd", addedName);
     }

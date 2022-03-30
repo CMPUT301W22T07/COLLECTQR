@@ -1,8 +1,6 @@
 package com.example.collectqr;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-
 import android.content.Context;
 
 import androidx.test.core.app.ApplicationProvider;
@@ -12,10 +10,10 @@ import com.example.collectqr.utilities.Preferences;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
 public class PreferencesTest {
-
-    private Context context = ApplicationProvider.getApplicationContext();
+    Context context = ApplicationProvider.getApplicationContext();
 
     @Before
     public void setup() {
@@ -24,8 +22,8 @@ public class PreferencesTest {
 
     @Test
     public void testPreferences() {
-        Preferences.savePreferences(context, "teststring1000");
-        String pref = Preferences.loadPreferences(context);
+        Preferences.saveUserName(context, "teststring1000");
+        String pref = Preferences.loadUserName(context);
         assertEquals("teststring1000", pref);
     }
 
