@@ -24,7 +24,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_weight="0.5"
-            android:padding="6dp"
+            android:padding="4.5dp"
             android:text="Username"
             android:textSize="20sp">
         </TextView>
