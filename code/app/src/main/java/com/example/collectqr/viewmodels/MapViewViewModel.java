@@ -11,6 +11,7 @@ import androidx.lifecycle.MutableLiveData;
 
 import com.example.collectqr.data.LocationRepository;
 import com.example.collectqr.data.MapViewController;
+import com.example.collectqr.model.MapPOI;
 import com.firebase.geofire.GeoFireUtils;
 import com.firebase.geofire.GeoLocation;
 import com.firebase.geofire.GeoQueryBounds;
@@ -20,7 +21,6 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QuerySnapshot;
-import com.mapbox.geojson.Point;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -47,10 +47,10 @@ public class MapViewViewModel extends AndroidViewModel {
 
     // Class Variables
     private final FirebaseFirestore db = FirebaseFirestore.getInstance();
-    private final List<Point> POIList = new ArrayList<>();
+    private final List<MapPOI> POIList = new ArrayList<>();
 
     private MapViewController mMapController;
-    private MutableLiveData<List<Point>> qrGeoLocations;
+    private MutableLiveData<List<MapPOI>> qrGeoLocations;
     private final LiveData<Location> locationLiveData;
     public int lastPOILen = 0;
 
@@ -60,7 +60,7 @@ public class MapViewViewModel extends AndroidViewModel {
     }
 
 
-    public LiveData<List<Point>> getGeoLocations(Location location) {
+    public LiveData<List<MapPOI>> getGeoLocations(Location location) {
         if (qrGeoLocations == null && location != null) {
             qrGeoLocations = new MutableLiveData<>();
             loadGeoLocations(location);
@@ -117,10 +117,11 @@ public class MapViewViewModel extends AndroidViewModel {
                 lat = Double.parseDouble(lat_str);
                 lng = Double.parseDouble(lng_str);
 
-                Point e = Point.fromLngLat(lng, lat);
+                MapPOI mapPOI = new MapPOI(lng, lat, doc);
+
                 // Create points to add here
-                POIList.add(e);
-                Log.d(LOGGER_TAG, e.toString());
+                POIList.add(mapPOI);
+                Log.d(LOGGER_TAG, mapPOI.toString());
             }
         }
         qrGeoLocations.setValue(POIList);
@@ -128,7 +129,32 @@ public class MapViewViewModel extends AndroidViewModel {
     }
 
 
-    private void clearPoints(@NonNull List<Point> POIList) {
+//    public DocumentSnapshot getDocumentFromPoint(
+//            mapDataCallback callback,
+//            @NonNull CircleAnnotation circleAnnotation) {
+//        // Need to create a callback to handle the async op
+//        Point point = circleAnnotation.getPoint();
+//        JsonObject data = circleAnnotation.getData().getAsJsonObject();
+//        String hash = data.get("sha256").getAsString();
+//
+//        DocumentReference docRef = db.collection(COLLECTION).document(hash);
+//        Task<DocumentSnapshot> bruh =  docRef.get().addOnCompleteListener(task -> {
+//            // https://stackoverflow.com/a/47853774 by Alex Mamo
+//            callback.onCallback(task.getResult());
+//            // String strPoints = task.getResult().getString("points");
+//            // if (strPoints != null) {
+//            //     int points = Integer.parseInt(strPoints);
+//            //     Log.d(LOGGER_TAG, "Hash: " + hash + " ; " +
+//            //             "Points: " + points);
+//            // }
+//
+//        }); // :(
+//
+//        return bruh.getResult();
+//    }
+
+
+    private void clearPoints(@NonNull List<MapPOI> POIList) {
         POIList.clear();
     }
 
@@ -144,3 +170,5 @@ public class MapViewViewModel extends AndroidViewModel {
         clearPoints(POIList);
     }
 }
+
+

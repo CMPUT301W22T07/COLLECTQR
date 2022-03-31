@@ -3,7 +3,6 @@ package com.example.collectqr;
 import android.app.ActivityManager;
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.View;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.splashscreen.SplashScreen;
@@ -35,7 +34,7 @@ public class MainAppActivity extends AppCompatActivity {
         doesUserExist();
 
         super.onCreate(savedInstanceState);
-        //setupWindowAttributes();
+        setupWindowAttributes();
 
         // Setup view binding in this activity; see dev docs
         binding = ActivityAppBinding.inflate(getLayoutInflater());
@@ -68,7 +67,7 @@ public class MainAppActivity extends AppCompatActivity {
                 Launch the login activity as the base of the stack
                 https://stackoverflow.com/a/16388608 by Cynichniy Bandera
              */
-            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK |  Intent.FLAG_ACTIVITY_CLEAR_TASK);
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
             startActivity(intent);
         }
     }
@@ -100,7 +99,5 @@ public class MainAppActivity extends AppCompatActivity {
         /* Swapping the eye-searing container colour
            https://trendyprogrammer.blogspot.com/2020/01/how-to-show-content-behind-status-bar.html
          */
-        getWindow().getDecorView().setSystemUiVisibility(
-                View.SYSTEM_UI_FLAG_FULLSCREEN | View.SYSTEM_UI_FLAG_LAYOUT_STABLE);
     }
 }

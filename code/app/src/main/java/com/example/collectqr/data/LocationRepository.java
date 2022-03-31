@@ -1,5 +1,6 @@
 package com.example.collectqr.data;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.location.Location;
 
@@ -26,8 +27,8 @@ public final class LocationRepository extends LiveData<Location> {
     // https://www.geeksforgeeks.org/singleton-class-java/ Pavan Gopal Rayapati
     // Naive singleton. Honestly trash for use in Android in particular but works for now
     private static volatile LocationRepository sSoleInstance = null;
-    private FusedLocationProviderClient fusedLocationProviderClient;
-    private LocationRequest locationRequest;
+    private final FusedLocationProviderClient fusedLocationProviderClient;
+    private final LocationRequest locationRequest;
 
 
     public LocationRepository(Context context) {
@@ -49,6 +50,7 @@ public final class LocationRepository extends LiveData<Location> {
     }
 
 
+    @SuppressLint("MissingPermission")
     @Override
     protected void onActive() {
         super.onActive();
@@ -82,6 +84,7 @@ public final class LocationRepository extends LiveData<Location> {
     }
 
 
+    @SuppressLint("MissingPermission")
     private void startLocationUpdates() {
         fusedLocationProviderClient.requestLocationUpdates(locationRequest, locationCallback(), null);
     }

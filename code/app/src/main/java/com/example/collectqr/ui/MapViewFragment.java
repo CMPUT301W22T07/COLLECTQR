@@ -24,9 +24,12 @@ import androidx.lifecycle.ViewModelProvider;
 import com.example.collectqr.EnterQrInfoActivity;
 import com.example.collectqr.ScanQRCodeActivity;
 import com.example.collectqr.databinding.FragmentMapViewBinding;
+import com.example.collectqr.model.MapPOI;
 import com.example.collectqr.utilities.Preferences;
 import com.example.collectqr.viewmodels.MapViewViewModel;
-import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
+import com.google.gson.Gson;
+import com.google.gson.JsonElement;
 import com.mapbox.android.core.permissions.PermissionsListener;
 import com.mapbox.android.core.permissions.PermissionsManager;
 import com.mapbox.android.gestures.MoveGestureDetector;
@@ -40,15 +43,20 @@ import com.mapbox.maps.plugin.Plugin;
 import com.mapbox.maps.plugin.annotation.AnnotationConfig;
 import com.mapbox.maps.plugin.annotation.AnnotationPlugin;
 import com.mapbox.maps.plugin.annotation.AnnotationType;
+import com.mapbox.maps.plugin.annotation.generated.CircleAnnotation;
 import com.mapbox.maps.plugin.annotation.generated.CircleAnnotationManager;
 import com.mapbox.maps.plugin.annotation.generated.CircleAnnotationOptions;
+import com.mapbox.maps.plugin.annotation.generated.OnCircleAnnotationClickListener;
 import com.mapbox.maps.plugin.gestures.GesturesPlugin;
-import com.mapbox.maps.plugin.gestures.OnMapClickListener;
 import com.mapbox.maps.plugin.gestures.OnMoveListener;
 import com.mapbox.maps.plugin.locationcomponent.LocationComponentPlugin;
 import com.mapbox.maps.plugin.locationcomponent.OnIndicatorPositionChangedListener;
 
+import org.jetbrains.annotations.Contract;
+
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 
 /**
@@ -68,9 +76,22 @@ public class MapViewFragment extends Fragment {
     private static final String PREFS_CAM_ZOOM = "cameraZoom";
     private static final String PREFS_CAM_PITCH = "cameraPitch";
     private FragmentMapViewBinding binding;
+    private BottomSheetDialogFragment infoSheet;
 
     // Map Variables
     private MapView mapView;
+    // Store reference and override the circle annotation click listener
+    private final OnCircleAnnotationClickListener poiClickListener =
+            circleAnnotation -> {
+                Point point = circleAnnotation.getPoint();
+                Toast.makeText(
+                        requireContext(),
+                        "Annotation clicked: " + point.latitude() + " " + point.longitude(),
+                        Toast.LENGTH_SHORT
+                ).show();
+                showInfoSheet(circleAnnotation);
+                return true;
+            };
     // Store reference and override the position listener
     private final OnIndicatorPositionChangedListener posChangedListener =
             new OnIndicatorPositionChangedListener() {
@@ -99,20 +120,8 @@ public class MapViewFragment extends Fragment {
         public void onMoveEnd(@NonNull MoveGestureDetector moveGestureDetector) {
         }
     };
-    // Store reference for the on-click listener
-    private final OnMapClickListener onMapClickListener = new OnMapClickListener() {
-        @Override
-        public boolean onMapClick(@NonNull Point point) {
-            Style style = mapView.getMapboxMap().getStyle();
-            if (style != null) {
-                //TODO
-            }
-            return false;
-        }
-    };
 
     private Location lastKnownLocation;
-    private FusedLocationProviderClient fusedLocationProviderClient;
     private GesturesPlugin gesturesPlugin;
     private LocationComponentPlugin locationComponentPlugin;
     private MapViewViewModel mViewModel;
@@ -124,6 +133,8 @@ public class MapViewFragment extends Fragment {
      *
      * @return A map-view fragment
      */
+    @NonNull
+    @Contract(" -> new")
     public static MapViewFragment newInstance() {
         return new MapViewFragment();
     }
@@ -386,7 +397,7 @@ public class MapViewFragment extends Fragment {
     }
 
 
-    private void addMapMarkers(@NonNull List<Point> POIList) {
+    private void addMapMarkers(@NonNull List<MapPOI> POIList) {
 
         if (mViewModel.lastPOILen != POIList.size()) {
 
@@ -398,11 +409,26 @@ public class MapViewFragment extends Fragment {
                             new AnnotationConfig()
                     );
 
-            for (Point point : POIList) {
+            List<CircleAnnotation> circleAnnotations = circleAnnotationManager.getAnnotations();
+            circleAnnotationManager.addClickListener(poiClickListener);
+
+            for (MapPOI mapPOI : POIList) {
+                // Converting a map point's qr code hash to json
+                // https://stackoverflow.com/a/12155874 by Ankur
+                Map<String, String> dataMap = new HashMap<>();
+                dataMap.put("sha256", mapPOI.getHash());
+
+                // Parsing json
+                // https://howtodoinjava.com/gson/gson-jsonparser/
+                JsonElement dataJson = new Gson().toJsonTree(dataMap);
+
+
+                // Create the annotation to display on the map and include the arbitrary data
+                // (hash) as JSON data
                 CircleAnnotationOptions circleAnnotationOptions =
                         new CircleAnnotationOptions()
-                                .withPoint(point)
-                                .withDraggable(true)
+                                .withData(dataJson)
+                                .withPoint(mapPOI.getPoint())
                                 .withCircleRadius(8.0)
                                 .withCircleColor("#ee4e8b")
                                 .withCircleStrokeWidth(2.0)
@@ -415,6 +441,33 @@ public class MapViewFragment extends Fragment {
         }
 
         Log.d(TAG, "Didn't draw the points");
+    }
+
+    /**
+     * Based on: https://material.io/components/sheets-bottom/android#using-bottom-sheets
+     *
+     * @param circleAnnotation
+     */
+    private void showInfoSheet(CircleAnnotation circleAnnotation) {
+//        DocumentSnapshot document =  mViewModel.getDocumentFromPoint(
+//                new mapDataCallback() {
+//                    @Override
+//                    public void onCallback(DocumentSnapshot doc) {
+//                        Log.d("MapViewCallback", doc.getString("points"));
+//                    }
+//                },
+//                circleAnnotation);
+
+        infoSheet = new MapInfoBottomSheet();
+        infoSheet.show(requireActivity().getSupportFragmentManager(), infoSheet.getTag());
+
+//        int points = 0;
+//
+//         String strPoints = document.getString("points");
+//         if (strPoints != null) {
+//             points = Integer.parseInt(strPoints);
+//         }
+
     }
 
 
