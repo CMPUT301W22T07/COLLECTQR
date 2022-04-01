@@ -45,6 +45,7 @@ public class LeaderboardController {
     public void setCurrentCategory(String category) {
         this.currentCategory = category;
     }
+
     /**
      * Takes an empty ArrayList and the adapter of the ListView
      * Downloads the data into the ArrayList sorts it and notifies the adapter
@@ -69,18 +70,21 @@ public class LeaderboardController {
                         dataLists.get("most_points").clear();
                         dataLists.get("most_codes").clear();
                         dataLists.get("best_code").clear();
+                        dataLists.get("region_best").clear();
                         for (QueryDocumentSnapshot doc : queryDocumentSnapshots) {
                             Log.d(TAG, String.valueOf(doc.getData().get("username")));
                             String name = String.valueOf(doc.getData().get("username"));
                             int totalPoints = Integer.parseInt(String.valueOf(doc.getData().get("total_points")));
                             int numCodes = Integer.parseInt(String.valueOf(doc.getData().get("num_codes")));
                             int bestCode = Integer.parseInt(String.valueOf(doc.getData().get("best_code")));
+                            int regionBest = Integer.parseInt(String.valueOf(doc.getData().get("region_best")));
 
                             User userObj = new User(name);
-                            userObj.updateScore(numCodes, totalPoints, bestCode);
+                            userObj.updateScore(numCodes, totalPoints, bestCode, regionBest);
                             dataLists.get("most_points").add(userObj);
                             dataLists.get("most_codes").add(userObj);
                             dataLists.get("best_code").add(userObj);
+                            dataLists.get("region_best").add(userObj);
                         }
                         controller.sortLists(dataLists);
 
@@ -89,13 +93,20 @@ public class LeaderboardController {
                             if (item.getUsername().equals(username)) {
                                 if (currentCategory.equals("most_points")) {
                                     score.setText(item.getStats().get("total_points") + " points");
-                                    rank.setText(Integer.toString(i+1));
+                                    String rankStr = Integer.toString(i+1);
+                                    rank.setText("#" + rankStr);
                                 } else if (currentCategory.equals("most_codes")) {
                                     score.setText(item.getStats().get("num_codes") + " codes");
-                                    rank.setText(Integer.toString(i+1));
-                                } else {
+                                    String rankStr = Integer.toString(i+1);
+                                    rank.setText("#" + rankStr);
+                                } else if (currentCategory.equals("best_code")) {
                                     score.setText(item.getStats().get("best_code") + " points");
-                                    rank.setText(Integer.toString(i+1));
+                                    String rankStr = Integer.toString(i+1);
+                                    rank.setText("#" + rankStr);
+                                } else if (currentCategory.equals("region_best")) {
+                                    score.setText(item.getStats().get("region_points") + " points");
+                                    String rankStr = Integer.toString(i+1);
+                                    rank.setText("#" + rankStr);
                                 }
                             }
                         }
@@ -103,6 +114,7 @@ public class LeaderboardController {
                         adapters.get("most_points").notifyDataSetChanged();
                         adapters.get("most_codes").notifyDataSetChanged();
                         adapters.get("best_code").notifyDataSetChanged();
+                        adapters.get("region_best").notifyDataSetChanged();
                     }
                 });
     }
@@ -129,6 +141,12 @@ public class LeaderboardController {
             @Override
             public int compare(User user, User t1) {
                 return t1.getStats().get("best_code")-user.getStats().get("best_code");
+            }
+        });
+        dataLists.get("region_best").sort(new Comparator<User>() {
+            @Override
+            public int compare(User user, User t1){
+                return t1.getStats().get("region_points")-user.getStats().get("region_points");
             }
         });
     }

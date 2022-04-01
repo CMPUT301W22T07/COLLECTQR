@@ -95,11 +95,6 @@ public class LeaderboardRecyclerAdapter extends RecyclerView.Adapter<Leaderboard
         // contents of the view with that element
         User user = data.get(position);
 
-        // set TextView for each list element
-        TextView userName = viewGroup.findViewById(R.id.username_text);
-        TextView userScore = viewGroup.findViewById(R.id.score_text);
-        TextView userRank = viewGroup.findViewById(R.id.rank_text);
-
         viewHolder.getUserName().setText(user.getUsername());
         if (category.equals("most_points")) {
             viewHolder.getUserScore().setText(user.getStats().get("total_points") + " points");
@@ -107,9 +102,12 @@ public class LeaderboardRecyclerAdapter extends RecyclerView.Adapter<Leaderboard
             viewHolder.getUserScore().setText(user.getStats().get("num_codes") + " codes");
         } else if (category.equals("best_code")) {
             viewHolder.getUserScore().setText(user.getStats().get("best_code") + " points");
+        } else if (category.equals("region_best")) {
+            viewHolder.getUserScore().setText(user.getStats().get("region_points") + " points");
         }
         // index of user in sorted list plus 1 = rank
-        viewHolder.getUserRank().setText(Integer.toString(data.indexOf(user)+1));
+        String rankStr = Integer.toString(data.indexOf(user)+1);
+        viewHolder.getUserRank().setText("#" + rankStr);
     }
 
     /**

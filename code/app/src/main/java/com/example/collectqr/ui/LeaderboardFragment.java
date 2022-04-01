@@ -118,11 +118,13 @@ public class LeaderboardFragment extends Fragment {
         dataLists.put("most_points", new ArrayList<>());
         dataLists.put("most_codes", new ArrayList<>());
         dataLists.put("best_code", new ArrayList<>());
+        dataLists.put("region_best", new ArrayList<>());
 
         adapterLists = new ArrayMap<>();
         adapterLists.put("most_points", new LeaderboardRecyclerAdapter(dataLists.get("most_points"), "most_points"));
         adapterLists.put("most_codes", new LeaderboardRecyclerAdapter(dataLists.get("most_codes"), "most_codes"));
         adapterLists.put("best_code", new LeaderboardRecyclerAdapter(dataLists.get("best_code"), "best_code"));
+        adapterLists.put("region_best", new LeaderboardRecyclerAdapter(dataLists.get("region_best"), "region_best"));
 
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getContext());
         leaderboardList.setLayoutManager(layoutManager);
@@ -143,13 +145,20 @@ public class LeaderboardFragment extends Fragment {
             if (item.getUsername().equals(username)) {
                 if (currentCategory.equals("most_points")) {
                     personalScore.setText(item.getStats().get("total_points") + " points");
-                    personalRank.setText(Integer.toString(i+1));
+                    String rankStr = Integer.toString(i+1);
+                    personalRank.setText("#" + rankStr);
                 } else if (currentCategory.equals("most_codes")) {
                     personalScore.setText(item.getStats().get("num_codes") + " codes");
-                    personalRank.setText(Integer.toString(i+1));
-                } else {
+                    String rankStr = Integer.toString(i+1);
+                    personalRank.setText("#" + rankStr);
+                } else if (currentCategory.equals("best_code")) {
                     personalScore.setText(item.getStats().get("best_code") + " points");
-                    personalRank.setText(Integer.toString(i+1));
+                    String rankStr = Integer.toString(i+1);
+                    personalRank.setText("#" + rankStr);
+                } else if (currentCategory.equals("region_best")){
+                    personalScore.setText(item.getStats().get("region_points") + " points");
+                    String rankStr = Integer.toString(i+1);
+                    personalRank.setText("#" + rankStr);
                 }
             }
         }
@@ -174,6 +183,10 @@ public class LeaderboardFragment extends Fragment {
                     leaderboardList.setAdapter(adapterLists.get("best_code"));
                     leaderboardController.setCurrentCategory("best_code");
                     updatePersonalCard("best_code");
+                } else if (tab.getPosition()==3) {
+                    leaderboardList.setAdapter(adapterLists.get("region_best"));
+                    leaderboardController.setCurrentCategory("region_best");
+                    updatePersonalCard("region_best");
                 }
             }
             @Override
