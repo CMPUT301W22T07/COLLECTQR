@@ -110,7 +110,6 @@ public class LeaderboardController {
                                 }
                             }
                         }
-
                         adapters.get("most_points").notifyDataSetChanged();
                         adapters.get("most_codes").notifyDataSetChanged();
                         adapters.get("best_code").notifyDataSetChanged();

@@ -12,7 +12,6 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-
 import com.example.collectqr.R;
 import com.example.collectqr.adapters.LeaderboardRecyclerAdapter;
 import com.example.collectqr.data.LeaderboardController;
