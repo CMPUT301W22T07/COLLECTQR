@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- https://material.io/components/app-bars-top/android#regular-top-app-bar -->
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/top_app_bar">
+
+    <item
+        android:id="@+id/user_search"
+        android:icon="?android:attr/actionModeWebSearchDrawable"
+        app:showAsAction="ifRoom"
+        android:title="Search for User"
+        android:visible="false"/>
+
+    <item
+        android:id="@+id/user_profile"
+        android:icon="@drawable/ic_baseline_account_circle_24"
+        app:showAsAction="ifRoom"
+        android:title="My Profile"
+        android:visible="true"/>
+
+    <item
+        android:id="@+id/sort_history"
+        android:icon="@drawable/ic_baseline_sort_24"
+        app:showAsAction="ifRoom"
+        android:title="Sort Codes"
+        android:visible="false"/>
+
+</menu>

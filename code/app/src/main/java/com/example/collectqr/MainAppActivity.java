@@ -3,9 +3,12 @@ package com.example.collectqr;
 import android.app.ActivityManager;
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import androidx.core.splashscreen.SplashScreen;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
@@ -13,6 +16,7 @@ import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
 
 import com.example.collectqr.databinding.ActivityAppBinding;
+import com.example.collectqr.ui.ProfileDialogFragment;
 import com.example.collectqr.utilities.Preferences;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -41,18 +45,30 @@ public class MainAppActivity extends AppCompatActivity {
         binding = ActivityAppBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
+        setUpTopAppBar();
+
         /* Bottom Navigation Boilerplate from Android Studio
            Supplementary source: https://developer.android.com/guide/navigation/navigation-ui#java
          */
-        AppBarConfiguration appBarConfiguration = new AppBarConfiguration.Builder(
-                R.id.navigation_leaderboard, R.id.navigation_map, R.id.navigation_history).build();
+        //AppBarConfiguration appBarConfiguration = new AppBarConfiguration.Builder(
+        //        R.id.navigation_leaderboard, R.id.navigation_map, R.id.navigation_history).build();
         NavController navController =
                 Navigation.findNavController(this, R.id.nav_host_fragment_container_main);
-        NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
+        //NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
         NavigationUI.setupWithNavController(binding.bottomnavContainer, navController);
-
     }
 
+
+    /*
+    YouTube Video
+    Author: Philipp Lackner
+    https://youtu.be/CRmfdVYWOhc
+     */
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.top_app_bar, menu);
+        return true;
+    }
 
     /**
      * Check if a user already exists on the device. If not, start Login activity
@@ -92,6 +108,38 @@ public class MainAppActivity extends AppCompatActivity {
         }
     }
 
+    private void setUpTopAppBar() {
+        /*
+        https://developer.android.com/training/appbar/setting-up#add-toolbar
+        https://stackoverflow.com/a/42837106
+        StackOverflow, Author tahsinRupam
+        */
+        Toolbar toolbar = (Toolbar) findViewById(R.id.topAppBar);
+        setSupportActionBar(toolbar);
+
+        /*
+        https://material.io/components/app-bars-top/android#regular-top-app-bar
+        StackOverflow, Author: reVerse
+        https://stackoverflow.com/a/27490705
+         */
+        toolbar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem item) {
+                switch (item.getItemId()) {
+                    case R.id.user_search:
+                        System.out.println("clicked user search");
+                        return true;
+                    case R.id.user_profile:
+                        new ProfileDialogFragment().show(getSupportFragmentManager(), "DISPLAY_PROFILE");
+                        return true;
+                    case R.id.sort_history:
+                        System.out.println("clicked sort history");
+                        return true;
+                }
+                return false;
+            }
+        });
+    }
 
     /**
      * Setup window attributes and decorations at startup
