@@ -10,6 +10,7 @@ import android.os.Bundle;
 import android.provider.Settings;
 import android.util.Log;
 import android.view.View;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -19,7 +20,9 @@ import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
 
+import com.example.collectqr.data.UserController;
 import com.example.collectqr.databinding.ActivityAppBinding;
+import com.example.collectqr.model.User;
 import com.example.collectqr.utilities.Preferences;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -72,6 +75,8 @@ public class MainAppActivity extends AppCompatActivity {
      * Check if a user already exists on the device. If not, start Login activity
      */
     public void doesUserExist() {
+        //initially write false to users admin status to prevent any bugs
+        Preferences.saveAdminStatus(context, false);
         //check if the current device id exists within the db
         @SuppressLint("HardwareIds") String device_id = Settings.Secure.getString(this.getContentResolver(), Settings.Secure.ANDROID_ID);
 
@@ -97,6 +102,8 @@ public class MainAppActivity extends AppCompatActivity {
                                     //device does exist within db, save username to shared preferences
                                     //for future use in other parts of the application
                                     Preferences.saveUserName(context, document.getId());
+                                    //check if the user has admin permissions
+                                    checkIfAdmin(device_id);
                                 }
                             }
                         } else {
@@ -106,6 +113,31 @@ public class MainAppActivity extends AppCompatActivity {
                 });
     }
 
+    /**
+     * Check if a user should have admin permissions by checking the database, if the user should or
+     * shouldn't have admin permissions, write this data to shared preferences for future use
+     */
+    public void checkIfAdmin(String device_id) {
+        db = FirebaseFirestore.getInstance();
+        //search firebase to see if username is already in db
+        db.collection("Admins")
+                .whereEqualTo("device_id", device_id)
+                .get()
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        if (task.getResult().isEmpty()) {
+                            //user doesn't exist within admin document, so they are not an admin
+                            //write this to shared preferences
+                            Preferences.saveAdminStatus(context, false);
+                        } else {
+                            //user is an admin, write this to shared preferences
+                            Preferences.saveAdminStatus(context, true);
+                        }
+                    } else {
+                        Log.d(TAG, "Error getting documents: ", task.getException());
+                    }
+                });
+    }
 
     /**
      * Keep the monkeys out
