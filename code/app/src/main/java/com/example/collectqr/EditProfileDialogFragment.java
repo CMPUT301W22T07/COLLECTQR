@@ -46,6 +46,10 @@ public class EditProfileDialogFragment extends DialogFragment {
                 .setPositiveButton("Save", null)
                 .create();
 
+        /*
+        StackOverflow, Author: Mohamed AbdelraZek
+        https://stackoverflow.com/a/67540989
+         */
         dialog.getWindow().setBackgroundDrawable(getResources().getDrawable(R.drawable.white_rounded_rectangle));
 
         /*

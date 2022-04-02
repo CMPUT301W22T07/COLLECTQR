@@ -20,6 +20,7 @@ import androidx.fragment.app.DialogFragment;
 
 import com.example.collectqr.DummyActivity;
 import com.example.collectqr.EditProfileDialogFragment;
+import com.example.collectqr.GenerateQRCodeActivity;
 import com.example.collectqr.LoginActivity;
 import com.example.collectqr.R;
 import com.example.collectqr.utilities.Preferences;
@@ -41,9 +42,6 @@ public class ProfileDialogFragment extends DialogFragment {
     public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         View rootView = LayoutInflater.from(getActivity()).inflate(R.layout.profile_dialog_fragment, null);
-        //if (getDialog()!=null && getDialog().getWindow()!=null) {
-         //   getDialog().getWindow().setBackgroundDrawable(getResources().getDrawable(R.drawable.white_rounded_rectangle));
-        //}
 
         TextView usernameView = rootView.findViewById(R.id.profile_username);
         TextView emailView = rootView.findViewById(R.id.profile_email);
@@ -53,7 +51,6 @@ public class ProfileDialogFragment extends DialogFragment {
         TextView editButton = rootView.findViewById(R.id.profile_edit_profile);
 
         String username = Preferences.loadUserName(getContext());
-        usernameView.setText(username);
         //https://firebase.google.com/docs/firestore/query-data/listen
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         DocumentReference docRef = db.collection("Users").document(username);
@@ -97,8 +94,9 @@ public class ProfileDialogFragment extends DialogFragment {
         exportButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                // TODO: change dummy activity to an activity that generates qr code to export user
-                Intent intent = new Intent(getContext(), DummyActivity.class);
+                // TODO: change dummy activity to an activity that generates qr codes
+                Intent intent = new Intent(getContext(), GenerateQRCodeActivity.class);
+                intent.putExtra("qrGen", 0);
                 startActivity(intent);
             }
         });
@@ -106,8 +104,8 @@ public class ProfileDialogFragment extends DialogFragment {
         shareButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                // TODO: change dummy activity to an activity that generates qr code to share user
-                Intent intent = new Intent(getContext(), DummyActivity.class);
+                Intent intent = new Intent(getContext(), GenerateQRCodeActivity.class);
+                intent.putExtra("qrGen", 1);
                 startActivity(intent);
             }
         });
@@ -115,7 +113,8 @@ public class ProfileDialogFragment extends DialogFragment {
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
         Dialog dialog = builder.setView(rootView).create();
         /*
-
+        StackOverflow, Author: Mohamed AbdelraZek
+        https://stackoverflow.com/a/67540989
          */
         dialog.getWindow().setBackgroundDrawable(getResources().getDrawable(R.drawable.white_rounded_rectangle));
         return dialog;

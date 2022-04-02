@@ -60,12 +60,21 @@ public class ScanQRCodeActivity extends AppCompatActivity {
 
             @Override
             public void onCodeScanned(String data) {
-                scannedTextView.setText(data);
-                String sha = new HashConversion().convertToSHA256(data);
-                Intent intent = new Intent();
-                intent.putExtra("sha", sha);
-                // https://www.tutorialspoint.com/how-to-send-data-to-previous-activity-in-android
-                setResult(RESULT_OK, intent);
+                ////scannedTextView.setText(data);
+
+                if (data.contains(" GameStatus")) {
+                    Intent intent = new Intent(getApplicationContext(), DummyActivity.class);
+                    intent.putExtra("data", data);
+                    startActivity(intent);
+                }
+
+                else {
+                    String sha = new HashConversion().convertToSHA256(data);
+                    Intent intent = new Intent();
+                    intent.putExtra("sha", sha);
+                    // https://www.tutorialspoint.com/how-to-send-data-to-previous-activity-in-android
+                    setResult(RESULT_OK, intent);
+                }
                 finish();
             }
         });
