@@ -1,8 +1,14 @@
 package com.example.collectqr.ui;
 
+import android.Manifest;
 import android.app.Activity;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
+import android.content.res.Configuration;
+import android.location.Location;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,29 +17,46 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.content.res.AppCompatResources;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.example.collectqr.EnterQrInfoActivity;
 import com.example.collectqr.ScanQRCodeActivity;
 import com.example.collectqr.databinding.FragmentMapViewBinding;
+import com.example.collectqr.model.MapPOI;
 import com.example.collectqr.utilities.Preferences;
 import com.example.collectqr.viewmodels.MapViewViewModel;
+import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
+import com.google.gson.Gson;
+import com.google.gson.JsonElement;
 import com.mapbox.android.core.permissions.PermissionsListener;
 import com.mapbox.android.core.permissions.PermissionsManager;
 import com.mapbox.android.gestures.MoveGestureDetector;
 import com.mapbox.geojson.Point;
 import com.mapbox.maps.CameraOptions;
+import com.mapbox.maps.CameraState;
 import com.mapbox.maps.MapView;
 import com.mapbox.maps.Style;
 import com.mapbox.maps.plugin.LocationPuck2D;
 import com.mapbox.maps.plugin.Plugin;
+import com.mapbox.maps.plugin.annotation.AnnotationConfig;
+import com.mapbox.maps.plugin.annotation.AnnotationPlugin;
+import com.mapbox.maps.plugin.annotation.AnnotationType;
+import com.mapbox.maps.plugin.annotation.generated.CircleAnnotation;
+import com.mapbox.maps.plugin.annotation.generated.CircleAnnotationManager;
+import com.mapbox.maps.plugin.annotation.generated.CircleAnnotationOptions;
+import com.mapbox.maps.plugin.annotation.generated.OnCircleAnnotationClickListener;
 import com.mapbox.maps.plugin.gestures.GesturesPlugin;
 import com.mapbox.maps.plugin.gestures.OnMoveListener;
 import com.mapbox.maps.plugin.locationcomponent.LocationComponentPlugin;
 import com.mapbox.maps.plugin.locationcomponent.OnIndicatorPositionChangedListener;
 
+import org.jetbrains.annotations.Contract;
+
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 
 /**
@@ -44,10 +67,31 @@ import java.util.List;
 public class MapViewFragment extends Fragment {
 
     private final String TAG = "MapViewFragment";
+    // From osmdroid example under Apache 2.0 License
+    // https://github.com/osmdroid/osmdroid
+    private SharedPreferences mPrefs;
+    private final static String PREFS_NAME = "com.example.collectqr.prefs";
+    private static final String PREFS_CAM_LAT = "cameraLatitude";
+    private static final String PREFS_CAM_LON = "cameraLongitude";
+    private static final String PREFS_CAM_ZOOM = "cameraZoom";
+    private static final String PREFS_CAM_PITCH = "cameraPitch";
     private FragmentMapViewBinding binding;
+    private BottomSheetDialogFragment infoSheet;
 
     // Map Variables
     private MapView mapView;
+    // Store reference and override the circle annotation click listener
+    private final OnCircleAnnotationClickListener poiClickListener =
+            circleAnnotation -> {
+                Point point = circleAnnotation.getPoint();
+                Toast.makeText(
+                        requireContext(),
+                        "Annotation clicked: " + point.latitude() + " " + point.longitude(),
+                        Toast.LENGTH_SHORT
+                ).show();
+                showInfoSheet(circleAnnotation);
+                return true;
+            };
     // Store reference and override the position listener
     private final OnIndicatorPositionChangedListener posChangedListener =
             new OnIndicatorPositionChangedListener() {
@@ -76,6 +120,8 @@ public class MapViewFragment extends Fragment {
         public void onMoveEnd(@NonNull MoveGestureDetector moveGestureDetector) {
         }
     };
+
+    private Location lastKnownLocation;
     private GesturesPlugin gesturesPlugin;
     private LocationComponentPlugin locationComponentPlugin;
     private MapViewViewModel mViewModel;
@@ -87,10 +133,11 @@ public class MapViewFragment extends Fragment {
      *
      * @return A map-view fragment
      */
+    @NonNull
+    @Contract(" -> new")
     public static MapViewFragment newInstance() {
         return new MapViewFragment();
     }
-
 
     /**
      * Setting up the map to be displayed in the fragment.
@@ -112,6 +159,25 @@ public class MapViewFragment extends Fragment {
         checkPermissions();
         return view;
 
+    }
+
+    private void getLocation() {
+        String locationFinePermission = Manifest.permission.ACCESS_FINE_LOCATION;
+        String locationCoarsePermission = Manifest.permission.ACCESS_COARSE_LOCATION;
+
+        if (ContextCompat.checkSelfPermission(requireContext(), locationFinePermission)
+                == PackageManager.PERMISSION_GRANTED
+                || ContextCompat.checkSelfPermission(requireContext(), locationCoarsePermission)
+                == PackageManager.PERMISSION_GRANTED) {
+            requestLocationUpdates();
+        } else {
+            permManager.requestLocationPermissions(requireActivity());
+        }
+    }
+
+    private void requestLocationUpdates() {
+        mViewModel.getLocationLiveData().observe(getViewLifecycleOwner(),
+                location -> lastKnownLocation = location);
     }
 
 
@@ -149,13 +215,33 @@ public class MapViewFragment extends Fragment {
      */
     private void onMapReady() {
         mapView.getMapboxMap().setCamera(
-                new CameraOptions.Builder().zoom(14.0).build()
+                new CameraOptions.Builder().zoom(14.0).pitch(40.0).build()
         );
         mapView.getMapboxMap().loadStyleUri(Style.MAPBOX_STREETS,
                 style -> {
                     initLocationComponent();
                     setupGesturesListener();
                 });
+
+        // https://developer.android.com/guide/topics/ui/look-and-feel/darktheme#java
+        // https://stackoverflow.com/a/41451143 by harshithdwivedi
+        int currentTheme = getResources().getConfiguration().uiMode & Configuration.UI_MODE_NIGHT_MASK;
+        switch (currentTheme) {
+            case Configuration.UI_MODE_NIGHT_NO:
+                mapView.getMapboxMap().loadStyleUri(Style.MAPBOX_STREETS,
+                        style -> {
+                            initLocationComponent();
+                            setupGesturesListener();
+                        });
+                break;
+            case Configuration.UI_MODE_NIGHT_YES:
+                mapView.getMapboxMap().loadStyleUri(Style.DARK,
+                        style -> {
+                            initLocationComponent();
+                            setupGesturesListener();
+                        });
+                break;
+        }
     }
 
 
@@ -279,11 +365,6 @@ public class MapViewFragment extends Fragment {
     }
 
 
-    private void drawMarkers() {
-
-    }
-
-
     /**
      * Setup the interactive elements of the fragment, like buttons.
      *
@@ -293,15 +374,100 @@ public class MapViewFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        if (savedInstanceState != null) {
+            locationComponentPlugin.removeOnIndicatorPositionChangedListener(posChangedListener);
+            double lat = savedInstanceState.getDouble(PREFS_CAM_LAT);
+            double lon = savedInstanceState.getDouble(PREFS_CAM_LON);
+            double pitch = savedInstanceState.getDouble(PREFS_CAM_PITCH);
+            double zoom = savedInstanceState.getDouble(PREFS_CAM_ZOOM);
+            mapView.getMapboxMap().setCamera(
+                    new CameraOptions.Builder()
+                            .center(Point.fromLngLat(lon, lat))
+                            .pitch(pitch)
+                            .zoom(zoom)
+                            .build()
+            );
+        }
         mViewModel = new ViewModelProvider(this).get(MapViewViewModel.class);
-        mViewModel.getGeoLocations().observe(getViewLifecycleOwner(), geoLocations -> {
-            addMapMarkers();
+        mViewModel.getLocationLiveData().observe(getViewLifecycleOwner(), location -> {
+            mViewModel.getGeoLocations(location).observe(
+                    getViewLifecycleOwner(), this::addMapMarkers);
         });
-        // TODO: Use the ViewModel
         setButtonsActions();
     }
 
-    private void addMapMarkers() {
+
+    private void addMapMarkers(@NonNull List<MapPOI> POIList) {
+
+        if (mViewModel.lastPOILen != POIList.size()) {
+
+            AnnotationPlugin annotationPlugin = mapView.getPlugin(Plugin.MAPBOX_ANNOTATION_PLUGIN_ID);
+            assert annotationPlugin != null;
+            CircleAnnotationManager circleAnnotationManager =
+                    (CircleAnnotationManager) annotationPlugin.createAnnotationManager(
+                            AnnotationType.CircleAnnotation,
+                            new AnnotationConfig()
+                    );
+
+            List<CircleAnnotation> circleAnnotations = circleAnnotationManager.getAnnotations();
+            circleAnnotationManager.addClickListener(poiClickListener);
+
+            for (MapPOI mapPOI : POIList) {
+                // Converting a map point's qr code hash to json
+                // https://stackoverflow.com/a/12155874 by Ankur
+                Map<String, String> dataMap = new HashMap<>();
+                dataMap.put("sha256", mapPOI.getHash());
+
+                // Parsing json
+                // https://howtodoinjava.com/gson/gson-jsonparser/
+                JsonElement dataJson = new Gson().toJsonTree(dataMap);
+
+
+                // Create the annotation to display on the map and include the arbitrary data
+                // (hash) as JSON data
+                CircleAnnotationOptions circleAnnotationOptions =
+                        new CircleAnnotationOptions()
+                                .withData(dataJson)
+                                .withPoint(mapPOI.getPoint())
+                                .withCircleRadius(8.0)
+                                .withCircleColor("#ee4e8b")
+                                .withCircleStrokeWidth(2.0)
+                                .withCircleStrokeColor("#ffffff");
+
+                circleAnnotationManager.create(circleAnnotationOptions);
+            }
+            Log.d(TAG, "Points drawn ");
+            return;
+        }
+
+        Log.d(TAG, "Didn't draw the points");
+    }
+
+    /**
+     * Based on: https://material.io/components/sheets-bottom/android#using-bottom-sheets
+     *
+     * @param circleAnnotation
+     */
+    private void showInfoSheet(CircleAnnotation circleAnnotation) {
+//        DocumentSnapshot document =  mViewModel.getDocumentFromPoint(
+//                new mapDataCallback() {
+//                    @Override
+//                    public void onCallback(DocumentSnapshot doc) {
+//                        Log.d("MapViewCallback", doc.getString("points"));
+//                    }
+//                },
+//                circleAnnotation);
+
+        infoSheet = new MapInfoBottomSheet();
+        infoSheet.show(requireActivity().getSupportFragmentManager(), infoSheet.getTag());
+
+//        int points = 0;
+//
+//         String strPoints = document.getString("points");
+//         if (strPoints != null) {
+//             points = Integer.parseInt(strPoints);
+//         }
+
     }
 
 
@@ -312,7 +478,8 @@ public class MapViewFragment extends Fragment {
     public void onDestroy() {
         super.onDestroy();
         GesturesPlugin gesturesPlugin = mapView.getPlugin(Plugin.MAPBOX_GESTURES_PLUGIN_ID);
-        LocationComponentPlugin locationComponentPlugin = mapView.getPlugin(Plugin.Mapbox.MAPBOX_LOCATION_COMPONENT_PLUGIN_ID);
+        LocationComponentPlugin locationComponentPlugin =
+                mapView.getPlugin(Plugin.Mapbox.MAPBOX_LOCATION_COMPONENT_PLUGIN_ID);
 
         assert gesturesPlugin != null;
         assert locationComponentPlugin != null;
@@ -339,4 +506,25 @@ public class MapViewFragment extends Fragment {
         permManager.onRequestPermissionsResult(requestCode, permissions, grantResults);
     }
 
+    /**
+     * Respond to new system settings
+     *
+     * @param newConfig
+     */
+    @Override
+    public void onConfigurationChanged(@NonNull Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        onMapReady();
+    }
+
+    @Override
+    public void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+        mViewModel.lastPOILen = 0;
+        CameraState cameraState = mapView.getMapboxMap().getCameraState();
+        outState.putDouble(PREFS_CAM_LAT, cameraState.getCenter().latitude());
+        outState.putDouble(PREFS_CAM_LON, cameraState.getCenter().longitude());
+        outState.putDouble(PREFS_CAM_ZOOM, cameraState.getZoom());
+        outState.putDouble(PREFS_CAM_PITCH, cameraState.getPitch());
+    }
 }

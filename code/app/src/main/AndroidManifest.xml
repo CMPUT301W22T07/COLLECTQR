@@ -23,6 +23,9 @@
             android:name="com.example.collectqr.ScanQRCodeActivity"
             android:exported="true" />
         <activity
+            android:name="com.example.collectqr.ScanQRCodeLoginActivity"
+            android:exported="true" />
+        <activity
             android:name="com.example.collectqr.EnterQrInfoActivity"
             android:exported="true" />
         <activity
@@ -42,6 +45,7 @@
             </intent-filter>
         </activity>
         <activity android:name=".LoginActivity" />
+        <activity android:name=".DummyActivity"/>
     </application>
 
 </manifest>
