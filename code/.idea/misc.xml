@@ -11,12 +11,13 @@
         <entry key="..\:/Users/daryn/AndroidStudioProjects/COLLECTQR/code/app/src/main/res/layout/content.xml" value="0.22826086956521738" />
         <entry key="..\:/Users/daryn/AndroidStudioProjects/COLLECTQR/code/app/src/main/res/layout/history_item.xml" value="0.22826086956521738" />
         <entry key="..\:/Users/daryn/AndroidStudioProjects/COLLECTQR/code/app/src/main/res/layout/history_page_activity.xml" value="0.22826086956521738" />
+        <entry key="app/src/main/res/layout/activity_app.xml" value="0.18297101449275363" />
+        <entry key="app/src/main/res/layout/activity_generate_qrcode.xml" value="0.33" />
+        <entry key="app/src/main/res/layout/activity_home_qrcode.xml" value="0.18297101449275363" />
         <entry key="app/src/main/res/layout/activity_login.xml" value="0.25" />
+        <entry key="app/src/main/res/layout/activity_scan_qrcode.xml" value="0.18297101449275363" />
       </map>
     </option>
-  </component>
-  <component name="ProjectPlainTextFileTypeManager">
-    <file url="file://$PROJECT_DIR$/app/gradle.properties" />
   </component>
   <component name="ProjectRootManager" version="2" languageLevel="JDK_11" default="true" project-jdk-name="Android Studio default JDK" project-jdk-type="JavaSDK">
     <output url="file://$PROJECT_DIR$/build/classes" />

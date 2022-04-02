@@ -61,6 +61,7 @@ public class ScanQRCodeLoginActivity extends AppCompatActivity {
             @Override
             public void onCodeScanned(String data) {
                 scannedTextView.setText(data);
+                // System.out.println(data);
                 // 'data' is where the string is stored for the QR Code ---------------------------------------------------------------------------------------------------------------
                 // the plan is we login from here, so the code would go here
             }
