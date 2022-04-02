@@ -12,7 +12,7 @@
         android:layout_height="wrap_content"
         android:id="@+id/frame"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="70dp">
+        android:layout_marginTop="200dp">
 
         <TextView
             android:id="@+id/frameText"
@@ -35,26 +35,45 @@
 
     </FrameLayout>
 
-    <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
-        android:id="@+id/QRCodeGeneratorBtn"
-        android:layout_width="match_parent"
+    <TextView
+        android:id="@+id/qrGenTxt2"
+        android:layout_width="250dp"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/frame"
-        android:layout_marginStart="20dp"
-        android:layout_marginTop="30dp"
-        android:layout_marginEnd="20dp"
-        android:text="Generate Log In QR Code"
-        android:textAllCaps="false" />
+        android:layout_alignStart="@+id/frame"
+        android:layout_alignEnd="@+id/frame"
+        android:layout_alignBottom="@+id/frame"
+        android:layout_marginStart="1dp"
+        android:layout_marginEnd="-1dp"
+        android:layout_marginBottom="271dp"
+        android:elevation="1dp"
+        android:padding="4dp"
+        android:text="Share Profile QR Code"
+        android:textAlignment="center"
+        android:textAllCaps="false"
+        android:textColor="@color/black"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        tools:visibility="invisible" />
 
-    <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
-        android:id="@+id/QRCodeGeneratorBtn2"
-        android:layout_width="match_parent"
+    <TextView
+        android:id="@+id/qrGenTxt"
+        android:layout_width="250dp"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/QRCodeGeneratorBtn"
-        android:layout_marginStart="20dp"
-        android:layout_marginTop="30dp"
-        android:layout_marginEnd="20dp"
-        android:text="Generate Game Status QR Code"
-        android:textAllCaps="false" />
+        android:layout_alignStart="@+id/frame"
+        android:layout_alignEnd="@+id/frame"
+        android:layout_alignBottom="@+id/frame"
+        android:layout_marginStart="1dp"
+        android:layout_marginEnd="-1dp"
+        android:layout_marginBottom="271dp"
+        android:elevation="1dp"
+        android:padding="4dp"
+        android:text="Export Profile QR Code"
+        android:textAlignment="center"
+        android:textAllCaps="false"
+        android:textColor="@color/black"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        tools:visibility="invisible" />
+
 
 </RelativeLayout>

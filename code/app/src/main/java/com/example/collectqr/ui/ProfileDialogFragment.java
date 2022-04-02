@@ -19,6 +19,7 @@ import androidx.fragment.app.DialogFragment;
 
 import com.example.collectqr.DummyActivity;
 import com.example.collectqr.EditProfileDialogFragment;
+import com.example.collectqr.GenerateQRCodeActivity;
 import com.example.collectqr.LoginActivity;
 import com.example.collectqr.R;
 import com.example.collectqr.utilities.Preferences;
@@ -82,7 +83,8 @@ public class ProfileDialogFragment extends DialogFragment {
             @Override
             public void onClick(View view) {
                 // TODO: change dummy activity to an activity that generates qr codes
-                Intent intent = new Intent(getContext(), DummyActivity.class);
+                Intent intent = new Intent(getContext(), GenerateQRCodeActivity.class);
+                intent.putExtra("qrGen", 0);
                 startActivity(intent);
             }
         });
@@ -90,7 +92,8 @@ public class ProfileDialogFragment extends DialogFragment {
         shareButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(getContext(), DummyActivity.class);
+                Intent intent = new Intent(getContext(), GenerateQRCodeActivity.class);
+                intent.putExtra("qrGen", 1);
                 startActivity(intent);
             }
         });

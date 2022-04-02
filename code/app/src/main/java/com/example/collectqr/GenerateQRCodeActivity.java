@@ -3,6 +3,7 @@ package com.example.collectqr;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.view.View;
@@ -26,22 +27,25 @@ import com.journeyapps.barcodescanner.BarcodeEncoder;
 public class GenerateQRCodeActivity extends AppCompatActivity {
 
     private TextView qrCodeTextView;
+    private TextView qrGenTxt;
+    private TextView qrGenTxt2;
     private ImageView qrCodeImageView;
 
-    private Button qrCodeGeneratorButton;
-    private Button qrCodeGeneratorButton2;
     private String qrCodeText;
     private String qrCodeText2;
+
+    private int qrGen;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_generate_qrcode);
         qrCodeTextView = findViewById(R.id.frameText);
+        qrGenTxt = findViewById(R.id.qrGenTxt);
+        qrGenTxt2 = findViewById(R.id.qrGenTxt2);
         qrCodeImageView = findViewById(R.id.QRCodeImg);
 
-        qrCodeGeneratorButton = findViewById(R.id.QRCodeGeneratorBtn);
-        qrCodeGeneratorButton2 = findViewById(R.id.QRCodeGeneratorBtn2);
+
         // gets string of username + LogIn identifier
         qrCodeText = Preferences.loadUserName(this) + " LogIn";
         // gets string of username + GameStatus identifier
@@ -51,10 +55,15 @@ public class GenerateQRCodeActivity extends AppCompatActivity {
         //qrCodeText = qrCodeText.replace(" LogIn", "");
 
 
-        // button to generate sign in qr code
-        qrCodeGeneratorButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
+        Intent intent = getIntent();
+        qrGen = intent.getIntExtra("qrGen", 0);
+
+        qrGenTxt.setVisibility(View.GONE);
+        qrGenTxt2.setVisibility(View.GONE);
+
+        if (qrGen == 0) {
+                qrGenTxt.setVisibility(View.VISIBLE);
+
                 String data = qrCodeText.trim();
                 if(data.isEmpty()){
                     Toast.makeText(GenerateQRCodeActivity.this, "Please Enter Some Data to Generate QR Code", Toast.LENGTH_SHORT).show();
@@ -83,45 +92,40 @@ public class GenerateQRCodeActivity extends AppCompatActivity {
                         e.printStackTrace();
                     }
                 }
-            }
-        });
+        }
 
 
-        // button to generate game status qr code
-        qrCodeGeneratorButton2.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                String data = qrCodeText2.trim();
-                if(data.isEmpty()){
-                    Toast.makeText(GenerateQRCodeActivity.this, "Please Enter Some Data to Generate QR Code", Toast.LENGTH_SHORT).show();
-                }else{
+        else {
+            qrGenTxt2.setVisibility(qrGenTxt2.VISIBLE);
 
-                    // Initialize multi format writer
-                    MultiFormatWriter writer = new MultiFormatWriter();
+            String data = qrCodeText2.trim();
+            if (data.isEmpty()) {
+                Toast.makeText(GenerateQRCodeActivity.this, "Please Enter Some Data to Generate QR Code", Toast.LENGTH_SHORT).show();
+            } else {
 
-                    // Initialize bit matrix
-                    try {
-                        BitMatrix matrix = writer.encode(data, BarcodeFormat.QR_CODE, 250, 250);
+                // Initialize multi format writer
+                MultiFormatWriter writer = new MultiFormatWriter();
 
-                        // Initialize barcode encoder
-                        BarcodeEncoder encoder = new BarcodeEncoder();
+                // Initialize bit matrix
+                try {
+                    BitMatrix matrix = writer.encode(data, BarcodeFormat.QR_CODE, 250, 250);
 
-                        // Initialize Bitmap
-                        Bitmap bitmap = encoder.createBitmap(matrix);
+                    // Initialize barcode encoder
+                    BarcodeEncoder encoder = new BarcodeEncoder();
 
-                        // set bitmap on image view
-                        qrCodeImageView.setImageBitmap(bitmap);
+                    // Initialize Bitmap
+                    Bitmap bitmap = encoder.createBitmap(matrix);
 
-                        // replaces text view with qr code by hiding it
-                        qrCodeTextView.setVisibility(View.GONE);
+                    // set bitmap on image view
+                    qrCodeImageView.setImageBitmap(bitmap);
 
-                    } catch (WriterException e) {
-                        e.printStackTrace();
-                    }
+                    // replaces text view with qr code by hiding it
+                    qrCodeTextView.setVisibility(View.GONE);
+
+                } catch (WriterException e) {
+                    e.printStackTrace();
                 }
             }
-        });
-
-
+        }
     }
 }
