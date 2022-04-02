@@ -97,7 +97,6 @@ public class MainAppActivity extends AppCompatActivity {
                                     //device does exist within db, save username to shared preferences
                                     //for future use in other parts of the application
                                     Preferences.saveUserName(context, document.getId());
-                                    System.out.println(Preferences.loadUserName(context));
                                 }
                             }
                         } else {
