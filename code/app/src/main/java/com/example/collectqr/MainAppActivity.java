@@ -1,10 +1,17 @@
 package com.example.collectqr;
 
+import static android.content.ContentValues.TAG;
+
+import android.annotation.SuppressLint;
 import android.app.ActivityManager;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.provider.Settings;
+import android.util.Log;
 import android.view.View;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.splashscreen.SplashScreen;
 import androidx.navigation.NavController;
@@ -14,8 +21,14 @@ import androidx.navigation.ui.NavigationUI;
 
 import com.example.collectqr.databinding.ActivityAppBinding;
 import com.example.collectqr.utilities.Preferences;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
+
+import java.util.Arrays;
 
 /**
  * The main page of the app, through the use of various fragments,
@@ -24,6 +37,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 public class MainAppActivity extends AppCompatActivity {
     private FirebaseFirestore db;
     private ActivityAppBinding binding;
+    private Context context = this;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,19 +72,39 @@ public class MainAppActivity extends AppCompatActivity {
      * Check if a user already exists on the device. If not, start Login activity
      */
     public void doesUserExist() {
-        //load username from SharedPreferences
-        String username = Preferences.loadUserName(this);
+        //check if the current device id exists within the db
+        @SuppressLint("HardwareIds") String device_id = Settings.Secure.getString(this.getContentResolver(), Settings.Secure.ANDROID_ID);
 
-        //if username is null, the user should be prompted to create a username
-        //////if (username == null) { --------------------------------------------------------------------- this was done on purpose
-            Intent intent = new Intent(this, LoginActivity.class);
-            /*
-                Launch the login activity as the base of the stack
-                https://stackoverflow.com/a/16388608 by Cynichniy Bandera
-             */
-            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK |  Intent.FLAG_ACTIVITY_CLEAR_TASK);
-            startActivity(intent);
-        //////} --------------------------------------------------------------------- fix later
+        db = FirebaseFirestore.getInstance();
+        db.collection("Users")
+                .whereArrayContainsAny("devices", Arrays.asList(device_id))
+                .get()
+                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                        if (task.isSuccessful()) {
+                            if (task.getResult().isEmpty()) {
+                                //device doesn't exist within the db, so go to login activity
+                                Intent intent = new Intent(context, LoginActivity.class);
+                                /*
+                                Launch the login activity as the base of the stack
+                                https://stackoverflow.com/a/16388608 by Cynichniy Bandera
+                                */
+                                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK |  Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                                startActivity(intent);
+                            } else {
+                                for (QueryDocumentSnapshot document : task.getResult()) {
+                                    //device does exist within db, save username to shared preferences
+                                    //for future use in other parts of the application
+                                    Preferences.saveUserName(context, document.getId());
+                                    System.out.println(Preferences.loadUserName(context));
+                                }
+                            }
+                        } else {
+                            Log.d(TAG, "Error getting documents: ", task.getException());
+                        }
+                    }
+                });
     }
 
 
