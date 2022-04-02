@@ -2,14 +2,17 @@ package com.example.collectqr.ui;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import androidx.appcompat.widget.Toolbar;
 
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.collectqr.MainAppActivity;
 import com.example.collectqr.data.HistoryController;
 import com.example.collectqr.utilities.Preferences;
 import com.example.collectqr.R;
@@ -61,6 +64,7 @@ public class HistoryFragment extends Fragment {
         TextView numCodes = rootView.findViewById(R.id.history_num_codes);
         controller.setStatsBarData(totalPoints, numCodes);
 
+
         /*
         https://youtu.be/17NbUcEts9c
         YouTube, Author: Coding in Flow
@@ -72,16 +76,22 @@ public class HistoryFragment extends Fragment {
         recyclerView.setAdapter(controller.getAdapter());
 
         createSortSheetDialog();
-        FloatingActionButton fab = rootView.findViewById(R.id.sort_history_fab);
-        fab.setOnClickListener(new View.OnClickListener() {
+        Toolbar toolbar = (Toolbar) getActivity().findViewById(R.id.topAppBar);
+        toolbar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
             @Override
-            public void onClick(View view) {
-                sortSheet.show();
+            public boolean onMenuItemClick(MenuItem menuItem) {
+                switch (menuItem.getItemId()) {
+                    case R.id.sort_history:
+                        sortSheet.show();
+                        return true;
+                }
+                return false;
             }
         });
 
         return rootView;
     }
+
 
     /**
      * Creates a SheetDialog containing the UI to sort the items displayed in the RecyclerView

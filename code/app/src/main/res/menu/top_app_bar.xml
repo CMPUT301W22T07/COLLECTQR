@@ -7,7 +7,7 @@
     <item
         android:id="@+id/user_search"
         android:icon="?android:attr/actionModeWebSearchDrawable"
-        app:showAsAction="ifRoom"
+        app:showAsAction="collapseActionView|ifRoom"
         android:title="Search for User"
         android:visible="false"/>
 

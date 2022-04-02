@@ -4,17 +4,22 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.util.ArrayMap;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import androidx.appcompat.widget.SearchView;
+import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.collectqr.MainAppActivity;
 import com.example.collectqr.R;
 import com.example.collectqr.adapters.LeaderboardRecyclerAdapter;
 import com.example.collectqr.data.LeaderboardController;
+import com.example.collectqr.model.QRCode;
 import com.example.collectqr.utilities.Preferences;
 import com.example.collectqr.model.User;
 import com.google.android.material.tabs.TabLayout;
@@ -131,24 +136,68 @@ public class LeaderboardFragment extends Fragment {
 
         setTabListeners();
 
+        Toolbar toolbar = (Toolbar) getActivity().findViewById(R.id.topAppBar);
+        toolbar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem menuItem) {
+                if (menuItem.getItemId()==R.id.user_search) {
+                    /*
+                    SearchView searchView = (SearchView) menuItem.getActionView();
+                    searchView.setOnSearchClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view) {
+                             scrollToUser(searchView.getQuery().toString());
+                        }
+                    });
+                     */
+                }
+                return false;
+            }
+        });
+
         personalUsername.setText(username);
 
         return leaderboardView;
     }
 
+    public boolean scrollToUser(String username) {
+        // TODO: scroll to
+        ArrayList<User> list = null;
+        switch (tabs.getSelectedTabPosition()) {
+            case 0:
+                list = dataLists.get("most_points");
+                break;
+            case 1:
+                list = dataLists.get("most_codes");
+                break;
+            case 2:
+                list = dataLists.get("best_code");
+                break;
+        }
+        if (list != null) {
+            for (int i = 0; i < list.size(); i++) {
+                if (list.get(i).getUsername().equals(username)) {
+                    leaderboardList.scrollToPosition(15);
+                }
+            }
+            return true;
+        }
+        return false;
+    }
+
     public void updatePersonalCard(String currentCategory) {
-        for (int i=0; i<dataLists.get(currentCategory).size(); i++) {
+        for (int i = 0; i < dataLists.get(currentCategory).size(); i++) {
             User item = dataLists.get(currentCategory).get(i);
             if (item.getUsername().equals(username)) {
                 if (currentCategory.equals("most_points")) {
                     personalScore.setText(item.getStats().get("total_points") + " points");
-                    personalRank.setText(Integer.toString(i+1));
+                    personalRank.setText(Integer.toString(i + 1));
                 } else if (currentCategory.equals("most_codes")) {
                     personalScore.setText(item.getStats().get("num_codes") + " codes");
-                    personalRank.setText(Integer.toString(i+1));
+                    personalRank.setText(Integer.toString(i + 1));
                 } else {
                     personalScore.setText(item.getStats().get("best_code") + " points");
-                    personalRank.setText(Integer.toString(i+1));
+                    personalRank.setText(Integer.toString(i + 1));
                 }
             }
         }
@@ -161,22 +210,25 @@ public class LeaderboardFragment extends Fragment {
         tabs.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
             public void onTabSelected(TabLayout.Tab tab) {
-                if (tab.getPosition()==0) {
+                if (tab.getPosition() == 0) {
                     leaderboardList.setAdapter(adapterLists.get("most_points"));
                     leaderboardController.setCurrentCategory("most_points");
                     updatePersonalCard("most_points");
-                } else if (tab.getPosition()==1) {
+                } else if (tab.getPosition() == 1) {
                     leaderboardList.setAdapter(adapterLists.get("most_codes"));
                     leaderboardController.setCurrentCategory("most_codes");
                     updatePersonalCard("most_codes");
-                } else if (tab.getPosition()==2) {
+                } else if (tab.getPosition() == 2) {
                     leaderboardList.setAdapter(adapterLists.get("best_code"));
                     leaderboardController.setCurrentCategory("best_code");
                     updatePersonalCard("best_code");
                 }
             }
+
             @Override
-            public void onTabUnselected(TabLayout.Tab tab) {}
+            public void onTabUnselected(TabLayout.Tab tab) {
+            }
+
             @Override
             public void onTabReselected(TabLayout.Tab tab) {
                 onTabSelected(tab);

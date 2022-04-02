@@ -3,6 +3,7 @@ package com.example.collectqr;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -32,7 +33,9 @@ public class EditProfileDialogFragment extends DialogFragment {
         View rootView = LayoutInflater.from(getActivity()).inflate(R.layout.edit_profile_dialog_fragment, null);
 
         EditText emailField = rootView.findViewById(R.id.edit_email);
+        emailField.setText(getArguments().getString("email"));
         EditText phoneField = rootView.findViewById(R.id.edit_phone);
+        phoneField.setText(getArguments().getString("phone"));
 
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
 
@@ -42,6 +45,8 @@ public class EditProfileDialogFragment extends DialogFragment {
                 .setNegativeButton("Cancel", null)
                 .setPositiveButton("Save", null)
                 .create();
+
+        dialog.getWindow().setBackgroundDrawable(getResources().getDrawable(R.drawable.white_rounded_rectangle));
 
         /*
         StackOverflow, Author: Tom Bollwitt

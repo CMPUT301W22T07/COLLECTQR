@@ -5,6 +5,7 @@ import static android.content.ContentValues.TAG;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Intent;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -31,12 +32,18 @@ import com.google.firebase.firestore.FirebaseFirestoreException;
 // Modified from Lab 3 Instructions - Fragments.pdf
 
 public class ProfileDialogFragment extends DialogFragment {
+    private String email;
+    private String phone;
+
     // https://developer.android.com/guide/topics/ui/dialogs#DialogFragment
     @NonNull
     @Override
     public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         View rootView = LayoutInflater.from(getActivity()).inflate(R.layout.profile_dialog_fragment, null);
+        //if (getDialog()!=null && getDialog().getWindow()!=null) {
+         //   getDialog().getWindow().setBackgroundDrawable(getResources().getDrawable(R.drawable.white_rounded_rectangle));
+        //}
 
         TextView usernameView = rootView.findViewById(R.id.profile_username);
         TextView emailView = rootView.findViewById(R.id.profile_email);
@@ -46,6 +53,7 @@ public class ProfileDialogFragment extends DialogFragment {
         TextView editButton = rootView.findViewById(R.id.profile_edit_profile);
 
         String username = Preferences.loadUserName(getContext());
+        usernameView.setText(username);
         //https://firebase.google.com/docs/firestore/query-data/listen
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         DocumentReference docRef = db.collection("Users").document(username);
@@ -60,10 +68,12 @@ public class ProfileDialogFragment extends DialogFragment {
                 if (snapshot != null && snapshot.exists()) {
                     Log.d(TAG, "Current data: " + snapshot.getData());
                     if (!snapshot.getString("email").isEmpty()) {
-                        emailView.setText(snapshot.getString("email"));
+                        email = snapshot.getString("email");
+                        emailView.setText(email);
                     }
                     if (!snapshot.getString("phone").isEmpty()) {
-                        phoneView.setText(snapshot.getString("phone"));
+                        phone = snapshot.getString("phone");
+                        phoneView.setText(phone);
                     }
                 } else {
                     Log.d(TAG, "Current data: null");
@@ -74,14 +84,20 @@ public class ProfileDialogFragment extends DialogFragment {
         editButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                new EditProfileDialogFragment().show(getActivity().getSupportFragmentManager(), "EDIT_PROFILE");
+                // Modified from Lab 3 Participation Exercise Hints
+                Bundle args = new Bundle();
+                args.putString("email", email);
+                args.putString("phone", phone);
+                EditProfileDialogFragment profileFragment = new EditProfileDialogFragment();
+                profileFragment.setArguments(args);
+                profileFragment.show(getActivity().getSupportFragmentManager(), "EDIT_PROFILE");
             }
         });
 
         exportButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                // TODO: change dummy activity to an activity that generates qr codes
+                // TODO: change dummy activity to an activity that generates qr code to export user
                 Intent intent = new Intent(getContext(), DummyActivity.class);
                 startActivity(intent);
             }
@@ -90,13 +106,19 @@ public class ProfileDialogFragment extends DialogFragment {
         shareButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                // TODO: change dummy activity to an activity that generates qr code to share user
                 Intent intent = new Intent(getContext(), DummyActivity.class);
                 startActivity(intent);
             }
         });
 
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-        return builder.setView(rootView).create();
+        Dialog dialog = builder.setView(rootView).create();
+        /*
+
+         */
+        dialog.getWindow().setBackgroundDrawable(getResources().getDrawable(R.drawable.white_rounded_rectangle));
+        return dialog;
     }
 
 }
