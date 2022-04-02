@@ -66,4 +66,25 @@ public class UserController {
         }
 
     }
+
+    /**
+     * Takes a given user's device_id, and adds them as an admin user
+     *
+     * @param device_id the user's device_id to be added
+     */
+    public void addAdminUser(String device_id) {
+        FirebaseFirestore db;
+        db = FirebaseFirestore.getInstance();
+        final CollectionReference userReference = db.collection("Admins");
+
+        HashMap<String, String> data = new HashMap<>();
+        data.put("device_id", device_id);
+
+        //Add the information to the database
+        userReference
+                .document(device_id)
+                .set(data)
+                .addOnSuccessListener(aVoid -> Log.d(TAG, "Data has been added successfully!"))
+                .addOnFailureListener(e -> Log.d(TAG, "Data could not be added!" + e));
+    }
 }
