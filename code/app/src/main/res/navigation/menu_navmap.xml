@@ -20,4 +20,10 @@
         android:name="com.example.collectqr.ui.HistoryFragment"
         android:label="@string/title_history"
         tools:layout="@layout/fragment_history" />
+    <fragment
+        android:id="@+id/navigation_user_profile"
+        android:name="com.example.collectqr.ui.ViewUserProfile"
+        android:label="@string/title_map"
+        app:argType="string"
+        tools:layout="@layout/fragment_view_user_profile" />
 </navigation>
