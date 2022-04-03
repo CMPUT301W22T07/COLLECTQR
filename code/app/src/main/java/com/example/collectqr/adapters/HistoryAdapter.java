@@ -1,18 +1,24 @@
 package com.example.collectqr.adapters;
 
 
+import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+
+import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.example.collectqr.model.QRCode;
 import com.example.collectqr.R;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
+import com.google.rpc.context.AttributeContext;
+
 import java.util.ArrayList;
+import java.util.ResourceBundle;
 
 
 // https://developer.android.com/guide/topics/ui/layout/recyclerview#implement-adapter
@@ -25,7 +31,20 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.ViewHold
 
     private ArrayList<QRCode> qrHistoryData;
     private ViewGroup viewGroup;
+    private OnRecyclerItemClickListener listener;
+    private View previousSelected = null;
 
+    /*
+    YouTube Video, Author: Coding in Flow
+    https://youtu.be/bhhs4bwYyhc
+     */
+    public interface OnRecyclerItemClickListener {
+        void onRecyclerItemClick(int position, View view);
+    }
+
+    public void setOnItemClickListener(OnRecyclerItemClickListener listener) {
+        this.listener = listener;
+    }
     /**
      * Provide a reference to the type of views that you are using
      * (custom ViewHolder).
@@ -35,13 +54,25 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.ViewHold
         private TextView pointsView;
         private TextView dateView;
 
-        public ViewHolder(View view) {
+        public ViewHolder(View view, OnRecyclerItemClickListener listener, ViewGroup viewGroup) {
             super(view);
             // Define click listener for the ViewHolder's View
 
             imageView = view.findViewById(R.id.history_card_image);
             pointsView = view.findViewById(R.id.history_card_points);
             dateView = view.findViewById(R.id.history_card_date);
+
+            view.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    if (listener != null) {
+                        int position = getAdapterPosition();
+                        if (position != RecyclerView.NO_POSITION) {
+                            listener.onRecyclerItemClick(position, view);
+                        }
+                    }
+                }
+            });
         }
 
         public TextView getPointsView() {
@@ -72,7 +103,7 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.ViewHold
         this.viewGroup = viewGroup;
         View view = LayoutInflater.from(viewGroup.getContext())
                 .inflate(R.layout.history_list_item, viewGroup, false);
-        return new ViewHolder(view);
+        return new ViewHolder(view, this.listener, viewGroup);
     }
 
     // Replace the contents of a view (invoked by the layout manager)

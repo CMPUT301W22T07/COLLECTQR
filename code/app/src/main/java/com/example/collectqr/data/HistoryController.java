@@ -5,10 +5,16 @@ import static android.content.ContentValues.TAG;
 import android.util.Log;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import com.example.collectqr.QRCodeController;
 import com.example.collectqr.adapters.HistoryAdapter;
 import com.example.collectqr.model.QRCode;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
@@ -47,6 +53,10 @@ public class HistoryController {
      */
     public HistoryAdapter getAdapter() {
         return adapter;
+    }
+
+    public ArrayList<QRCode> getData() {
+        return qrData;
     }
 
     /**
@@ -95,10 +105,10 @@ public class HistoryController {
                             FirebaseFirestoreException error) {
                         qrData.clear();
                         for (QueryDocumentSnapshot doc : queryDocumentSnapshots) {
-                            Log.d(TAG, String.valueOf(doc.getData().get("hash")));
+                            Log.d(TAG, String.valueOf(doc.getData().get("sha")));
                             String imageName = doc.getString("image");
                             Integer points = Integer.parseInt(doc.get("points").toString());
-                            String sha = doc.getString("hash");
+                            String sha = doc.getString("sha");
                             Date date = doc.getDate("date");
                             qrData.add(new QRCode(sha, points, date, imageName)); // Adding the cities and provinces from FireStore
                         }
@@ -145,5 +155,15 @@ public class HistoryController {
         }
         adapter.notifyDataSetChanged();
         currentSort = sortBy;
+    }
+
+    public void deleteCode(QRCode code) {
+        int secondBest = 0;
+        for (int i=0; i<qrData.size(); i++) {
+            if (qrData.get(i).getSha256()!=code.getSha256() && qrData.get(i).getPoints() > secondBest) {
+                secondBest = qrData.get(i).getPoints();
+            }
+        }
+        new QRCodeController().deleteCodeFromAccount(code, secondBest, username);
     }
 }

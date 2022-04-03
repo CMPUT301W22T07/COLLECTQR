@@ -9,6 +9,8 @@ import androidx.annotation.NonNull;
 
 import com.example.collectqr.model.QRCode;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
@@ -23,6 +25,11 @@ import java.util.Map;
  * focus on the QRCode class
  */
 public class QRCodeController {
+    private FirebaseFirestore db;
+
+    public QRCodeController() {
+        db = FirebaseFirestore.getInstance();
+    }
 
     /**
      * Takes a given QR code, and writes all its relevant contents to firestore.
@@ -30,12 +37,10 @@ public class QRCodeController {
      * @param code the QR code to be stored to firestore
      */
     public void writeToFirestore(QRCode code) {
-        FirebaseFirestore db;
-        db = FirebaseFirestore.getInstance();
         final CollectionReference codeReference = db.collection("QRCodes");
 
         HashMap<String, Object> data = new HashMap<>();
-        data.put("sha256", code.getSha256());
+        data.put("sha", code.getSha256());
         if (code.getLatitude()!=null) {
             data.put("geohash", code.getGeoHash());
         } else {
@@ -89,7 +94,6 @@ public class QRCodeController {
      * @param username
      */
     public void writeToUserFirestore(QRCode qrCode, String username) {
-        FirebaseFirestore db = FirebaseFirestore.getInstance();
         DocumentReference docRef = db.collection("Users").document(username).collection("ScannedCodes").document(qrCode.getSha256());
         docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
             @Override
@@ -145,7 +149,6 @@ public class QRCodeController {
      * @param username
      */
     public void writeToCodesFirestore(QRCode qrCode, String username) {
-        FirebaseFirestore db = FirebaseFirestore.getInstance();
         DocumentReference docRef = db.collection("QRCodes").document(qrCode.getSha256());
         docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
                 @Override
@@ -182,5 +185,49 @@ public class QRCodeController {
                     }
                 }
             });
+    }
+
+    public void deleteCodeFromAccount(QRCode code, int secondBest, String username) {
+        // https://firebase.google.com/docs/firestore/manage-data/delete-data#delete_documents
+        db.collection("Users").document(username).collection("ScannedCodes").document(code.getSha256())
+                .delete()
+                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+                        Log.d(TAG, "DocumentSnapshot successfully deleted!");
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Log.w(TAG, "Error deleting document", e);
+                    }
+                });
+        db.collection("Users").document(username).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                if (task.isSuccessful()) {
+                    DocumentSnapshot document = task.getResult();
+                    if (document.exists()) {
+                        Log.d(TAG, "DocumentSnapshot data: " + document.getData());
+                        Integer totalPoints = Integer.parseInt(document.get("total_points").toString());
+                        Integer numCodes = Integer.parseInt(document.get("num_codes").toString());
+                        Integer bestCode = Integer.parseInt(document.get("best_code").toString());
+                        DocumentReference documentReference = db.collection("Users").document(username);
+                        documentReference.update("total_points", totalPoints - code.getPoints());
+                        documentReference.update("num_codes", numCodes - 1);
+                        if (bestCode == code.getPoints()) {
+                            if (secondBest!=code.getPoints()) {
+                                documentReference.update("best_code", secondBest);
+                            }
+                        }
+                    } else {
+                        Log.d(TAG, "No such document");
+                    }
+                } else {
+                    Log.d(TAG, "get failed with ", task.getException());
+                }
+            }
+        });
     }
 }
