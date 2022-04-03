@@ -36,12 +36,14 @@ public class ScanQRCodeActivity extends AppCompatActivity {
         scannerLiveView = findViewById(R.id.camView);
         scannedTextView = findViewById(R.id.scannedData);
 
+        // check for whether permissions granted or not
         if(checkPermission()){
             Toast.makeText(this, "Permission Granted..",Toast.LENGTH_SHORT).show();
         }else{
             requestPermission();
         }
 
+        // scanner activity begins and is waiting for qr code to be presented to camera
         scannerLiveView.setScannerViewEventListener(new ScannerLiveView.ScannerViewEventListener() {
             @Override
             public void onScannerStarted(ScannerLiveView scanner) {
@@ -58,6 +60,7 @@ public class ScanQRCodeActivity extends AppCompatActivity {
                 Toast.makeText(ScanQRCodeActivity.this, "Scanner Error Occurred Please Start Again...", Toast.LENGTH_SHORT).show();
             }
 
+            // if the qr code is scanned successfully, run the following block of code
             @Override
             public void onCodeScanned(String data) {
                 ////scannedTextView.setText(data);

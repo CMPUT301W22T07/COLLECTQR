@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 
+// this class is only a placeholder and is not used in the app
 public class QRCodeHomeActivity extends AppCompatActivity {
 
     private Button generateQRButton;

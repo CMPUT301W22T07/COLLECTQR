@@ -30,6 +30,7 @@ public class EnterQrInfoActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_enter_qr_info);
 
+        // setup activity for entering qr code info
         Intent intent = getIntent();
         String sha = intent.getStringExtra("sha");
         String username = intent.getStringExtra("username");
@@ -44,11 +45,13 @@ public class EnterQrInfoActivity extends AppCompatActivity {
         qrCode = new QRCode(sha);
         QRCodeScore qrCodeScore = new QRCodeScore();
         qrCode.setDate(new Date());
+        // get the score of the scanned qr code
         Integer points = qrCodeScore.calculateScore(qrCode);
         qrCode.setPoints(points);
 
         pointsView.setText(qrCode.getPoints().toString()+" points");
 
+        // optional additions to the qr code post
         addImageButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
