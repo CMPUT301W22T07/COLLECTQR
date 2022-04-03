@@ -13,6 +13,8 @@ import android.widget.TextView;
 import androidx.appcompat.widget.SearchView;
 import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
+import androidx.navigation.NavController;
+import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -171,7 +173,11 @@ public class LeaderboardFragment extends Fragment {
                 @Override
                 public void onRecyclerItemClick(int position, String key) {
                     String userToView = dataLists.get(key).get(position).getUsername();
-                    // TODO: send to and implement User fragment
+                    //Navigate the User Profile of the user that was clicked on
+                    NavController navController =  Navigation.findNavController(getView());
+                    Bundle bundle = new Bundle();
+                    bundle.putString("username", userToView);
+                    navController.navigate(R.id.navigation_user_profile, bundle);
                 }
             });
         }
