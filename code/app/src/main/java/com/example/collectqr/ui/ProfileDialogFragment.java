@@ -5,23 +5,18 @@ import static android.content.ContentValues.TAG;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Intent;
-import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.Window;
-import android.view.WindowManager;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.DialogFragment;
 
-import com.example.collectqr.DummyActivity;
 import com.example.collectqr.EditProfileDialogFragment;
 import com.example.collectqr.GenerateQRCodeActivity;
-import com.example.collectqr.LoginActivity;
 import com.example.collectqr.R;
 import com.example.collectqr.utilities.Preferences;
 import com.google.firebase.firestore.DocumentReference;
@@ -124,7 +119,7 @@ public class ProfileDialogFragment extends DialogFragment {
         StackOverflow, Author: Mohamed AbdelraZek
         https://stackoverflow.com/a/67540989
          */
-        dialog.getWindow().setBackgroundDrawable(getResources().getDrawable(R.drawable.white_rounded_rectangle));
+        dialog.getWindow().setBackgroundDrawable(getResources().getDrawable(R.drawable.white_rounded_rectangle, getActivity().getTheme()));
         return dialog;
     }
 
