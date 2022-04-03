@@ -51,6 +51,7 @@ public class ProfileDialogFragment extends DialogFragment {
         TextView editButton = rootView.findViewById(R.id.profile_edit_profile);
 
         String username = Preferences.loadUserName(getContext());
+        usernameView.setText(username);
         //https://firebase.google.com/docs/firestore/query-data/listen
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         DocumentReference docRef = db.collection("Users").document(username);
@@ -94,7 +95,6 @@ public class ProfileDialogFragment extends DialogFragment {
         exportButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                // TODO: change dummy activity to an activity that generates qr codes
                 Intent intent = new Intent(getContext(), GenerateQRCodeActivity.class);
                 intent.putExtra("qrGen", 0);
                 startActivity(intent);
