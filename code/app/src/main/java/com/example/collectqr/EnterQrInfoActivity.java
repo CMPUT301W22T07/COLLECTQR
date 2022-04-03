@@ -46,7 +46,7 @@ public class EnterQrInfoActivity extends AppCompatActivity {
         QRCodeScore qrCodeScore = new QRCodeScore();
         qrCode.setDate(new Date());
         // get the score of the scanned qr code
-        Integer points = qrCodeScore.calculateScore(qrCode);
+        Integer points = qrCodeScore.calculateScore(qrCode.getSha256());
         qrCode.setPoints(points);
 
         pointsView.setText(qrCode.getPoints().toString()+" points");
