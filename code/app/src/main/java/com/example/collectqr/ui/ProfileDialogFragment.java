@@ -91,7 +91,7 @@ public class ProfileDialogFragment extends DialogFragment {
         achievementsButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                // TODO: implements achievemnts
+                // TODO: implement achievements
             }
         });
 

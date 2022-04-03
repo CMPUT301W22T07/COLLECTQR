@@ -54,7 +54,7 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.ViewHold
         private TextView pointsView;
         private TextView dateView;
 
-        public ViewHolder(View view, OnRecyclerItemClickListener listener, ViewGroup viewGroup) {
+        public ViewHolder(View view, OnRecyclerItemClickListener listener) {
             super(view);
             // Define click listener for the ViewHolder's View
 
@@ -103,7 +103,7 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.ViewHold
         this.viewGroup = viewGroup;
         View view = LayoutInflater.from(viewGroup.getContext())
                 .inflate(R.layout.history_list_item, viewGroup, false);
-        return new ViewHolder(view, this.listener, viewGroup);
+        return new ViewHolder(view, this.listener);
     }
 
     // Replace the contents of a view (invoked by the layout manager)

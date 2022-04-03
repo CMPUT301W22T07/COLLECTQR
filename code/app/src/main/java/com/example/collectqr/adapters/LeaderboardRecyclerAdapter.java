@@ -3,16 +3,12 @@ package com.example.collectqr.adapters;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.bumptech.glide.Glide;
 import com.example.collectqr.R;
 import com.example.collectqr.model.User;
-import com.google.firebase.storage.FirebaseStorage;
-import com.google.firebase.storage.StorageReference;
 
 import java.util.ArrayList;
 
@@ -25,6 +21,19 @@ public class LeaderboardRecyclerAdapter extends RecyclerView.Adapter<Leaderboard
     private ArrayList<User> data;
     private ViewGroup viewGroup;
     private String category;
+    private LeaderboardRecyclerAdapter.OnRecyclerItemClickListener listener;
+
+    /*
+    YouTube Video, Author: Coding in Flow
+    https://youtu.be/bhhs4bwYyhc
+     */
+    public interface OnRecyclerItemClickListener {
+        void onRecyclerItemClick(int position, String category);
+    }
+
+    public void setOnItemClickListener(LeaderboardRecyclerAdapter.OnRecyclerItemClickListener listener) {
+        this.listener = listener;
+    }
 
     /**
      * Provide a reference to the type of views that you are using
@@ -35,13 +44,25 @@ public class LeaderboardRecyclerAdapter extends RecyclerView.Adapter<Leaderboard
         private TextView userScore;
         private TextView userRank;
 
-        public ViewHolder(View view) {
+        public ViewHolder(View view, OnRecyclerItemClickListener listener, String category) {
             super(view);
             // Define click listener for the ViewHolder's View
 
             userName = view.findViewById(R.id.username_text);
             userScore = view.findViewById(R.id.score_text);
             userRank = view.findViewById(R.id.rank_text);
+
+            view.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    if (listener != null) {
+                        int position = getAdapterPosition();
+                        if (position != RecyclerView.NO_POSITION) {
+                            listener.onRecyclerItemClick(position, category);
+                        }
+                    }
+                }
+            });
         }
 
         public TextView getUserName() {
@@ -80,7 +101,7 @@ public class LeaderboardRecyclerAdapter extends RecyclerView.Adapter<Leaderboard
         this.viewGroup = viewGroup;
         View view = LayoutInflater.from(viewGroup.getContext())
                 .inflate(R.layout.content, viewGroup, false);
-        return new ViewHolder(view);
+        return new ViewHolder(view, this.listener, this.category);
     }
 
     /**

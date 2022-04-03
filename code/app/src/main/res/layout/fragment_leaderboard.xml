@@ -55,7 +55,8 @@
             android:background="@drawable/leaderboard_personal_background"
             android:orientation="horizontal"
             android:weightSum="1"
-            android:visibility="visible">
+            android:visibility="visible"
+            android:clickable="true">
 
             <LinearLayout
                 android:layout_width="match_parent"

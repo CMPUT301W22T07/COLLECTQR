@@ -1,5 +1,6 @@
 package com.example.collectqr.ui;
 
+import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.util.ArrayMap;
@@ -15,6 +16,8 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.collectqr.DummyActivity;
+import com.example.collectqr.GenerateQRCodeActivity;
 import com.example.collectqr.MainAppActivity;
 import com.example.collectqr.R;
 import com.example.collectqr.adapters.LeaderboardRecyclerAdapter;
@@ -134,6 +137,8 @@ public class LeaderboardFragment extends Fragment {
 
         leaderboardController.downloadData(dataLists, adapterLists, personalScore, personalRank);
 
+        setOnRecyclerItemClickListener();
+
         setTabListeners();
 
         Toolbar toolbar = (Toolbar) getActivity().findViewById(R.id.topAppBar);
@@ -158,6 +163,18 @@ public class LeaderboardFragment extends Fragment {
         personalUsername.setText(username);
 
         return leaderboardView;
+    }
+
+    private void setOnRecyclerItemClickListener() {
+        for ( String key : adapterLists.keySet()) {
+            adapterLists.get(key).setOnItemClickListener(new LeaderboardRecyclerAdapter.OnRecyclerItemClickListener() {
+                @Override
+                public void onRecyclerItemClick(int position, String key) {
+                    String userToView = dataLists.get(key).get(position).getUsername();
+                    // TODO: send to and implement User fragment
+                }
+            });
+        }
     }
 
     public boolean scrollToUser(String username) {
