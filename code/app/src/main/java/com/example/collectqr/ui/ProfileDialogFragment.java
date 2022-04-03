@@ -49,6 +49,7 @@ public class ProfileDialogFragment extends DialogFragment {
         TextView exportButton = rootView.findViewById(R.id.profile_export_profile);
         TextView shareButton = rootView.findViewById(R.id.profile_share_profile);
         TextView editButton = rootView.findViewById(R.id.profile_edit_profile);
+        TextView achievementsButton = rootView.findViewById(R.id.profile_achievements);
 
         String username = Preferences.loadUserName(getContext());
         usernameView.setText(username);
@@ -89,6 +90,13 @@ public class ProfileDialogFragment extends DialogFragment {
                 EditProfileDialogFragment profileFragment = new EditProfileDialogFragment();
                 profileFragment.setArguments(args);
                 profileFragment.show(getActivity().getSupportFragmentManager(), "EDIT_PROFILE");
+            }
+        });
+
+        achievementsButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                // TODO: implements achievemnts
             }
         });
 
