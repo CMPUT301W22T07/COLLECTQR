@@ -8,6 +8,7 @@ import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.appcompat.widget.SearchView;
@@ -123,6 +124,9 @@ public class LeaderboardFragment extends Fragment {
         personalRank = leaderboardView.findViewById(R.id.personal_rank_text);
         tabs = leaderboardView.findViewById(R.id.leaderboard_tabs);
 
+        //get access to persistent UI element
+        LinearLayout persistentPlayerInfo = leaderboardView.findViewById(R.id.persistent_user_score);
+
         dataLists = new ArrayMap<>();
         dataLists.put("most_points", new ArrayList<>());
         dataLists.put("most_codes", new ArrayList<>());
@@ -159,6 +163,17 @@ public class LeaderboardFragment extends Fragment {
                      */
                 }
                 return false;
+            }
+        });
+
+        persistentPlayerInfo.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                //redirect the user to their own profile if the bottom persistent layout is clicked
+                NavController navController =  Navigation.findNavController(getView());
+                Bundle bundle = new Bundle();
+                bundle.putString("username", username);
+                navController.navigate(R.id.navigation_user_profile, bundle);
             }
         });
 
