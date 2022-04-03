@@ -49,7 +49,7 @@ public class HistoryController {
     /**
      * Returns an adapter for a RecyclerView
      * @return HistoryAdapter
-     *      THis is the adapter to be used to controll the RecyclerView on the HistoryFragment
+     *      THis is the adapter to be used to control the RecyclerView on the HistoryFragment
      */
     public HistoryAdapter getAdapter() {
         return adapter;

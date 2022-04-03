@@ -16,8 +16,11 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.content.res.AppCompatResources;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.navigation.NavController;
+import androidx.navigation.Navigation;
 
 import com.example.collectqr.EnterQrInfoActivity;
+import com.example.collectqr.R;
 import com.example.collectqr.ScanQRCodeActivity;
 import com.example.collectqr.databinding.FragmentMapViewBinding;
 import com.example.collectqr.model.MapPOI;
@@ -318,7 +321,12 @@ public class MapViewFragment extends Fragment {
      */
     private void setButtonsActions() {
         binding.fabLaunchQRScanner.setOnClickListener(view -> startScanner());
-        binding.fabGpsLockLocation.setOnClickListener(view -> onCameraTrackingRequested());
+
+        binding.fabGpsLockLocation.setOnClickListener(
+                view -> {
+                    NavController navController =  Navigation.findNavController(view);
+                }
+        );
     }
 
 

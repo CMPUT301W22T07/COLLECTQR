@@ -122,6 +122,7 @@ public class MainAppActivity extends AppCompatActivity {
         Preferences.saveAdminStatus(context, false);
         //check if the current device id exists within the db
         @SuppressLint("HardwareIds") String device_id = Settings.Secure.getString(this.getContentResolver(), Settings.Secure.ANDROID_ID);
+        System.out.println(device_id);
 
         db = FirebaseFirestore.getInstance();
         db.collection("Users")
