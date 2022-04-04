@@ -27,7 +27,7 @@ public class User {
         stats.put("num_codes", 0);
         stats.put("total_points", 0);
         stats.put("best_code", 0);
-        stats.put("region_points", 0);
+        stats.put("region_best", 0);
         this.stats = stats;
 
         this.codes_scanned = new HashMap<>();
@@ -146,10 +146,10 @@ public class User {
      * @param  num_codes the number of codes the user has scanned
      * @param  total_points the total_points the user has
      */
-    public void updateScore(int num_codes, int total_points, int best_code, int region_points) {
+    public void updateScore(int num_codes, int total_points, int best_code, int region_best) {
         stats.replace("num_codes", num_codes);
         stats.replace("total_points", total_points);
         stats.replace("best_code", best_code);
-        stats.replace("region_points", region_points);
+        stats.replace("region_best", region_best);
     }
 }

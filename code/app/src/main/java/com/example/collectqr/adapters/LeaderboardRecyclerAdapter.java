@@ -15,6 +15,7 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 // https://developer.android.com/guide/topics/ui/layout/recyclerview#implement-adapter
 /**
@@ -97,13 +98,17 @@ public class LeaderboardRecyclerAdapter extends RecyclerView.Adapter<Leaderboard
 
         viewHolder.getUserName().setText(user.getUsername());
         if (category.equals("most_points")) {
+            // gets users total points
             viewHolder.getUserScore().setText(user.getStats().get("total_points") + " points");
         } else if (category.equals("most_codes")) {
+            // gets users number of codes scanned
             viewHolder.getUserScore().setText(user.getStats().get("num_codes") + " codes");
         } else if (category.equals("best_code")) {
+            // gets users best single code score
             viewHolder.getUserScore().setText(user.getStats().get("best_code") + " points");
         } else if (category.equals("region_best")) {
-            viewHolder.getUserScore().setText(user.getStats().get("region_points") + " points");
+            // gets users highest scoring code from region
+            viewHolder.getUserScore().setText(user.getStats().get("region_best") + " points");
         }
         // index of user in sorted list plus 1 = rank
         String rankStr = Integer.toString(data.indexOf(user)+1);

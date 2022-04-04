@@ -2,16 +2,16 @@ package com.example.collectqr.data;
 
 import static android.content.ContentValues.TAG;
 
-import static java.util.Objects.isNull;
-
 import android.util.ArrayMap;
 import android.util.Log;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.example.collectqr.adapters.LeaderboardRecyclerAdapter;
 import com.example.collectqr.model.User;
+import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
@@ -20,6 +20,7 @@ import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * LeaderboardController class
@@ -70,14 +71,18 @@ public class LeaderboardController {
                         dataLists.get("most_points").clear();
                         dataLists.get("most_codes").clear();
                         dataLists.get("best_code").clear();
-                        dataLists.get("region_best").clear();
                         for (QueryDocumentSnapshot doc : queryDocumentSnapshots) {
                             Log.d(TAG, String.valueOf(doc.getData().get("username")));
                             String name = String.valueOf(doc.getData().get("username"));
+
+                            // get data from db
                             int totalPoints = Integer.parseInt(String.valueOf(doc.getData().get("total_points")));
                             int numCodes = Integer.parseInt(String.valueOf(doc.getData().get("num_codes")));
                             int bestCode = Integer.parseInt(String.valueOf(doc.getData().get("best_code")));
-                            int regionBest = Integer.parseInt(String.valueOf(doc.getData().get("region_best")));
+
+                            // get best code from region
+                            CollectionReference scannedCodesCollection = doc.getReference().collection("ScannedCodes");
+                            int regionBest = getRegionBest(scannedCodesCollection, name);
 
                             User userObj = new User(name);
                             userObj.updateScore(numCodes, totalPoints, bestCode, regionBest);
@@ -104,7 +109,7 @@ public class LeaderboardController {
                                     String rankStr = Integer.toString(i+1);
                                     rank.setText("#" + rankStr);
                                 } else if (currentCategory.equals("region_best")) {
-                                    score.setText(item.getStats().get("region_points") + " points");
+                                    score.setText(item.getStats().get("region_best") + " points");
                                     String rankStr = Integer.toString(i+1);
                                     rank.setText("#" + rankStr);
                                 }
@@ -145,8 +150,31 @@ public class LeaderboardController {
         dataLists.get("region_best").sort(new Comparator<User>() {
             @Override
             public int compare(User user, User t1){
-                return t1.getStats().get("region_points")-user.getStats().get("region_points");
+                return t1.getStats().get("region_best")-user.getStats().get("region_best");
             }
         });
+    }
+
+    private int getRegionBest(@NonNull CollectionReference scannedCodesCollection, String name){
+        AtomicInteger best = new AtomicInteger();
+        scannedCodesCollection.addSnapshotListener((value, error) -> {
+            assert value != null;
+            for (QueryDocumentSnapshot d : value) {
+                Log.d("REGIONBESTQUERY", "Getting scanned codes by: " + name);
+                if (d.get("points") != null){
+                    //&& d.get("geohash") != null) {
+
+                    int points = Integer.parseInt(String.valueOf(d.getData().get("points")));
+                    //String geohash = d.get("geohash").toString();
+
+                    if (points >= best.get()){
+                            //&& (geohash == region)) {
+                        best.set(points);
+                    }
+
+                }
+            }
+        });
+        return best.get();
     }
 }

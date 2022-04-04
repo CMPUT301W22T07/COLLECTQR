@@ -155,7 +155,7 @@ public class LeaderboardFragment extends Fragment {
                     String rankStr = Integer.toString(i+1);
                     personalRank.setText("#" + rankStr);
                 } else if (currentCategory.equals("region_best")){
-                    personalScore.setText(item.getStats().get("region_points") + " points");
+                    personalScore.setText(item.getStats().get("region_best") + " points");
                     String rankStr = Integer.toString(i+1);
                     personalRank.setText("#" + rankStr);
                 }
