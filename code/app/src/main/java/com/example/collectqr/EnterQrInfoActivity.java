@@ -94,13 +94,29 @@ public class EnterQrInfoActivity extends AppCompatActivity {
         // optional additions to the qr code post
         addImageButton.setOnClickListener(new View.OnClickListener() {
             @Override
+
+/**
+ *
+ * On click
+ *
+ * @param view  the view
+ */
             public void onClick(View view) {
+
                 // TODO: add image functionality
             }
         });
         saveButton.setOnClickListener(new View.OnClickListener() {
             @Override
+
+/**
+ *
+ * On click
+ *
+ * @param view  the view
+ */
             public void onClick(View view) {
+
                 qrCode.setQr_image("test.jpg");
                 if(locationSwitch.isChecked()) {
                     qrCode.setAllLocations(latitude, longitude);

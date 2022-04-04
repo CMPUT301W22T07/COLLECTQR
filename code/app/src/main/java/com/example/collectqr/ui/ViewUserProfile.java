@@ -40,6 +40,10 @@ import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 
+
+/**
+ * The class View user profile extends fragment
+ */
 public class ViewUserProfile extends Fragment {
     private HistoryController controller;
     private RecyclerView.LayoutManager layoutManager;
@@ -47,7 +51,18 @@ public class ViewUserProfile extends Fragment {
     private String username;
     // https://developer.android.com/guide/topics/ui/dialogs#DialogFragment
     @Override
+
+/**
+ *
+ * On create view
+ *
+ * @param inflater  the inflater
+ * @param container  the container
+ * @param savedInstanceState  the saved instance state
+ * @return View
+ */
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+
         super.onCreate(savedInstanceState);
 
         //get the view for this fragment
@@ -90,8 +105,18 @@ public class ViewUserProfile extends Fragment {
         DocumentReference docRef = db.collection("Users").document(username);
         docRef.addSnapshotListener(new EventListener<DocumentSnapshot>() {
             @Override
+
+
+/**
+ *
+ * On event
+ *
+ * @param DocumentSnapshot  the document snapshot
+ * @param @Nullable  the @ nullable
+ */
             public void onEvent(@Nullable DocumentSnapshot snapshot,
                                 @Nullable FirebaseFirestoreException e) {
+
                 if (e != null) {
                     Log.w(TAG, "Listen failed.", e);
                     return;
@@ -111,26 +136,59 @@ public class ViewUserProfile extends Fragment {
             //before deleting the user, create a popup dialog to confirm they want
             //to delete them
             @Override
+
+/**
+ *
+ * On click
+ *
+ * @param view  the view
+ */
             public void onClick(View view) {
+
                 new MaterialAlertDialogBuilder(getContext(),
                         com.google.android.material.R.style.ThemeOverlay_Material3_Dialog)
                         // https://stackoverflow.com/a/19064968 by Singhak
                         .setMessage("Are you sure you want to delete this user?")
                         .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                             @Override
+
+/**
+ *
+ * On click
+ *
+ * @param dialogInterface  the dialog interface
+ * @param i  the i
+ */
                             public void onClick(DialogInterface dialogInterface, int i) {
+
                                 //confirmation given, so delete the user from the database
                                 db.collection("Users").document(username)
                                         .delete()
                                         .addOnSuccessListener(new OnSuccessListener<Void>() {
                                             @Override
+
+/**
+ *
+ * On success
+ *
+ * @param aVoid  the a void
+ */
                                             public void onSuccess(Void aVoid) {
+
                                                 Log.d(TAG, "DocumentSnapshot successfully deleted!");
                                             }
                                         })
                                         .addOnFailureListener(new OnFailureListener() {
                                             @Override
+
+/**
+ *
+ * On failure
+ *
+ * @param Exception  the exception
+ */
                                             public void onFailure(@NonNull Exception e) {
+
                                                 Log.w(TAG, "Error deleting document", e);
                                             }
                                         });

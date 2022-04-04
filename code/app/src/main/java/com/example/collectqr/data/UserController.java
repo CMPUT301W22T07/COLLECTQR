@@ -22,6 +22,7 @@ public class UserController {
      * @param user the user to be stored to firestore
      */
     public void writeToFirestore(User user) {
+
         FirebaseFirestore db;
         db = FirebaseFirestore.getInstance();
         final CollectionReference userReference = db.collection("Users");
@@ -79,6 +80,7 @@ public class UserController {
      * @param device_id the user's device_id to be added
      */
     public void addAdminUser(String device_id) {
+
         FirebaseFirestore db;
         db = FirebaseFirestore.getInstance();
         final CollectionReference userReference = db.collection("Admins");

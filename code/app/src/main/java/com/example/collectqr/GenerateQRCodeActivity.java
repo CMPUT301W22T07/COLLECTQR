@@ -62,36 +62,36 @@ public class GenerateQRCodeActivity extends AppCompatActivity {
         qrGenTxt2.setVisibility(View.GONE);
 
         if (qrGen == 0) {
-                qrGenTxt.setVisibility(View.VISIBLE);
+            qrGenTxt.setVisibility(View.VISIBLE);
 
-                String data = qrCodeText.trim();
-                if(data.isEmpty()){
-                    Toast.makeText(GenerateQRCodeActivity.this, "Please Enter Some Data to Generate QR Code", Toast.LENGTH_SHORT).show();
-                }else{
+            String data = qrCodeText.trim();
+            if(data.isEmpty()){
+                Toast.makeText(GenerateQRCodeActivity.this, "Please Enter Some Data to Generate QR Code", Toast.LENGTH_SHORT).show();
+            }else{
 
-                    // Initialize multi format writer
-                    MultiFormatWriter writer = new MultiFormatWriter();
+                // Initialize multi format writer
+                MultiFormatWriter writer = new MultiFormatWriter();
 
-                    // Initialize bit matrix
-                    try {
-                        BitMatrix matrix = writer.encode(data, BarcodeFormat.QR_CODE, 250, 250);
+                // Initialize bit matrix
+                try {
+                    BitMatrix matrix = writer.encode(data, BarcodeFormat.QR_CODE, 250, 250);
 
-                        // Initialize barcode encoder
-                        BarcodeEncoder encoder = new BarcodeEncoder();
+                    // Initialize barcode encoder
+                    BarcodeEncoder encoder = new BarcodeEncoder();
 
-                        // Initialize Bitmap
-                        Bitmap bitmap = encoder.createBitmap(matrix);
+                    // Initialize Bitmap
+                    Bitmap bitmap = encoder.createBitmap(matrix);
 
-                        // set bitmap on image view
-                        qrCodeImageView.setImageBitmap(bitmap);
+                    // set bitmap on image view
+                    qrCodeImageView.setImageBitmap(bitmap);
 
-                        // replaces text view with qr code by hiding it
-                        qrCodeTextView.setVisibility(View.GONE);
+                    // replaces text view with qr code by hiding it
+                    qrCodeTextView.setVisibility(View.GONE);
 
-                    } catch (WriterException e) {
-                        e.printStackTrace();
-                    }
+                } catch (WriterException e) {
+                    e.printStackTrace();
                 }
+            }
         }
 
 

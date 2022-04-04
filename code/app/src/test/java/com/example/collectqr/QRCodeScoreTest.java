@@ -8,9 +8,20 @@ import org.junit.Test;
 
 import java.util.Arrays;
 
+
+/**
+ * The class  QR code score test
+ */
 public class QRCodeScoreTest {
     @Test
+
+/**
+ *
+ * Test score system
+ *
+ */
     public void testScoreSystem() {
+
         QRCodeScore qrScore = new QRCodeScore();
 
         char[] chars1 = new char[64];

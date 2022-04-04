@@ -13,6 +13,10 @@ import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
 
+
+/**
+ * The class Final location repository extends live data< location>
+ */
 public final class LocationRepository extends LiveData<Location> {
     /* Sources
        https://developer.android.com/jetpack/guide for the architecture
@@ -31,7 +35,16 @@ public final class LocationRepository extends LiveData<Location> {
     private final LocationRequest locationRequest;
 
 
+
+    /**
+     *
+     * Location repository
+     *
+     * @param context  the context
+     * @return public
+     */
     public LocationRepository(Context context) {
+
         int ONE_MINUTE = 60000;
         locationRequest = LocationRequest.create();
         locationRequest.setInterval(ONE_MINUTE);
@@ -42,7 +55,16 @@ public final class LocationRepository extends LiveData<Location> {
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(context);
     }
 
+
+    /**
+     *
+     * Location repository
+     *
+     * @param context  the context
+     * @return LocationRepository
+     */
     public static LocationRepository locationRepository(Context context) {
+
         if (sSoleInstance == null) {
             sSoleInstance = new LocationRepository(context);
         }
@@ -65,10 +87,26 @@ public final class LocationRepository extends LiveData<Location> {
         fusedLocationProviderClient.removeLocationUpdates(locationCallback());
     }
 
+
+    /**
+     *
+     * Location callback
+     *
+     * @return LocationCallback
+     */
     private LocationCallback locationCallback() {
+
         return new LocationCallback() {
             @Override
+
+/**
+ *
+ * On location result
+ *
+ * @param LocationResult  the location result
+ */
             public void onLocationResult(@NonNull LocationResult locationResult) {
+
                 super.onLocationResult(locationResult);
 
                 for (Location location : locationResult.getLocations()) {
@@ -79,13 +117,28 @@ public final class LocationRepository extends LiveData<Location> {
     }
 
 
+
+    /**
+     *
+     * Sets the location data
+     *
+     * @param location  the location
+     */
     private void setLocationData(Location location) {
+
         setValue(location);
     }
 
 
     @SuppressLint("MissingPermission")
+
+/**
+ *
+ * Start location updates
+ *
+ */
     private void startLocationUpdates() {
+
         fusedLocationProviderClient.requestLocationUpdates(locationRequest, locationCallback(), null);
     }
 

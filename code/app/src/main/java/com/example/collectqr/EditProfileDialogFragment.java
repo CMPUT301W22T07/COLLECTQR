@@ -22,11 +22,24 @@ import com.google.firebase.firestore.FirebaseFirestore;
 
 
 // Modified from Lab 3 Instructions - Fragments.pdf
+
+/**
+ * The class Edit profile dialog fragment extends dialog fragment
+ */
 public class EditProfileDialogFragment extends DialogFragment {
     // https://developer.android.com/guide/topics/ui/dialogs#DialogFragment
     @NonNull
     @Override
+
+/**
+ *
+ * On create dialog
+ *
+ * @param Bundle  the bundle
+ * @return Dialog
+ */
     public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
+
         super.onCreate(savedInstanceState);
         View rootView = LayoutInflater.from(getActivity()).inflate(R.layout.edit_profile_dialog_fragment, null);
 
@@ -56,11 +69,27 @@ public class EditProfileDialogFragment extends DialogFragment {
          */
         dialog.setOnShowListener(new DialogInterface.OnShowListener() {
             @Override
+
+/**
+ *
+ * On show
+ *
+ * @param dialogInterface  the dialog interface
+ */
             public void onShow(DialogInterface dialogInterface) {
+
                 Button button = ((AlertDialog) dialog).getButton(AlertDialog.BUTTON_POSITIVE);
                 button.setOnClickListener(new View.OnClickListener() {
                     @Override
+
+/**
+ *
+ * On click
+ *
+ * @param view  the view
+ */
                     public void onClick(View view) {
+
                         String email = emailField.getText().toString();
                         String phone = phoneField.getText().toString();
                         if (validate(phone, email, rootView)) {
@@ -101,7 +130,16 @@ public class EditProfileDialogFragment extends DialogFragment {
         return valid;
     }
 
+
+    /**
+     *
+     * Gets the toast position Y
+     *
+     * @param rootView  the root view
+     * @return the toast position Y
+     */
     private int getToastPositionY(View rootView) {
+
         /*
         StackOverflow, Author:Alexander Knauf
         https://stackoverflow.com/a/64440541

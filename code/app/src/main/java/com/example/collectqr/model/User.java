@@ -72,7 +72,15 @@ public class User {
         this.scan_300_points = scan_300_points;
     }
 
+
+    /**
+     *
+     * It is a constructor.
+     *
+     * @param username  the username
+     */
     public User(String username) {
+
         this.username = username;
         this.email = "";
         this.phone = "";
@@ -104,8 +112,10 @@ public class User {
      * @param  date the date the QR code was scanned
      * @param  image the path to the image taken of the QR code
      */
+
     public void addCode(String hash, Integer points, String latitude, String longitude,
                         String geohash, Date date, String image) {
+
         HashMap<String, Object> inner = new HashMap<>();
         inner.put("points", points.toString());
         inner.put("latitude", latitude);
@@ -122,6 +132,7 @@ public class User {
      * @return The user's username
      */
     public String getUsername() {
+
         return username;
     }
 
@@ -131,6 +142,7 @@ public class User {
      * @return The user's email
      */
     public String getEmail() {
+
         return email;
     }
 
@@ -140,6 +152,7 @@ public class User {
      * @param email the user's new email
      */
     public void setEmail(String email) {
+
         this.email = email;
     }
 
@@ -149,6 +162,7 @@ public class User {
      * @return The user's phone number
      */
     public String getPhone() {
+
         return phone;
     }
 
@@ -158,6 +172,7 @@ public class User {
      * @param phone the user's new phone number
      */
     public void setPhone(String phone) {
+
         this.phone = phone;
     }
 
@@ -167,6 +182,7 @@ public class User {
      * @return A list of all the user's devices
      */
     public ArrayList<String> getDevices() {
+
         return devices;
     }
 
@@ -176,6 +192,7 @@ public class User {
      * @param device another device belonging to the user
      */
     public void addDevice(String device) {
+
         this.devices.add(device);
     }
 
@@ -186,6 +203,7 @@ public class User {
      * @return A hashmap containing information about the users stats
      */
     public HashMap<String, Integer> getStats() {
+
         return stats;
     }
 
@@ -197,6 +215,7 @@ public class User {
      * @return A hashmap containing information about the QR codes the user has scanned
      */
     public HashMap<String, HashMap<String, Object>> getCodes_scanned() {
+
         return codes_scanned;
     }
 
@@ -207,6 +226,7 @@ public class User {
      * @param  total_points the total_points the user has
      */
     public void updateScore(int num_codes, int total_points, int best_code) {
+
         stats.replace("num_codes", num_codes);
         stats.replace("total_points", total_points);
         stats.replace("best_code", best_code);

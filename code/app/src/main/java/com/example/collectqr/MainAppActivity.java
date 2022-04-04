@@ -95,7 +95,17 @@ public class MainAppActivity extends AppCompatActivity {
          */
         navController.addOnDestinationChangedListener(new NavController.OnDestinationChangedListener() {
             @Override
+
+/**
+ *
+ * On destination changed
+ *
+ * @param NavController  the nav controller
+ * @param NavDestination  the nav destination
+ * @param Bundle  the bundle
+ */
             public void onDestinationChanged(@NonNull NavController navController, @NonNull NavDestination navDestination, @Nullable Bundle bundle) {
+
                 matchTopBar(navDestination.getId());
             }
         });
@@ -107,7 +117,16 @@ public class MainAppActivity extends AppCompatActivity {
     https://youtu.be/CRmfdVYWOhc
      */
     @Override
+
+/**
+ *
+ * On create options menu
+ *
+ * @param menu  the menu
+ * @return boolean
+ */
     public boolean onCreateOptionsMenu(Menu menu) {
+
         appBarMenu = menu;
         getMenuInflater().inflate(R.menu.top_app_bar, menu);
         return true;
@@ -118,6 +137,7 @@ public class MainAppActivity extends AppCompatActivity {
      * Check if a user already exists on the device. If not, start Login activity
      */
     public void doesUserExist() {
+
         //initially write false to users admin status to prevent any bugs
         Preferences.saveAdminStatus(context, false);
         //check if the current device id exists within the db
@@ -130,7 +150,15 @@ public class MainAppActivity extends AppCompatActivity {
                 .get()
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                     @Override
+
+/**
+ *
+ * On complete
+ *
+ * @param Task<QuerySnapshot>  the task< query snapshot>
+ */
                     public void onComplete(@NonNull Task<QuerySnapshot> task) {
+
                         if (task.isSuccessful()) {
                             if (task.getResult().isEmpty()) {
                                 //device doesn't exist within the db, so go to login activity
@@ -162,6 +190,7 @@ public class MainAppActivity extends AppCompatActivity {
      * shouldn't have admin permissions, write this data to shared preferences for future use
      */
     public void checkIfAdmin(String device_id) {
+
         db = FirebaseFirestore.getInstance();
         //search firebase to see if username is already in db
         db.collection("Admins")
@@ -187,6 +216,7 @@ public class MainAppActivity extends AppCompatActivity {
      * Keep the monkeys out
      */
     public void noMonkeys() {
+
         if (ActivityManager.isUserAMonkey()) {
             new MaterialAlertDialogBuilder(this,
                     com.google.android.material.R.style.ThemeOverlay_Material3_Dialog)
@@ -201,7 +231,15 @@ public class MainAppActivity extends AppCompatActivity {
         }
     }
 
+
+    /**
+     *
+     * Match top bar
+     *
+     * @param fragmentId  the fragment identifier
+     */
     private void matchTopBar(int fragmentId) {
+
         if (appBarMenu != null) {
             switch (fragmentId) {
                 case R.id.navigation_map:
@@ -227,7 +265,14 @@ public class MainAppActivity extends AppCompatActivity {
         return;
     }
 
+
+    /**
+     *
+     * Sets the up profile button
+     *
+     */
     private void setUpProfileButton() {
+
         /*
         https://material.io/components/app-bars-top/android#regular-top-app-bar
         StackOverflow, Author: reVerse
@@ -235,7 +280,16 @@ public class MainAppActivity extends AppCompatActivity {
          */
         toolbar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
             @Override
+
+/**
+ *
+ * On menu item click
+ *
+ * @param item  the item
+ * @return boolean
+ */
             public boolean onMenuItemClick(MenuItem item) {
+
                 new ProfileDialogFragment().show(getSupportFragmentManager(), "DISPLAY_PROFILE");
                 return true;
             }
@@ -246,6 +300,7 @@ public class MainAppActivity extends AppCompatActivity {
      * Setup window attributes and decorations at startup
      */
     public void setupWindowAttributes() {
+
         /* Swapping the eye-searing container colour
            https://trendyprogrammer.blogspot.com/2020/01/how-to-show-content-behind-status-bar.html
          */

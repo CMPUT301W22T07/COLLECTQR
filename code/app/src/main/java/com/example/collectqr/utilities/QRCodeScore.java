@@ -9,7 +9,7 @@ import com.example.collectqr.model.QRCode;
  * score of a QR code
  */
 public class QRCodeScore extends HashConversion {
-     /**
+    /**
      * Calculates the score of a QR Code converted to SHA-256 hash following the scoring system
      * proposed in the project description.
      *
@@ -19,6 +19,7 @@ public class QRCodeScore extends HashConversion {
      *      long value of the score of the SHA-256 hash
      */
     public int calculateScore(String sha256String) {
+
 
         int score = 0;
         int comboLength = 0;

@@ -22,6 +22,7 @@ public class Preferences {
      * @param  username the username to be saved
      */
     public static void saveUserName(Context context, String username) {
+
         SharedPreferences sharedPreferences = context.getSharedPreferences("sharedPreferences", MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
         Gson gson = new Gson();
@@ -37,6 +38,7 @@ public class Preferences {
      * @return the username stored in shared preferences
      */
     public static String loadUserName(Context context) {
+
         SharedPreferences sharedPreferences = context.getSharedPreferences("sharedPreferences", MODE_PRIVATE);
         Gson gson = new Gson();
         String json = sharedPreferences.getString("username", null);
@@ -51,6 +53,7 @@ public class Preferences {
      * @param  admin whether the user is an admin or not
      */
     public static void saveAdminStatus(Context context, boolean admin) {
+
         SharedPreferences sharedPreferences = context.getSharedPreferences("sharedPreferences", MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
         Gson gson = new Gson();
@@ -66,6 +69,7 @@ public class Preferences {
      * @return whether the user is an admin or not
      */
     public static Boolean loadAdminStatus(Context context) {
+
         SharedPreferences sharedPreferences = context.getSharedPreferences("sharedPreferences", MODE_PRIVATE);
         Gson gson = new Gson();
         String json = sharedPreferences.getString("admin", null);
@@ -79,6 +83,7 @@ public class Preferences {
      * @param  context
      */
     public static void deletePreferences(Context context) {
+
         SharedPreferences sharedPreferences = context.getSharedPreferences("sharedPreferences", MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.clear();

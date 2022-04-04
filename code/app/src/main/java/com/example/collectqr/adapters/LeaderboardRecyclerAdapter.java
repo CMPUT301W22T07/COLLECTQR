@@ -31,7 +31,15 @@ public class LeaderboardRecyclerAdapter extends RecyclerView.Adapter<Leaderboard
         void onRecyclerItemClick(int position, String category);
     }
 
+
+    /**
+     *
+     * Sets the on item click listener
+     *
+     * @param listener  the listener
+     */
     public void setOnItemClickListener(LeaderboardRecyclerAdapter.OnRecyclerItemClickListener listener) {
+
         this.listener = listener;
     }
 
@@ -44,7 +52,18 @@ public class LeaderboardRecyclerAdapter extends RecyclerView.Adapter<Leaderboard
         private TextView userScore;
         private TextView userRank;
 
+
+        /**
+         *
+         * View holder
+         *
+         * @param view  the view
+         * @param listener  the listener
+         * @param category  the category
+         * @return public
+         */
         public ViewHolder(View view, OnRecyclerItemClickListener listener, String category) {
+
             super(view);
             // Define click listener for the ViewHolder's View
 
@@ -54,7 +73,15 @@ public class LeaderboardRecyclerAdapter extends RecyclerView.Adapter<Leaderboard
 
             view.setOnClickListener(new View.OnClickListener() {
                 @Override
+
+/**
+ *
+ * On click
+ *
+ * @param view  the view
+ */
                 public void onClick(View view) {
+
                     if (listener != null) {
                         int position = getAdapterPosition();
                         if (position != RecyclerView.NO_POSITION) {
@@ -65,15 +92,39 @@ public class LeaderboardRecyclerAdapter extends RecyclerView.Adapter<Leaderboard
             });
         }
 
+
+        /**
+         *
+         * Gets the user name
+         *
+         * @return the user name
+         */
         public TextView getUserName() {
+
             return userName;
         }
 
+
+        /**
+         *
+         * Gets the user score
+         *
+         * @return the user score
+         */
         public TextView getUserScore() {
+
             return userScore;
         }
 
+
+        /**
+         *
+         * Gets the user rank
+         *
+         * @return the user rank
+         */
         public TextView getUserRank() {
+
             return userRank;
         }
     }
@@ -85,6 +136,7 @@ public class LeaderboardRecyclerAdapter extends RecyclerView.Adapter<Leaderboard
      * @param category
      */
     public LeaderboardRecyclerAdapter(ArrayList<User> data, String category) {
+
         this.data = data;
         this.category = category;
     }
@@ -97,6 +149,7 @@ public class LeaderboardRecyclerAdapter extends RecyclerView.Adapter<Leaderboard
      */
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup viewGroup, int viewType) {
+
         // Create a new view, which defines the UI of the list item
         this.viewGroup = viewGroup;
         View view = LayoutInflater.from(viewGroup.getContext())
@@ -112,6 +165,7 @@ public class LeaderboardRecyclerAdapter extends RecyclerView.Adapter<Leaderboard
      */
     @Override
     public void onBindViewHolder(ViewHolder viewHolder, final int position) {
+
         // Get element from your dataset at this position and replace the
         // contents of the view with that element
         User user = data.get(position);
@@ -139,6 +193,7 @@ public class LeaderboardRecyclerAdapter extends RecyclerView.Adapter<Leaderboard
      */
     @Override
     public int getItemCount() {
+
         return data.size();
     }
 }
