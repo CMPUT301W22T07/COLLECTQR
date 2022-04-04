@@ -134,30 +134,7 @@ public class QRCodeController {
                                         if (bestCode < qrCode.getPoints()) {
                                             documentReference.update("best_code", qrCode.getPoints());
                                         }
-
-                                        //handle checking for achievements
-                                        //first, check if the user has scanned an achievement-worthy
-                                        //number of codes
-                                        if(numCodes == 1) {
-                                            documentReference.update("scan_1_code", true);
-                                        } else if(numCodes == 10) {
-                                            documentReference.update("scan_10_codes", true);
-                                        } else if(numCodes == 50) {
-                                            documentReference.update("scan_50_codes", true);
-                                        }
-
-                                        //then, check if the user's scan had an achievement-worthy
-                                        //number of points
-                                        Integer qrPoints = qrCode.getPoints();
-                                        if(qrPoints < 10) {
-                                            documentReference.update("scan_10_points", true);
-                                        }
-                                        if(qrPoints >= 100) {
-                                            documentReference.update("scan_100_points", true);
-                                        }
-                                        if (qrPoints >= 300) {
-                                            documentReference.update("scan_300_points", true);
-                                        }
+                                        updateAchievements(numCodes, qrCode.getPoints(), documentReference);
                                     } else {
                                         Log.d(TAG, "No such document");
                                     }
@@ -172,6 +149,31 @@ public class QRCodeController {
                 }
             }
         });
+    }
+
+    private void updateAchievements(int numCodes, int qrPoints, DocumentReference documentReference) {
+        //handle checking for achievements
+        //first, check if the user has scanned an achievement-worthy
+        //number of codes
+        if(numCodes == 1) {
+            documentReference.update("scan_1_code", true);
+        } else if(numCodes == 10) {
+            documentReference.update("scan_10_codes", true);
+        } else if(numCodes == 50) {
+            documentReference.update("scan_50_codes", true);
+        }
+
+        //then, check if the user's scan had an achievement-worthy
+        //number of points
+        if(qrPoints < 10) {
+            documentReference.update("scan_10_points", true);
+        }
+        if(qrPoints >= 100) {
+            documentReference.update("scan_100_points", true);
+        }
+        if (qrPoints >= 300) {
+            documentReference.update("scan_300_points", true);
+        }
     }
 
     /**
