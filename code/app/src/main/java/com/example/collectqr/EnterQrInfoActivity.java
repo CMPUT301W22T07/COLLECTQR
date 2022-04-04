@@ -133,7 +133,7 @@ public class EnterQrInfoActivity extends AppCompatActivity {
  * @param view  the view
  */
             public void onClick(View view) {
-                String imagePath = "";
+                String imagePath = "default_image.jpg"; //set a default image
 
                 //set the qr image, first check if an image was uploaded by checking the bitmap
                 if(imageBitmap != null) {

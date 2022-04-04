@@ -32,12 +32,29 @@ public class MapPOI {
     private int intPoints = 0;
     private JsonElement jsonData;
 
+    /**
+     *
+     * It is a constructor.
+     *
+     * @param point  the point
+     * @param document  the document snapshot
+     */
+
     public MapPOI(Point point, @NonNull DocumentSnapshot document) {
         this.point = point;
         this.document = document;
         this.hash = document.getString(HASH_FIELD);
     }
 
+
+    /**
+     *
+     * It is a constructor.
+     *
+     * @param longitude  the longitude
+     * @param latitude  the latitude
+     * @param document  the document snapshot
+     */
     public MapPOI(double longitude, double latitude, @NonNull DocumentSnapshot document) {
 
         this.point = Point.fromLngLat(longitude, latitude);
