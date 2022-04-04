@@ -27,6 +27,10 @@ import com.google.firebase.firestore.FirebaseFirestoreException;
 
 // Modified from Lab 3 Instructions - Fragments.pdf
 
+
+/**
+ * The class Profile dialog fragment extends dialog fragment
+ */
 public class ProfileDialogFragment extends DialogFragment {
     private String email;
     private String phone;
@@ -34,7 +38,16 @@ public class ProfileDialogFragment extends DialogFragment {
     // https://developer.android.com/guide/topics/ui/dialogs#DialogFragment
     @NonNull
     @Override
+
+/**
+ *
+ * On create dialog
+ *
+ * @param Bundle  the bundle
+ * @return Dialog
+ */
     public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
+
         super.onCreate(savedInstanceState);
         View rootView = LayoutInflater.from(getActivity()).inflate(R.layout.profile_dialog_fragment, null);
 
@@ -53,8 +66,18 @@ public class ProfileDialogFragment extends DialogFragment {
         DocumentReference docRef = db.collection("Users").document(username);
         docRef.addSnapshotListener(new EventListener<DocumentSnapshot>() {
             @Override
+
+
+/**
+ *
+ * On event
+ *
+ * @param DocumentSnapshot  the document snapshot
+ * @param @Nullable  the @ nullable
+ */
             public void onEvent(@Nullable DocumentSnapshot snapshot,
                                 @Nullable FirebaseFirestoreException e) {
+
                 if (e != null) {
                     Log.w(TAG, "Listen failed.", e);
                     return;
@@ -77,7 +100,15 @@ public class ProfileDialogFragment extends DialogFragment {
 
         editButton.setOnClickListener(new View.OnClickListener() {
             @Override
+
+/**
+ *
+ * On click
+ *
+ * @param view  the view
+ */
             public void onClick(View view) {
+
                 // Modified from Lab 3 Participation Exercise Hints
                 Bundle args = new Bundle();
                 args.putString("email", email);
@@ -90,14 +121,30 @@ public class ProfileDialogFragment extends DialogFragment {
 
         achievementsButton.setOnClickListener(new View.OnClickListener() {
             @Override
+
+/**
+ *
+ * On click
+ *
+ * @param view  the view
+ */
             public void onClick(View view) {
+
                 // TODO: implement achievements
             }
         });
 
         exportButton.setOnClickListener(new View.OnClickListener() {
             @Override
+
+/**
+ *
+ * On click
+ *
+ * @param view  the view
+ */
             public void onClick(View view) {
+
                 Intent intent = new Intent(getContext(), GenerateQRCodeActivity.class);
                 intent.putExtra("qrGen", 0);
                 startActivity(intent);
@@ -106,7 +153,15 @@ public class ProfileDialogFragment extends DialogFragment {
 
         shareButton.setOnClickListener(new View.OnClickListener() {
             @Override
+
+/**
+ *
+ * On click
+ *
+ * @param view  the view
+ */
             public void onClick(View view) {
+
                 Intent intent = new Intent(getContext(), GenerateQRCodeActivity.class);
                 intent.putExtra("qrGen", 1);
                 startActivity(intent);

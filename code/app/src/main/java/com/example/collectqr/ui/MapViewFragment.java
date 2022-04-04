@@ -86,7 +86,15 @@ public class MapViewFragment extends Fragment {
     private final OnIndicatorPositionChangedListener posChangedListener =
             new OnIndicatorPositionChangedListener() {
                 @Override
+
+/**
+ *
+ * On indicator position changed
+ *
+ * @param Point  the point
+ */
                 public void onIndicatorPositionChanged(@NonNull Point point) {
+
                     mapView.getMapboxMap().setCamera(new CameraOptions.Builder()
                             .center(point).build());
                     GesturesPlugin gestures = mapView.getPlugin(Plugin.Mapbox.MAPBOX_GESTURES_PLUGIN_ID);
@@ -101,7 +109,15 @@ public class MapViewFragment extends Fragment {
                             getViewLifecycleOwner(), this::addMapMarkers);
                 }
 
+
+                /**
+                 *
+                 * Add map markers
+                 *
+                 * @param POIList  the  POI list
+                 */
                 private void addMapMarkers(List<MapPOI> POIList) {
+
 
                     if (mViewModel.lastPOILen != POIList.size()) {
 
@@ -152,17 +168,42 @@ public class MapViewFragment extends Fragment {
     // Store reference and override the on-move listener
     private final OnMoveListener onMoveListener = new OnMoveListener() {
         @Override
+
+/**
+ *
+ * On move begin
+ *
+ * @param MoveGestureDetector  the move gesture detector
+ */
         public void onMoveBegin(@NonNull MoveGestureDetector moveGestureDetector) {
+
             onCameraTrackingDismissed();
         }
 
         @Override
+
+/**
+ *
+ * On move
+ *
+ * @param MoveGestureDetector  the move gesture detector
+ * @return boolean
+ */
         public boolean onMove(@NonNull MoveGestureDetector moveGestureDetector) {
+
             return false;
         }
 
         @Override
+
+/**
+ *
+ * On move end
+ *
+ * @param MoveGestureDetector  the move gesture detector
+ */
         public void onMoveEnd(@NonNull MoveGestureDetector moveGestureDetector) {
+
         }
     };
 
@@ -181,6 +222,7 @@ public class MapViewFragment extends Fragment {
     @NonNull
     @Contract(" -> new")
     public static MapViewFragment newInstance() {
+
         return new MapViewFragment();
     }
 
@@ -194,8 +236,10 @@ public class MapViewFragment extends Fragment {
      * @return An inflated view with its corresponding layout
      */
     @Override
+
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
+
 
         super.onCreateView(inflater, container, savedInstanceState);
         username = Preferences.loadUserName(requireContext());
@@ -213,19 +257,36 @@ public class MapViewFragment extends Fragment {
      * If location permissions have been granted then prepare the map's settings.
      */
     private void checkPermissions() {
+
         if (PermissionsManager.areLocationPermissionsGranted(requireContext())) {
             onMapReady();
         } else {
             permManager = new PermissionsManager(new PermissionsListener() {
                 @Override
+
+/**
+ *
+ * On explanation needed
+ *
+ * @param list  the list
+ */
                 public void onExplanationNeeded(List<String> list) {
+
                     Toast.makeText(requireContext(),
                             "Location is used to move the map to where you are",
                             Toast.LENGTH_LONG).show();
                 }
 
                 @Override
+
+/**
+ *
+ * On permission result
+ *
+ * @param granted  the granted
+ */
                 public void onPermissionResult(boolean granted) {
+
                     if (granted) {
                         onMapReady();
                     } else {
@@ -242,6 +303,7 @@ public class MapViewFragment extends Fragment {
      * Setup the map's style, camera, and location/gesture listeners.
      */
     private void onMapReady() {
+
         mapView.getMapboxMap().setCamera(
                 new CameraOptions.Builder().zoom(14.0).pitch(40.0).build()
         );
@@ -277,6 +339,7 @@ public class MapViewFragment extends Fragment {
      * Add a onMoveListener for when the player manually moves the map camera.
      */
     private void setupGesturesListener() {
+
         gesturesPlugin = mapView.getPlugin(Plugin.Mapbox.MAPBOX_GESTURES_PLUGIN_ID);
         assert gesturesPlugin != null;
         gesturesPlugin.addOnMoveListener(onMoveListener);
@@ -288,6 +351,7 @@ public class MapViewFragment extends Fragment {
      * position.
      */
     private void initLocationComponent() {
+
         locationComponentPlugin =
                 mapView.getPlugin(Plugin.Mapbox.MAPBOX_LOCATION_COMPONENT_PLUGIN_ID);
 
@@ -320,6 +384,7 @@ public class MapViewFragment extends Fragment {
      * Sets actions on buttons making use of view binding.
      */
     private void setButtonsActions() {
+
         binding.fabLaunchQRScanner.setOnClickListener(view -> startScanner());
 
         binding.fabGpsLockLocation.setOnClickListener(
@@ -334,6 +399,7 @@ public class MapViewFragment extends Fragment {
      * Start the QR code scanner activity.
      */
     private void startScanner() {
+
         Intent intent = new Intent(this.getActivity(), ScanQRCodeActivity.class);
         startActivityForResult(intent, 1);
     }
@@ -349,6 +415,7 @@ public class MapViewFragment extends Fragment {
      */
     @Override
     public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+
         super.onActivityResult(requestCode, resultCode, data);
         if (resultCode == Activity.RESULT_OK) {
             if (requestCode == 1) {
@@ -367,6 +434,7 @@ public class MapViewFragment extends Fragment {
      * Move the map's camera to the player's current location.
      */
     private void onCameraTrackingRequested() {
+
         Toast.makeText(requireContext(), "Moving to your location", Toast.LENGTH_SHORT).show();
 
         GesturesPlugin gesturesPlugin = mapView.getPlugin(Plugin.MAPBOX_GESTURES_PLUGIN_ID);
@@ -385,6 +453,7 @@ public class MapViewFragment extends Fragment {
      * When the map camera moves, stop the camera from tracking the player's movement.
      */
     private void onCameraTrackingDismissed() {
+
         Toast.makeText(requireContext(), "onCameraTrackingDismissed", Toast.LENGTH_SHORT).show();
 
         GesturesPlugin gesturesPlugin = mapView.getPlugin(Plugin.MAPBOX_GESTURES_PLUGIN_ID);
@@ -407,6 +476,7 @@ public class MapViewFragment extends Fragment {
      */
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+
         super.onViewCreated(view, savedInstanceState);
 
         mViewModel = new ViewModelProvider(this).get(MapViewViewModel.class);
@@ -471,6 +541,7 @@ public class MapViewFragment extends Fragment {
      */
     private void showInfoSheet(CircleAnnotation circleAnnotation) {
 
+
         infoSheet = new MapInfoBottomSheet();
         infoSheet.show(requireActivity().getSupportFragmentManager(), infoSheet.getTag());
 
@@ -482,6 +553,7 @@ public class MapViewFragment extends Fragment {
      */
     @Override
     public void onDestroy() {
+
         super.onDestroy();
         GesturesPlugin gesturesPlugin = mapView.getPlugin(Plugin.MAPBOX_GESTURES_PLUGIN_ID);
         LocationComponentPlugin locationComponentPlugin =
@@ -505,9 +577,11 @@ public class MapViewFragment extends Fragment {
      * @deprecated
      */
     @Override
+
     public void onRequestPermissionsResult(int requestCode,
                                            @NonNull String[] permissions,
                                            @NonNull int[] grantResults) {
+
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         permManager.onRequestPermissionsResult(requestCode, permissions, grantResults);
     }
@@ -519,6 +593,7 @@ public class MapViewFragment extends Fragment {
      */
     @Override
     public void onConfigurationChanged(@NonNull Configuration newConfig) {
+
         super.onConfigurationChanged(newConfig);
         onMapReady();
     }

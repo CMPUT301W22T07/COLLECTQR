@@ -5,6 +5,10 @@ import android.os.Bundle;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+
+/**
+ * The class Dummy activity extends application compat activity
+ */
 public class DummyActivity extends AppCompatActivity {
 
     private String data;

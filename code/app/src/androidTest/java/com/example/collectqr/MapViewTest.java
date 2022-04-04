@@ -37,7 +37,14 @@ public class MapViewTest {
     private String username;
 
     @Test
+
+/**
+ *
+ * Create account
+ *
+ */
     public void createAccount() {
+
         // "Hey, that's..."
         Faker faker = new Faker();
         Preferences.deletePreferences(context);
@@ -66,7 +73,14 @@ public class MapViewTest {
     }
 
     @After
+
+/**
+ *
+ * Tear down
+ *
+ */
     public void tearDown() {
+
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         db.collection("Users").document(username).delete();
         Preferences.deletePreferences(context);

@@ -46,6 +46,7 @@ public class MapViewController {
      * @param location The location to search for nearby QR codes
      */
     public List<Point> getNearbyQRCodes(@NonNull Location location) {
+
         double lat = location.getLatitude();
         double lon = location.getLongitude();
         GeoLocation searchLocation = new GeoLocation(lat, lon);
@@ -66,8 +67,10 @@ public class MapViewController {
      * @param bounds The bounds of the area to search, based off the geo-hash
      * @param tasks  The List of Tasks to append tasks to.
      */
+
     private void queryDocuments(@NonNull List<GeoQueryBounds> bounds,
                                 List<Task<QuerySnapshot>> tasks) {
+
 
         // Query and create tasks
         for (GeoQueryBounds bound : bounds) {
@@ -97,6 +100,7 @@ public class MapViewController {
      * @param matchingDocuments A List of matching Firestore Documents to make Points from
      */
     private void generateMapPoints(@NonNull List<DocumentSnapshot> matchingDocuments) {
+
         for (DocumentSnapshot doc : matchingDocuments) {
             // Get the latitude from a document as a String
             try {

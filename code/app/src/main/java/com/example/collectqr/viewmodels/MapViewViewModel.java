@@ -52,12 +52,30 @@ public class MapViewViewModel extends AndroidViewModel {
     private MutableLiveData<List<MapPOI>> qrGeoLocations;
     public int lastPOILen = 0;
 
+
+    /**
+     *
+     * Map view view model
+     *
+     * @param Application  the application
+     * @return public
+     */
     public MapViewViewModel(@NonNull Application application) {
+
         super(application);
     }
 
 
+
+    /**
+     *
+     * Gets the geo locations
+     *
+     * @param location  the location
+     * @return the geo locations
+     */
     public LiveData<List<MapPOI>> getGeoLocations(Location location) {
+
         if (qrGeoLocations == null && location != null) {
             qrGeoLocations = new MutableLiveData<>();
             loadGeoLocations(location);
@@ -66,7 +84,15 @@ public class MapViewViewModel extends AndroidViewModel {
     }
 
 
+
+    /**
+     *
+     * Load geo locations
+     *
+     * @param location  the location
+     */
     private void loadGeoLocations(Location location) {
+
         GeoLocation searchLocation = new GeoLocation(location.getLatitude(), location.getLongitude());
         String hash = GeoFireUtils.getGeoHashForLocation(searchLocation);
         double radiusInM = MAX_RADIUS;
@@ -96,7 +122,15 @@ public class MapViewViewModel extends AndroidViewModel {
     }
 
 
+
+    /**
+     *
+     * Generate points
+     *
+     * @param List<DocumentSnapshot>  the list< document snapshot>
+     */
     private void generatePoints(@NonNull List<DocumentSnapshot> matchingDocs) {
+
         int listSize = matchingDocs.size();
 
         POIList.clear();

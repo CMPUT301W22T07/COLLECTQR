@@ -37,12 +37,21 @@ public class LeaderboardController {
      * @param username of the current user
      */
     public LeaderboardController(String username){
+
         this.username = username;
         db = FirebaseFirestore.getInstance();
 
     }
 
+
+    /**
+     *
+     * Sets the current category
+     *
+     * @param category  the category
+     */
     public void setCurrentCategory(String category) {
+
         this.currentCategory = category;
     }
     /**
@@ -60,12 +69,23 @@ public class LeaderboardController {
      *      this is the view that will display the user's rank
      */
     public void downloadData(ArrayMap<String, ArrayList<User>> dataLists, ArrayMap<String, LeaderboardRecyclerAdapter> adapters, TextView score, TextView rank) {
+
         LeaderboardController controller = this;
         db.collection("Users")
                 .addSnapshotListener(new EventListener<QuerySnapshot>() {
                     @Override
+
+
+/**
+ *
+ * On event
+ *
+ * @param QuerySnapshot  the query snapshot
+ * @param FirebaseFirestoreException  the firebase firestore exception
+ */
                     public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable
                             FirebaseFirestoreException error) {
+
                         dataLists.get("most_points").clear();
                         dataLists.get("most_codes").clear();
                         dataLists.get("best_code").clear();
@@ -112,21 +132,52 @@ public class LeaderboardController {
      *      this is a map of lists to be sorted
      */
     private void sortLists(ArrayMap<String, ArrayList<User>> dataLists) {
+
         dataLists.get("most_points").sort(new Comparator<User>() {
             @Override
+
+/**
+ *
+ * Compare
+ *
+ * @param user  the user
+ * @param t1  the t1
+ * @return int
+ */
             public int compare(User user, User t1) {
+
                 return t1.getStats().get("total_points")-user.getStats().get("total_points");
             }
         });
         dataLists.get("most_codes").sort(new Comparator<User>() {
             @Override
+
+/**
+ *
+ * Compare
+ *
+ * @param user  the user
+ * @param t1  the t1
+ * @return int
+ */
             public int compare(User user, User t1) {
+
                 return t1.getStats().get("num_codes")-user.getStats().get("num_codes");
             }
         });
         dataLists.get("best_code").sort(new Comparator<User>() {
             @Override
+
+/**
+ *
+ * Compare
+ *
+ * @param user  the user
+ * @param t1  the t1
+ * @return int
+ */
             public int compare(User user, User t1) {
+
                 return t1.getStats().get("best_code")-user.getStats().get("best_code");
             }
         });

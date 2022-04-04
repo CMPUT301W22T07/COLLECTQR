@@ -18,7 +18,14 @@ import static org.junit.Assert.*;
 @RunWith(AndroidJUnit4.class)
 public class ExampleInstrumentedTest {
     @Test
+
+/**
+ *
+ * Use application context
+ *
+ */
     public void useAppContext() {
+
         // Context of the app under test.
         Context appContext = InstrumentationRegistry.getInstrumentation().getTargetContext();
         assertEquals("com.example.qr_code_generatorscanner", appContext.getPackageName());

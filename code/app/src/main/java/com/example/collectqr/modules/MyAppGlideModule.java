@@ -13,9 +13,23 @@ import java.io.InputStream;
 
 // https://newbedev.com/using-firebase-storage-image-with-glide
 @GlideModule
+
+/**
+ * The class My application glide module extends application glide module
+ */
 public class MyAppGlideModule extends AppGlideModule {
     @Override
+
+/**
+ *
+ * Register components
+ *
+ * @param context  the context
+ * @param glide  the glide
+ * @param registry  the registry
+ */
     public void registerComponents(Context context, Glide glide, Registry registry) {
+
         // Register FirebaseImageLoader to handle StorageReference
         registry.append(StorageReference.class, InputStream.class,
                 new FirebaseImageLoader.Factory());

@@ -62,22 +62,54 @@ public class ScanQRCodeLoginActivity extends AppCompatActivity {
 
         scannerLiveView.setScannerViewEventListener(new ScannerLiveView.ScannerViewEventListener() {
             @Override
+
+/**
+ *
+ * On scanner started
+ *
+ * @param scanner  the scanner
+ */
             public void onScannerStarted(ScannerLiveView scanner) {
+
                 Toast.makeText(ScanQRCodeLoginActivity.this, "Scanner Started...", Toast.LENGTH_SHORT).show();
             }
 
             @Override
+
+/**
+ *
+ * On scanner stopped
+ *
+ * @param scanner  the scanner
+ */
             public void onScannerStopped(ScannerLiveView scanner) {
+
                 Toast.makeText(ScanQRCodeLoginActivity.this, "Scanner Stopped...", Toast.LENGTH_SHORT).show();
             }
 
             @Override
+
+/**
+ *
+ * On scanner error
+ *
+ * @param err  the err
+ */
             public void onScannerError(Throwable err) {
+
                 Toast.makeText(ScanQRCodeLoginActivity.this, "Scanner Error Occurred Please Start Again...", Toast.LENGTH_SHORT).show();
             }
 
             @Override
+
+/**
+ *
+ * On code scanned
+ *
+ * @param data  the data
+ */
             public void onCodeScanned(String data) {
+
                 //extract username from the QR Code data
                 String username = data.replace(" LogIn", "");
 
@@ -122,13 +154,28 @@ public class ScanQRCodeLoginActivity extends AppCompatActivity {
         });
     }
 
+
+    /**
+     *
+     * Check permission
+     *
+     * @return boolean
+     */
     private boolean checkPermission(){
+
         int cameraPermission = ContextCompat.checkSelfPermission(getApplicationContext(),CAMERA);
         int vibratePermission = ContextCompat.checkSelfPermission(getApplicationContext(),VIBRATE);
         return cameraPermission == PackageManager.PERMISSION_GRANTED && vibratePermission == PackageManager.PERMISSION_GRANTED;
     }
 
+
+    /**
+     *
+     * Request permission
+     *
+     */
     private void requestPermission(){
+
         int PERMISSION_CODE = 200;
         ActivityCompat.requestPermissions(this,new String[]{CAMERA,VIBRATE},PERMISSION_CODE);
     }
@@ -149,7 +196,17 @@ public class ScanQRCodeLoginActivity extends AppCompatActivity {
     }
 
     @Override
+
+/**
+ *
+ * On request permissions result
+ *
+ * @param requestCode  the request code
+ * @param String[]  the string []
+ * @param int[]  the int []
+ */
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         if(grantResults.length > 0){
             boolean cameraAccepted = grantResults[0] == PackageManager.PERMISSION_GRANTED;
