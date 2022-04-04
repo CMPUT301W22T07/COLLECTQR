@@ -20,6 +20,8 @@ import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.FutureTask;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -86,20 +88,25 @@ public class LeaderboardController {
                             int bestCode = Integer.parseInt(String.valueOf(doc.getData().get("best_code")));
 
                             // get best code from region
+                            // setup futuretask to wait for asynchronous query of getRegionBest
                             userRegionBest = 0;
                             CollectionReference scannedCodesCollection = doc.getReference().collection("ScannedCodes");
                             getRegionBest(scannedCodesCollection, name);
-                            int regionBest = userRegionBest;
-                            System.out.println(regionBest);
+                            System.out.println("Finished getRegionBest Call: " + userRegionBest);
 
+                            int regionBest = userRegionBest;
+                            System.out.println("Region best for " + name + ": " + regionBest);
 
                             User userObj = new User(name);
+                            System.out.println("adding user object with stats: numCodes-" + numCodes +
+                                    " totalPoints-" + totalPoints + " bestCode-" + bestCode + " regionBest-" + regionBest);
                             userObj.updateScore(numCodes, totalPoints, bestCode, regionBest);
                             dataLists.get("most_points").add(userObj);
                             dataLists.get("most_codes").add(userObj);
                             dataLists.get("best_code").add(userObj);
                             dataLists.get("region_best").add(userObj);
                         }
+                        System.out.println("sorting data lists");
                         controller.sortLists(dataLists);
 
                         for (int i = 0; i < dataLists.get(currentCategory).size(); i++) {
@@ -124,6 +131,7 @@ public class LeaderboardController {
                                 }
                             }
                         }
+                        System.out.println("notifying adapters of data change");
                         adapters.get("most_points").notifyDataSetChanged();
                         adapters.get("most_codes").notifyDataSetChanged();
                         adapters.get("best_code").notifyDataSetChanged();
