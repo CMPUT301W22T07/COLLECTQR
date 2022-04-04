@@ -20,6 +20,8 @@ import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.FutureTask;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -86,20 +88,33 @@ public class LeaderboardController {
                             int bestCode = Integer.parseInt(String.valueOf(doc.getData().get("best_code")));
 
                             // get best code from region
+                            // setup futuretask to wait for asynchronous query of getRegionBest
+                            final FutureTask<Object> ft = new FutureTask<Object>(() -> {}, new Object());
                             userRegionBest = 0;
                             CollectionReference scannedCodesCollection = doc.getReference().collection("ScannedCodes");
-                            getRegionBest(scannedCodesCollection, name);
-                            int regionBest = userRegionBest;
-                            System.out.println(regionBest);
+                            getRegionBest(scannedCodesCollection, name, ft);
+                            System.out.println("Finished getRegionBest Call: " + userRegionBest);
+                            try {
+                                ft.get();
+                            } catch (ExecutionException e) {
+                                e.printStackTrace();
+                            } catch (InterruptedException e) {
+                                e.printStackTrace();
+                            }
 
+                            int regionBest = userRegionBest;
+                            System.out.println("Region best for " + name + ": " + regionBest);
 
                             User userObj = new User(name);
+                            System.out.println("adding user object with stats: numCodes-" + numCodes +
+                                    " totalPoints-" + totalPoints + " bestCode-" + bestCode + " regionBest-" + regionBest);
                             userObj.updateScore(numCodes, totalPoints, bestCode, regionBest);
                             dataLists.get("most_points").add(userObj);
                             dataLists.get("most_codes").add(userObj);
                             dataLists.get("best_code").add(userObj);
                             dataLists.get("region_best").add(userObj);
                         }
+                        System.out.println("sorting data lists");
                         controller.sortLists(dataLists);
 
                         for (int i = 0; i < dataLists.get(currentCategory).size(); i++) {
@@ -124,6 +139,7 @@ public class LeaderboardController {
                                 }
                             }
                         }
+                        System.out.println("notifying adapters of data change");
                         adapters.get("most_points").notifyDataSetChanged();
                         adapters.get("most_codes").notifyDataSetChanged();
                         adapters.get("best_code").notifyDataSetChanged();
@@ -203,9 +219,10 @@ public class LeaderboardController {
      * @param name
      * @return best (int of best scoring code in the region)
      */
-    private void getRegionBest(@NonNull CollectionReference scannedCodesCollection, String name) {
+    private void getRegionBest(@NonNull CollectionReference scannedCodesCollection, String name, FutureTask<Object> ft) {
         scannedCodesCollection.addSnapshotListener((value, error) -> {
             userRegionBest = 0;
+            ft.run();
             assert value != null;
             for (QueryDocumentSnapshot codeDoc : value) {
                 Log.d("REGIONBESTQUERY", "Getting scanned codes by: " + name + " " +
