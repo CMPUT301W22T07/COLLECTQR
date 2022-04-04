@@ -11,12 +11,10 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.mapbox.geojson.Point;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -65,33 +63,33 @@ public class MapPOI {
         CollectionReference commentsCollection = documentReference.collection(COMMENTS_COLLECTION);
         CollectionReference scannedByCollection = documentReference.collection(SCANNED_BY_COLLECTION);
 
-        getComments(commentsCollection);
-        getAllScannedBy(scannedByCollection);
+        getFirestoreComments(commentsCollection);
+        getFirestoreScannedBy(scannedByCollection);
 
 //         Map<String, Map<String, String>> allData = new HashMap<>();
-         Map<String, Object> allData = new HashMap<>();
-         allData.put(COMMENTS_COLLECTION, allComments);
-         allData.put(SCANNED_BY_COLLECTION, allScannedBy);
+        Map<String, Object> allData = new HashMap<>();
+        allData.put(COMMENTS_COLLECTION, allComments);
+        allData.put(SCANNED_BY_COLLECTION, allScannedBy);
 
-         convertDataToJson(allData);
+
+
+        convertDataToJson(allData);
     }
 
 
     private void convertDataToJson(Map<String, Object> allData) {
         // Converting a map point's qr code hash to json
         // https://stackoverflow.com/a/12155874 by Ankur
-         dataJson = new Gson().toJsonTree(allComments);
+        dataJson = new Gson().toJsonTree(allComments);
 
         // https://stackoverflow.com/a/24635655 by matt burns
-         Gson gson = new GsonBuilder().enableComplexMapKeySerialization()
-                 .setPrettyPrinting().create();
+        Gson gson = new GsonBuilder().enableComplexMapKeySerialization()
+                .setPrettyPrinting().create();
 
-        Log.d("JSON", allComments.toString());
-        Log.d("JSON", gson.toJson(allComments));
     }
 
 
-    private void getAllScannedBy(@NonNull CollectionReference scannedByCollection) {
+    private void getFirestoreScannedBy(@NonNull CollectionReference scannedByCollection) {
         scannedByCollection.addSnapshotListener((value, error) -> {
             assert value != null;
             for (QueryDocumentSnapshot d : value) {
@@ -100,11 +98,21 @@ public class MapPOI {
                 // String date = (String) d.get(d.getId());
                 allScannedBy.add(docID);
             }
+
+            convertAllScannedByToJson(allScannedBy);
         });
     }
 
+    
+    private void convertAllScannedByToJson(ArrayList<String> allScannedBy) {
+//        Gson gson = new GsonBuilder().enableComplexMapKeySerialization()
+//                .setPrettyPrinting().create();
+        Gson gson = new Gson();
+        Log.d("JSON2", gson.toJson(allScannedBy));
+    }
 
-    private void getComments(@NonNull CollectionReference commentsCollection) {
+
+    private void getFirestoreComments(@NonNull CollectionReference commentsCollection) {
         commentsCollection.addSnapshotListener((value, error) -> {
             assert value != null;
             for (QueryDocumentSnapshot d : value) {
@@ -117,8 +125,18 @@ public class MapPOI {
                     allComments.put(docId, comment);
                 }
             }
+
+            convertAllCommentsToJson(allComments);
         });
 
+    }
+
+
+    private void convertAllCommentsToJson(Map<String, String> allComments) {
+//        Gson gson = new GsonBuilder().enableComplexMapKeySerialization()
+//                .setPrettyPrinting().create();
+        Gson gson = new Gson();
+        Log.d("JSON", gson.toJson(allComments));
     }
 
 

@@ -5,6 +5,8 @@ import static android.content.ContentValues.TAG;
 import android.annotation.SuppressLint;
 import android.app.ActivityManager;
 import android.content.Context;
+import android.app.SearchManager;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.provider.Settings;
@@ -12,17 +14,24 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.SearchView;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.splashscreen.SplashScreen;
 import androidx.navigation.NavController;
+import androidx.navigation.NavDestination;
 import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
 
+import com.example.collectqr.data.UserController;
 import com.example.collectqr.databinding.ActivityAppBinding;
+import com.example.collectqr.model.User;
+import com.example.collectqr.ui.HistoryFragment;
 import com.example.collectqr.ui.ProfileDialogFragment;
 import com.example.collectqr.utilities.Preferences;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -41,6 +50,8 @@ import java.util.Arrays;
 public class MainAppActivity extends AppCompatActivity {
     private FirebaseFirestore db;
     private ActivityAppBinding binding;
+    public Toolbar toolbar;
+    public Menu appBarMenu;
     private Context context = this;
 
     @Override
@@ -59,7 +70,14 @@ public class MainAppActivity extends AppCompatActivity {
         binding = ActivityAppBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
-        setUpTopAppBar();
+        /*
+        https://developer.android.com/training/appbar/setting-up#add-toolbar
+        https://stackoverflow.com/a/42837106
+        StackOverflow, Author tahsinRupam
+        */
+        toolbar = (Toolbar) findViewById(R.id.topAppBar);
+        setSupportActionBar(toolbar);
+        setUpProfileButton();
 
         /* Bottom Navigation Boilerplate from Android Studio
            Supplementary source: https://developer.android.com/guide/navigation/navigation-ui#java
@@ -70,6 +88,27 @@ public class MainAppActivity extends AppCompatActivity {
                 Navigation.findNavController(this, R.id.nav_host_fragment_container_main);
         //NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
         NavigationUI.setupWithNavController(binding.bottomnavContainer, navController);
+
+        /*
+        StackOverflow, Author: Marat, Edited By: Vlad
+        https://stackoverflow.com/a/56665687
+         */
+        navController.addOnDestinationChangedListener(new NavController.OnDestinationChangedListener() {
+            @Override
+
+/**
+ *
+ * On destination changed
+ *
+ * @param NavController  the nav controller
+ * @param NavDestination  the nav destination
+ * @param Bundle  the bundle
+ */
+            public void onDestinationChanged(@NonNull NavController navController, @NonNull NavDestination navDestination, @Nullable Bundle bundle) {
+
+                matchTopBar(navDestination.getId());
+            }
+        });
     }
 
     /*
@@ -78,7 +117,17 @@ public class MainAppActivity extends AppCompatActivity {
     https://youtu.be/CRmfdVYWOhc
      */
     @Override
+
+/**
+ *
+ * On create options menu
+ *
+ * @param menu  the menu
+ * @return boolean
+ */
     public boolean onCreateOptionsMenu(Menu menu) {
+
+        appBarMenu = menu;
         getMenuInflater().inflate(R.menu.top_app_bar, menu);
         return true;
     }
@@ -88,8 +137,12 @@ public class MainAppActivity extends AppCompatActivity {
      * Check if a user already exists on the device. If not, start Login activity
      */
     public void doesUserExist() {
+
+        //initially write false to users admin status to prevent any bugs
+        Preferences.saveAdminStatus(context, false);
         //check if the current device id exists within the db
         @SuppressLint("HardwareIds") String device_id = Settings.Secure.getString(this.getContentResolver(), Settings.Secure.ANDROID_ID);
+        System.out.println(device_id);
 
         db = FirebaseFirestore.getInstance();
         db.collection("Users")
@@ -97,7 +150,15 @@ public class MainAppActivity extends AppCompatActivity {
                 .get()
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                     @Override
+
+/**
+ *
+ * On complete
+ *
+ * @param Task<QuerySnapshot>  the task< query snapshot>
+ */
                     public void onComplete(@NonNull Task<QuerySnapshot> task) {
+
                         if (task.isSuccessful()) {
                             if (task.getResult().isEmpty()) {
                                 //device doesn't exist within the db, so go to login activity
@@ -113,7 +174,8 @@ public class MainAppActivity extends AppCompatActivity {
                                     //device does exist within db, save username to shared preferences
                                     //for future use in other parts of the application
                                     Preferences.saveUserName(context, document.getId());
-                                    System.out.println(Preferences.loadUserName(context));
+                                    //check if the user has admin permissions
+                                    checkIfAdmin(device_id);
                                 }
                             }
                         } else {
@@ -123,11 +185,38 @@ public class MainAppActivity extends AppCompatActivity {
                 });
     }
 
+    /**
+     * Check if a user should have admin permissions by checking the database, if the user should or
+     * shouldn't have admin permissions, write this data to shared preferences for future use
+     */
+    public void checkIfAdmin(String device_id) {
+
+        db = FirebaseFirestore.getInstance();
+        //search firebase to see if username is already in db
+        db.collection("Admins")
+                .whereEqualTo("device_id", device_id)
+                .get()
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        if (task.getResult().isEmpty()) {
+                            //user doesn't exist within admin document, so they are not an admin
+                            //write this to shared preferences
+                            Preferences.saveAdminStatus(context, false);
+                        } else {
+                            //user is an admin, write this to shared preferences
+                            Preferences.saveAdminStatus(context, true);
+                        }
+                    } else {
+                        Log.d(TAG, "Error getting documents: ", task.getException());
+                    }
+                });
+    }
 
     /**
      * Keep the monkeys out
      */
     public void noMonkeys() {
+
         if (ActivityManager.isUserAMonkey()) {
             new MaterialAlertDialogBuilder(this,
                     com.google.android.material.R.style.ThemeOverlay_Material3_Dialog)
@@ -142,14 +231,51 @@ public class MainAppActivity extends AppCompatActivity {
         }
     }
 
-    private void setUpTopAppBar() {
-        /*
-        https://developer.android.com/training/appbar/setting-up#add-toolbar
-        https://stackoverflow.com/a/42837106
-        StackOverflow, Author tahsinRupam
-        */
-        Toolbar toolbar = (Toolbar) findViewById(R.id.topAppBar);
-        setSupportActionBar(toolbar);
+
+    /**
+     *
+     * Match top bar
+     *
+     * @param fragmentId  the fragment identifier
+     */
+    private void matchTopBar(int fragmentId) {
+
+        if (appBarMenu != null) {
+            switch (fragmentId) {
+                case R.id.navigation_map:
+                    appBarMenu.findItem(R.id.user_search).setVisible(false);
+                    appBarMenu.findItem(R.id.sort_history).setVisible(false);
+                    appBarMenu.findItem(R.id.user_profile).setVisible(true);
+                    setUpProfileButton();
+                    return;
+
+                case R.id.navigation_history:
+                    appBarMenu.findItem(R.id.user_search).setVisible(false);
+                    appBarMenu.findItem(R.id.user_profile).setVisible(false);
+                    appBarMenu.findItem(R.id.sort_history).setVisible(true);
+                    return;
+
+                case R.id.navigation_leaderboard:
+                    appBarMenu.findItem(R.id.user_profile).setVisible(false);
+                    appBarMenu.findItem(R.id.sort_history).setVisible(false);
+                    appBarMenu.findItem(R.id.user_search).setVisible(true);
+                    return;
+                default:
+                    appBarMenu.findItem(R.id.user_profile).setVisible(false);
+                    appBarMenu.findItem(R.id.sort_history).setVisible(false);
+                    appBarMenu.findItem(R.id.user_search).setVisible(false);
+            }
+        }
+        return;
+    }
+
+
+    /**
+     *
+     * Sets the up profile button
+     *
+     */
+    private void setUpProfileButton() {
 
         /*
         https://material.io/components/app-bars-top/android#regular-top-app-bar
@@ -158,19 +284,18 @@ public class MainAppActivity extends AppCompatActivity {
          */
         toolbar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
             @Override
+
+/**
+ *
+ * On menu item click
+ *
+ * @param item  the item
+ * @return boolean
+ */
             public boolean onMenuItemClick(MenuItem item) {
-                switch (item.getItemId()) {
-                    case R.id.user_search:
-                        System.out.println("clicked user search");
-                        return true;
-                    case R.id.user_profile:
-                        new ProfileDialogFragment().show(getSupportFragmentManager(), "DISPLAY_PROFILE");
-                        return true;
-                    case R.id.sort_history:
-                        System.out.println("clicked sort history");
-                        return true;
-                }
-                return false;
+
+                new ProfileDialogFragment().show(getSupportFragmentManager(), "DISPLAY_PROFILE");
+                return true;
             }
         });
     }
@@ -179,6 +304,7 @@ public class MainAppActivity extends AppCompatActivity {
      * Setup window attributes and decorations at startup
      */
     public void setupWindowAttributes() {
+
         /* Swapping the eye-searing container colour
            https://trendyprogrammer.blogspot.com/2020/01/how-to-show-content-behind-status-bar.html
          */

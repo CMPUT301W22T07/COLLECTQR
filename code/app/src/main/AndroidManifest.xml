@@ -10,6 +10,8 @@
 
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.VIBRATE" />
+    <uses-feature android:name="android.hardware.camera"
+        android:required="true" />
 
     <application
         android:allowBackup="true"
@@ -21,6 +23,9 @@
         android:theme="@style/Theme.COLLECTQR">
         <activity
             android:name="com.example.collectqr.ScanQRCodeActivity"
+            android:exported="true" />
+        <activity
+            android:name="com.example.collectqr.ScanQRCodeLoginActivity"
             android:exported="true" />
         <activity
             android:name="com.example.collectqr.EnterQrInfoActivity"

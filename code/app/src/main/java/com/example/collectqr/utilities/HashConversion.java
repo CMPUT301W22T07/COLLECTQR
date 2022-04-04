@@ -17,6 +17,7 @@ public class HashConversion {
      * @return SHA-256 hash String of an Object
      */
     public String convertToSHA256(String string) {
+
         // https://www.baeldung.com/sha-256-hashing-java
         return Hashing.sha256()
                 .hashString(string, StandardCharsets.UTF_8)
@@ -31,6 +32,7 @@ public class HashConversion {
      * @return A location as a point
      */
     public GeoPoint convertLocationToPoint(GeoLocation geolocation) {
+
         return new GeoPoint(geolocation.latitude, geolocation.longitude);
     }
 
@@ -42,6 +44,7 @@ public class HashConversion {
      * @return A location as a point
      */
     public com.google.firebase.firestore.GeoPoint convertLocationToFBPoint(GeoLocation location) {
+
         return new com.google.firebase.firestore.GeoPoint(location.latitude, location.longitude);
     }
 

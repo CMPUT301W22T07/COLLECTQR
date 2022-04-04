@@ -34,25 +34,50 @@ import org.junit.runner.RunWith;
 @RunWith(AndroidJUnit4.class)
 @LargeTest
 
+
+/**
+ * The class History fragment test
+ */
 public class HistoryFragmentTest {
     @Rule
     public ActivityScenarioRule<MainAppActivity> activityRule =
             new ActivityScenarioRule<>(MainAppActivity.class);
 
     @Before
+
+/**
+ *
+ * Setup
+ *
+ */
     public void setup() {
+
         onView(withId(R.id.navigation_history)).perform(click());
     }
 
     @Test
+
+/**
+ *
+ * Check fragment
+ *
+ */
     public void checkFragment() {
+
         onView(withText(endsWith("Codes"))).check(matches(isDisplayed()));
         onView(withText(endsWith("Total Points"))).check(matches(isDisplayed()));
     }
 
     @Test
+
+/**
+ *
+ * Check fab
+ *
+ */
     public void checkFab() {
-        onView(withId(R.id.sort_history_fab)).perform(click());
+
+        onView(withId(R.id.sort_history)).perform(click());
         onView(withText("Sort by:")).check(matches(isDisplayed()));
     }
 }

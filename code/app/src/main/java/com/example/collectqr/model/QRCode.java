@@ -23,6 +23,13 @@ public class QRCode {
     private final HashMap<String, String> scanned_by;
     private final HashMap<String, String> comments;
 
+
+    /**
+     *
+     * It is a constructor.
+     *
+     * @param sha256  the sha256
+     */
     public QRCode(String sha256) {
         this.sha256 = sha256;
         this.points = 0; //this needs to be updated immediately
@@ -34,6 +41,15 @@ public class QRCode {
         this.comments = new HashMap<>();
         this.date = null;
     }
+
+    /**
+     *
+     * It is a constructor.
+     *
+     * @param sha256  the sha256
+     * @param latitude  the latitude
+     * @param longitude  the longitude
+     */
     public QRCode(String sha256, Double latitude, Double longitude) {
         this.sha256 = sha256;
         this.points = 0; //this needs to be updated immediately
@@ -46,6 +62,16 @@ public class QRCode {
         this.date = null;
     }
 
+
+    /**
+     *
+     * It is a constructor.
+     *
+     * @param sha256  the sha256
+     * @param points  the points
+     * @param date  the date
+     * @param qr_image  the qr_image
+     */
     public QRCode(String sha256, Integer points, Date date, String qr_image) {
         this.sha256 = sha256;
         this.points = points;
@@ -206,4 +232,17 @@ public class QRCode {
      * @param image
      */
     public void setQr_image(String image) { this.qr_image=image;}
+
+    /**
+     * Sets the latitude, longitude, and location of the QR Code
+     * using a given latitude and longitude
+     *
+     * @param latitude
+     * @param longitude
+     */
+    public void setAllLocations(Double latitude, Double longitude) {
+        this.latitude = latitude;
+        this.longitude = longitude;
+        this.location = new GeoLocation(latitude, longitude);
+    }
 }

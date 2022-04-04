@@ -6,7 +6,6 @@ import android.content.DialogInterface;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
@@ -23,16 +22,31 @@ import com.google.firebase.firestore.FirebaseFirestore;
 
 
 // Modified from Lab 3 Instructions - Fragments.pdf
+
+/**
+ * The class Edit profile dialog fragment extends dialog fragment
+ */
 public class EditProfileDialogFragment extends DialogFragment {
     // https://developer.android.com/guide/topics/ui/dialogs#DialogFragment
     @NonNull
     @Override
+
+/**
+ *
+ * On create dialog
+ *
+ * @param Bundle  the bundle
+ * @return Dialog
+ */
     public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
+
         super.onCreate(savedInstanceState);
         View rootView = LayoutInflater.from(getActivity()).inflate(R.layout.edit_profile_dialog_fragment, null);
 
         EditText emailField = rootView.findViewById(R.id.edit_email);
+        emailField.setText(getArguments().getString("email"));
         EditText phoneField = rootView.findViewById(R.id.edit_phone);
+        phoneField.setText(getArguments().getString("phone"));
 
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
 
@@ -44,16 +58,38 @@ public class EditProfileDialogFragment extends DialogFragment {
                 .create();
 
         /*
+        StackOverflow, Author: Mohamed AbdelraZek
+        https://stackoverflow.com/a/67540989
+         */
+        dialog.getWindow().setBackgroundDrawable(getResources().getDrawable(R.drawable.white_rounded_rectangle));
+
+        /*
         StackOverflow, Author: Tom Bollwitt
         https://stackoverflow.com/a/7636468
          */
         dialog.setOnShowListener(new DialogInterface.OnShowListener() {
             @Override
+
+/**
+ *
+ * On show
+ *
+ * @param dialogInterface  the dialog interface
+ */
             public void onShow(DialogInterface dialogInterface) {
+
                 Button button = ((AlertDialog) dialog).getButton(AlertDialog.BUTTON_POSITIVE);
                 button.setOnClickListener(new View.OnClickListener() {
                     @Override
+
+/**
+ *
+ * On click
+ *
+ * @param view  the view
+ */
                     public void onClick(View view) {
+
                         String email = emailField.getText().toString();
                         String phone = phoneField.getText().toString();
                         if (validate(phone, email, rootView)) {
@@ -94,7 +130,16 @@ public class EditProfileDialogFragment extends DialogFragment {
         return valid;
     }
 
+
+    /**
+     *
+     * Gets the toast position Y
+     *
+     * @param rootView  the root view
+     * @return the toast position Y
+     */
     private int getToastPositionY(View rootView) {
+
         /*
         StackOverflow, Author:Alexander Knauf
         https://stackoverflow.com/a/64440541

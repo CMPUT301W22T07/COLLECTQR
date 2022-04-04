@@ -22,6 +22,7 @@ public class UserController {
      * @param user the user to be stored to firestore
      */
     public void writeToFirestore(User user) {
+
         FirebaseFirestore db;
         db = FirebaseFirestore.getInstance();
         final CollectionReference userReference = db.collection("Users");
@@ -31,6 +32,12 @@ public class UserController {
         data.put("email", user.getEmail());
         data.put("phone", user.getPhone());
         data.put("devices", user.getDevices());
+        data.put("scan_1_code", user.isScan_1_code());
+        data.put("scan_10_codes", user.isScan_10_codes());
+        data.put("scan_50_codes", user.isScan_50_codes());
+        data.put("scan_10_points", user.isScan_10_points());
+        data.put("scan_100_points", user.isScan_100_points());
+        data.put("scan_300_points", user.isScan_300_points());
 
         //Move stats from HashMap to db
         for (Map.Entry<String, Integer> stats : user.getStats().entrySet()) {
@@ -65,5 +72,27 @@ public class UserController {
                     .addOnFailureListener(e -> Log.d(TAG, "Data could not be added!" + e));
         }
 
+    }
+
+    /**
+     * Takes a given user's device_id, and adds them as an admin user
+     *
+     * @param device_id the user's device_id to be added
+     */
+    public void addAdminUser(String device_id) {
+
+        FirebaseFirestore db;
+        db = FirebaseFirestore.getInstance();
+        final CollectionReference userReference = db.collection("Admins");
+
+        HashMap<String, String> data = new HashMap<>();
+        data.put("device_id", device_id);
+
+        //Add the information to the database
+        userReference
+                .document(device_id)
+                .set(data)
+                .addOnSuccessListener(aVoid -> Log.d(TAG, "Data has been added successfully!"))
+                .addOnFailureListener(e -> Log.d(TAG, "Data could not be added!" + e));
     }
 }
