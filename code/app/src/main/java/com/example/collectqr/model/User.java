@@ -16,12 +16,81 @@ public class User {
     private ArrayList<String> devices;
     private HashMap<String, Integer> stats;
     private final HashMap<String, HashMap<String, Object>> codes_scanned; //sha : date scanned
+    //achievements
+    private boolean scan_1_code;
+    private boolean scan_10_codes;
+    private boolean scan_50_codes;
+    private boolean scan_10_points;
+    private boolean scan_100_points;
+    private boolean scan_300_points;
 
+    public boolean isScan_1_code() {
+        return scan_1_code;
+    }
+
+    public void setScan_1_code(boolean scan_1_code) {
+        this.scan_1_code = scan_1_code;
+    }
+
+    public boolean isScan_10_codes() {
+        return scan_10_codes;
+    }
+
+    public void setScan_10_codes(boolean scan_10_codes) {
+        this.scan_10_codes = scan_10_codes;
+    }
+
+    public boolean isScan_50_codes() {
+        return scan_50_codes;
+    }
+
+    public void setScan_50_codes(boolean scan_50_codes) {
+        this.scan_50_codes = scan_50_codes;
+    }
+
+    public boolean isScan_10_points() {
+        return scan_10_points;
+    }
+
+    public void setScan_10_points(boolean scan_10_points) {
+        this.scan_10_points = scan_10_points;
+    }
+
+    public boolean isScan_100_points() {
+        return scan_100_points;
+    }
+
+    public void setScan_100_points(boolean scan_100_points) {
+        this.scan_100_points = scan_100_points;
+    }
+
+    public boolean isScan_300_points() {
+        return scan_300_points;
+    }
+
+    public void setScan_300_points(boolean scan_300_points) {
+        this.scan_300_points = scan_300_points;
+    }
+
+
+    /**
+     *
+     * It is a constructor.
+     *
+     * @param username  the username
+     */
     public User(String username) {
+
         this.username = username;
         this.email = "";
         this.phone = "";
         this.devices = new ArrayList<>();
+        this.scan_1_code=false;
+        this.scan_10_codes=false;
+        this.scan_50_codes=false;
+        this.scan_10_points=false;
+        this.scan_100_points=false;
+        this.scan_300_points=false;
 
         HashMap<String, Integer> stats = new HashMap<>();
         stats.put("num_codes", 0);
@@ -44,8 +113,10 @@ public class User {
      * @param  date the date the QR code was scanned
      * @param  image the path to the image taken of the QR code
      */
+
     public void addCode(String hash, Integer points, String latitude, String longitude,
                         String geohash, Date date, String image) {
+
         HashMap<String, Object> inner = new HashMap<>();
         inner.put("points", points.toString());
         inner.put("latitude", latitude);
@@ -62,6 +133,7 @@ public class User {
      * @return The user's username
      */
     public String getUsername() {
+
         return username;
     }
 
@@ -71,6 +143,7 @@ public class User {
      * @return The user's email
      */
     public String getEmail() {
+
         return email;
     }
 
@@ -80,6 +153,7 @@ public class User {
      * @param email the user's new email
      */
     public void setEmail(String email) {
+
         this.email = email;
     }
 
@@ -89,6 +163,7 @@ public class User {
      * @return The user's phone number
      */
     public String getPhone() {
+
         return phone;
     }
 
@@ -98,6 +173,7 @@ public class User {
      * @param phone the user's new phone number
      */
     public void setPhone(String phone) {
+
         this.phone = phone;
     }
 
@@ -107,6 +183,7 @@ public class User {
      * @return A list of all the user's devices
      */
     public ArrayList<String> getDevices() {
+
         return devices;
     }
 
@@ -116,6 +193,7 @@ public class User {
      * @param device another device belonging to the user
      */
     public void addDevice(String device) {
+
         this.devices.add(device);
     }
 
@@ -126,6 +204,7 @@ public class User {
      * @return A hashmap containing information about the users stats
      */
     public HashMap<String, Integer> getStats() {
+
         return stats;
     }
 
@@ -137,6 +216,7 @@ public class User {
      * @return A hashmap containing information about the QR codes the user has scanned
      */
     public HashMap<String, HashMap<String, Object>> getCodes_scanned() {
+
         return codes_scanned;
     }
 
@@ -146,6 +226,7 @@ public class User {
      * @param  num_codes the number of codes the user has scanned
      * @param  total_points the total_points the user has
      */
+
     public void updateScore(int num_codes, int total_points, int best_code, int region_best) {
         stats.replace("num_codes", num_codes);
         stats.replace("total_points", total_points);

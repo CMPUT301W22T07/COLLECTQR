@@ -9,7 +9,6 @@ import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
-import com.example.collectqr.data.LocationRepository;
 import com.example.collectqr.data.MapViewController;
 import com.example.collectqr.model.MapPOI;
 import com.firebase.geofire.GeoFireUtils;
@@ -42,7 +41,7 @@ public class MapViewViewModel extends AndroidViewModel {
     // Constants
     public final Double MAX_RADIUS = 5000.0;    // 50KM search radius max
     public final String COLLECTION = "QRCodes"; // Collection to query
-    public final String ORDERING = "geohash"; // How to order the documents
+    public final String ORDERING = "geohash";   // How to order the documents
     public final String LOGGER_TAG = "MapViewController";
 
     // Class Variables
@@ -51,16 +50,32 @@ public class MapViewViewModel extends AndroidViewModel {
 
     private MapViewController mMapController;
     private MutableLiveData<List<MapPOI>> qrGeoLocations;
-    private final LiveData<Location> locationLiveData;
     public int lastPOILen = 0;
 
+
+    /**
+     *
+     * Map view view model
+     *
+     * @param Application  the application
+     * @return public
+     */
     public MapViewViewModel(@NonNull Application application) {
+
         super(application);
-        locationLiveData = new LocationRepository(application);
     }
 
 
+
+    /**
+     *
+     * Gets the geo locations
+     *
+     * @param location  the location
+     * @return the geo locations
+     */
     public LiveData<List<MapPOI>> getGeoLocations(Location location) {
+
         if (qrGeoLocations == null && location != null) {
             qrGeoLocations = new MutableLiveData<>();
             loadGeoLocations(location);
@@ -69,7 +84,15 @@ public class MapViewViewModel extends AndroidViewModel {
     }
 
 
+
+    /**
+     *
+     * Load geo locations
+     *
+     * @param location  the location
+     */
     private void loadGeoLocations(Location location) {
+
         GeoLocation searchLocation = new GeoLocation(location.getLatitude(), location.getLongitude());
         String hash = GeoFireUtils.getGeoHashForLocation(searchLocation);
         double radiusInM = MAX_RADIUS;
@@ -99,10 +122,18 @@ public class MapViewViewModel extends AndroidViewModel {
     }
 
 
+
+    /**
+     *
+     * Generate points
+     *
+     * @param List<DocumentSnapshot>  the list< document snapshot>
+     */
     private void generatePoints(@NonNull List<DocumentSnapshot> matchingDocs) {
+
         int listSize = matchingDocs.size();
 
-        clearPoints(POIList);
+        POIList.clear();
 
         for (DocumentSnapshot doc : matchingDocs) {
             String lat_str = doc.getString("latitude");
@@ -129,45 +160,10 @@ public class MapViewViewModel extends AndroidViewModel {
     }
 
 
-//    public DocumentSnapshot getDocumentFromPoint(
-//            mapDataCallback callback,
-//            @NonNull CircleAnnotation circleAnnotation) {
-//        // Need to create a callback to handle the async op
-//        Point point = circleAnnotation.getPoint();
-//        JsonObject data = circleAnnotation.getData().getAsJsonObject();
-//        String hash = data.get("sha256").getAsString();
-//
-//        DocumentReference docRef = db.collection(COLLECTION).document(hash);
-//        Task<DocumentSnapshot> bruh =  docRef.get().addOnCompleteListener(task -> {
-//            // https://stackoverflow.com/a/47853774 by Alex Mamo
-//            callback.onCallback(task.getResult());
-//            // String strPoints = task.getResult().getString("points");
-//            // if (strPoints != null) {
-//            //     int points = Integer.parseInt(strPoints);
-//            //     Log.d(LOGGER_TAG, "Hash: " + hash + " ; " +
-//            //             "Points: " + points);
-//            // }
-//
-//        }); // :(
-//
-//        return bruh.getResult();
-//    }
-
-
-    private void clearPoints(@NonNull List<MapPOI> POIList) {
-        POIList.clear();
-    }
-
-
-    public LiveData<Location> getLocationLiveData() {
-        return locationLiveData;
-    }
-
-
     @Override
     protected void onCleared() {
         super.onCleared();
-        clearPoints(POIList);
+        POIList.clear();
     }
 }
 

@@ -13,6 +13,10 @@ import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
 
+
+/**
+ * The class Final location repository extends live data< location>
+ */
 public final class LocationRepository extends LiveData<Location> {
     /* Sources
        https://developer.android.com/jetpack/guide for the architecture
@@ -31,7 +35,16 @@ public final class LocationRepository extends LiveData<Location> {
     private final LocationRequest locationRequest;
 
 
+
+    /**
+     *
+     * Location repository
+     *
+     * @param context  the context
+     * @return public
+     */
     public LocationRepository(Context context) {
+
         int ONE_MINUTE = 60000;
         locationRequest = LocationRequest.create();
         locationRequest.setInterval(ONE_MINUTE);
@@ -42,7 +55,16 @@ public final class LocationRepository extends LiveData<Location> {
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(context);
     }
 
+
+    /**
+     *
+     * Location repository
+     *
+     * @param context  the context
+     * @return LocationRepository
+     */
     public static LocationRepository locationRepository(Context context) {
+
         if (sSoleInstance == null) {
             sSoleInstance = new LocationRepository(context);
         }
@@ -65,10 +87,26 @@ public final class LocationRepository extends LiveData<Location> {
         fusedLocationProviderClient.removeLocationUpdates(locationCallback());
     }
 
+
+    /**
+     *
+     * Location callback
+     *
+     * @return LocationCallback
+     */
     private LocationCallback locationCallback() {
+
         return new LocationCallback() {
             @Override
+
+/**
+ *
+ * On location result
+ *
+ * @param LocationResult  the location result
+ */
             public void onLocationResult(@NonNull LocationResult locationResult) {
+
                 super.onLocationResult(locationResult);
 
                 for (Location location : locationResult.getLocations()) {
@@ -79,55 +117,29 @@ public final class LocationRepository extends LiveData<Location> {
     }
 
 
+
+    /**
+     *
+     * Sets the location data
+     *
+     * @param location  the location
+     */
     private void setLocationData(Location location) {
+
         setValue(location);
     }
 
 
     @SuppressLint("MissingPermission")
+
+/**
+ *
+ * Start location updates
+ *
+ */
     private void startLocationUpdates() {
+
         fusedLocationProviderClient.requestLocationUpdates(locationRequest, locationCallback(), null);
     }
 
 }
-
-
-//public class bruh() {
-//    /**
-//     * Gets the last known location of the device using Google Play Service's Fused Location
-//     * Provider Client.
-//     *
-//     * @return A Location
-//     * @deprecated Use LocationRepository instead (TODO: Work in progress)
-//     */
-//    @Deprecated
-//    public Location getLastKnownLocation() {
-//        Context context = requireContext();
-//        AtomicReference<Location> location = new AtomicReference<>();
-//
-//        /* https://developer.android.com/training/location/retrieve-current#java
-//           https://stackoverflow.com/a/57237566 by rivaldi */
-//        if (ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION)
-//                == PackageManager.PERMISSION_GRANTED
-//                && ActivityCompat.checkSelfPermission(context,
-//                Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-//
-//            fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(context);
-//            Task<Location> locationResult = fusedLocationProviderClient.getLastLocation();
-//
-//            locationResult.addOnCompleteListener(requireActivity(), task -> {
-//
-//                if (task.isSuccessful()) {
-//                    location.set(task.getResult());
-//                    Log.d(TAG, location.get().toString());
-//                } else {
-//                    location.set(null);
-//                    Log.e(TAG,"FusedLocationProviderClient Failed to get Location");
-//                }
-//
-//            });
-//        }
-//
-//        return location.get();
-//    }
-//}

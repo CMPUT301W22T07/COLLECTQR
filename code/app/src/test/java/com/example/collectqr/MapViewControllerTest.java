@@ -12,6 +12,10 @@ import org.junit.Test;
 
 import java.util.List;
 
+
+/**
+ * The class Map view controller test
+ */
 public class MapViewControllerTest {
 
     private static final double lat_true = 53.260;
@@ -25,7 +29,14 @@ public class MapViewControllerTest {
     private static final double point_lon = -113.525829;
 
     @Test
+
+/**
+ *
+ * Test nearby qr query
+ *
+ */
     public void testNearbyQrQuery() {
+
         // Creating a test location with an empty provider
         Location testLocation = new Location("");
         testLocation.setLatitude(lat_true);

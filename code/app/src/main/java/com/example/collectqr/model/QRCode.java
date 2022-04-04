@@ -23,7 +23,15 @@ public class QRCode {
     private final HashMap<String, String> scanned_by;
     private final HashMap<String, String> comments;
 
+
+    /**
+     *
+     * It is a constructor.
+     *
+     * @param sha256  the sha256
+     */
     public QRCode(String sha256) {
+
         this.sha256 = sha256;
         this.points = 0; //this needs to be updated immediately
         this.latitude = null;
@@ -34,7 +42,17 @@ public class QRCode {
         this.comments = new HashMap<>();
         this.date = null;
     }
+
+    /**
+     *
+     * It is a constructor.
+     *
+     * @param sha256  the sha256
+     * @param latitude  the latitude
+     * @param longitude  the longitude
+     */
     public QRCode(String sha256, Double latitude, Double longitude) {
+
         this.sha256 = sha256;
         this.points = 0; //this needs to be updated immediately
         this.latitude = latitude;
@@ -46,7 +64,18 @@ public class QRCode {
         this.date = null;
     }
 
+
+    /**
+     *
+     * It is a constructor.
+     *
+     * @param sha256  the sha256
+     * @param points  the points
+     * @param date  the date
+     * @param qr_image  the qr_image
+     */
     public QRCode(String sha256, Integer points, Date date, String qr_image) {
+
         this.sha256 = sha256;
         this.points = points;
         this.date = date;
@@ -63,6 +92,7 @@ public class QRCode {
      *
      * @return the date when the user scanned the QR code
      */
+
     public Date getDate() { return date; }
 
     /**
@@ -71,6 +101,7 @@ public class QRCode {
      * @return the number of points the QR Code is worth
      */
     public Integer getPoints() {
+
         return points;
     }
 
@@ -82,6 +113,7 @@ public class QRCode {
      * @param  date the date the user scanned the QR Code
      */
     public void addScannedBy(String user, String date) {
+
         this.scanned_by.put(user, date);
     }
 
@@ -93,6 +125,7 @@ public class QRCode {
      * @param  comment the comment the user left
      */
     public void addComment(String user, String comment) {
+
         this.comments.put(user, comment);
     }
 
@@ -102,6 +135,7 @@ public class QRCode {
      * @return the QR Codes sha256 hash
      */
     public String getSha256() {
+
         return sha256;
     }
 
@@ -112,6 +146,7 @@ public class QRCode {
      * @return A string-representation of a GeoHash
      */
     public String getGeoHash() {
+
         return GeoFireUtils.getGeoHashForLocation(location);
     }
 
@@ -121,6 +156,7 @@ public class QRCode {
      * @return The latitude of a location as a String.
      */
     public String getLatitudeAsString() {
+
         return String.valueOf(latitude);
     }
 
@@ -130,6 +166,7 @@ public class QRCode {
      * @return The longitude of a location as a String.
      */
     public String getLongitudeAsString() {
+
         return String.valueOf(longitude);
     }
 
@@ -139,6 +176,7 @@ public class QRCode {
      * @return the latitude of the QR Code
      */
     public Double getLatitude() {
+
         return latitude;
     }
 
@@ -148,6 +186,7 @@ public class QRCode {
      * @return the longitude of the QR Code
      */
     public Double getLongitude() {
+
         return longitude;
     }
 
@@ -157,6 +196,7 @@ public class QRCode {
      * @return The path of the QR Code image
      */
     public String getQr_image() {
+
         return qr_image;
     }
 
@@ -167,6 +207,7 @@ public class QRCode {
      * @return A hashmap of the users who have scanned the QR code, along with the date they scanned
      */
     public HashMap<String, String> getScanned_by() {
+
         return scanned_by;
     }
 
@@ -177,6 +218,7 @@ public class QRCode {
      * @return A hashmap of the users who have scanned the QR code, along with their comment
      */
     public HashMap<String, String> getComments() {
+
         return comments;
     }
 
@@ -186,6 +228,7 @@ public class QRCode {
      * @return the geolocation of the QR code
      */
     public GeoLocation getLocation() {
+
         return location;
     }
 
@@ -206,4 +249,17 @@ public class QRCode {
      * @param image
      */
     public void setQr_image(String image) { this.qr_image=image;}
+
+    /**
+     * Sets the latitude, longitude, and location of the QR Code
+     * using a given latitude and longitude
+     *
+     * @param latitude
+     * @param longitude
+     */
+    public void setAllLocations(Double latitude, Double longitude) {
+        this.latitude = latitude;
+        this.longitude = longitude;
+        this.location = new GeoLocation(latitude, longitude);
+    }
 }

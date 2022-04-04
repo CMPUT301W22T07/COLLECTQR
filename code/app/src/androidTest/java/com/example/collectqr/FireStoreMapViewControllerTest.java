@@ -19,6 +19,10 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+
+/**
+ * The class Fire store map view controller test
+ */
 public class FireStoreMapViewControllerTest {
     FirebaseFirestore db;
     //    User test;
@@ -26,7 +30,14 @@ public class FireStoreMapViewControllerTest {
     QRCodeController qrController;
 
     @Before
+
+/**
+ *
+ * Setup fire store data
+ *
+ */
     public void setupFireStoreData() {
+
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         db.useEmulator("10.0.2.2", 8080);
 
@@ -40,7 +51,14 @@ public class FireStoreMapViewControllerTest {
     }
 
     @Test
+
+/**
+ *
+ * Test geo query
+ *
+ */
     public void testGeoQuery() {
+
         int TEST_LIMIT = 10;
         Faker faker = new Faker();
         List<User> userList = new ArrayList<>();
@@ -102,7 +120,14 @@ public class FireStoreMapViewControllerTest {
     }
 
     @Test
+
+/**
+ *
+ * Mini test
+ *
+ */
     public void miniTest() {
+
         Faker faker = new Faker();
 
         double offset = 100000000;     // instead of raising to a power, get float by div

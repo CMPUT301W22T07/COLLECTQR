@@ -61,7 +61,9 @@
             android:background="@drawable/leaderboard_personal_background"
             android:orientation="horizontal"
             android:weightSum="1"
-            android:visibility="visible">
+            android:visibility="visible"
+            android:clickable="true"
+            android:id="@+id/persistent_user_score">
 
             <LinearLayout
                 android:layout_width="match_parent"

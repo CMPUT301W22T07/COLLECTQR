@@ -24,7 +24,18 @@ public class MapInfoBottomSheet extends BottomSheetDialogFragment {
 
     @Nullable
     @Override
+
+/**
+ *
+ * On create view
+ *
+ * @param LayoutInflater  the layout inflater
+ * @param ViewGroup  the view group
+ * @param Bundle  the bundle
+ * @return View
+ */
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+
         super.onCreateView(inflater, container, savedInstanceState);
         binding = FragmentMapInfoSheetBinding.inflate(inflater, container, false);
         View view = binding.getRoot();

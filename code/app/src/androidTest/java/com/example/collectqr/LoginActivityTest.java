@@ -26,6 +26,10 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 
+
+/**
+ * The class Login activity test
+ */
 public class LoginActivityTest {
     private Solo solo;
     FirebaseFirestore db;
@@ -34,18 +38,43 @@ public class LoginActivityTest {
     public ActivityTestRule rule = new ActivityTestRule(MainAppActivity.class, true, true);
 
     @Before
+
+/**
+ *
+ * Setup
+ *
+ * @param Exception  the exception
+ * @throws   Exception
+ */
     public void setup() throws Exception {
+
         solo = new Solo(InstrumentationRegistry.getInstrumentation(), rule.getActivity());
         Preferences.deletePreferences(rule.getActivity());
     }
 
     @Test
+
+/**
+ *
+ * Start
+ *
+ * @param Exception  the exception
+ * @throws   Exception
+ */
     public void start() throws Exception {
+
         Activity activity = rule.getActivity();
     }
 
     @Test
+
+/**
+ *
+ * Check login success
+ *
+ */
     public void checkLoginSuccess() {
+
         solo.assertCurrentActivity("Wrong Activity", MainAppActivity.class);
         //solo.assertCurrentActivity("Wrong Activity", LoginActivity.class);
         solo.enterText((EditText) solo.getView(R.id.usernameEditText), "111testinguser111");
@@ -56,7 +85,14 @@ public class LoginActivityTest {
     }
 
     @Test
+
+/**
+ *
+ * Check login fail
+ *
+ */
     public void checkLoginFail() {
+
         solo.assertCurrentActivity("Wrong Activity", MainAppActivity.class);
         //solo.assertCurrentActivity("Wrong Activity", LoginActivity.class);
         solo.enterText((EditText) solo.getView(R.id.usernameEditText), "GeneralEd");
@@ -68,7 +104,14 @@ public class LoginActivityTest {
     }
 
     @Test
+
+/**
+ *
+ * Check shuffle button
+ *
+ */
     public void checkShuffleButton() {
+
         solo.assertCurrentActivity("Wrong Activity", MainAppActivity.class);
         //solo.assertCurrentActivity("Wrong Activity", LoginActivity.class);
         solo.clickOnButton("Give me a name!");
@@ -77,20 +120,45 @@ public class LoginActivityTest {
     }
 
     @After
+
+/**
+ *
+ * Tear down
+ *
+ * @param Exception  the exception
+ * @throws   Exception
+ */
     public void tearDown() throws Exception {
+
         Preferences.deletePreferences(rule.getActivity());
         db = FirebaseFirestore.getInstance();
         db.collection("Users").document("111testinguser111")
                 .delete()
                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
+
+/**
+ *
+ * On success
+ *
+ * @param aVoid  the a void
+ */
                     public void onSuccess(Void aVoid) {
+
                         Log.d(TAG, "DocumentSnapshot successfully deleted!");
                     }
                 })
                 .addOnFailureListener(new OnFailureListener() {
                     @Override
+
+/**
+ *
+ * On failure
+ *
+ * @param Exception  the exception
+ */
                     public void onFailure(@NonNull Exception e) {
+
                         Log.w(TAG, "Error deleting document", e);
                     }
                 });

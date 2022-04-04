@@ -1,10 +1,7 @@
 package com.example.collectqr.ui;
 
-import android.Manifest;
 import android.app.Activity;
 import android.content.Intent;
-import android.content.SharedPreferences;
-import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.location.Location;
 import android.os.Bundle;
@@ -17,11 +14,13 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.content.res.AppCompatResources;
-import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.navigation.NavController;
+import androidx.navigation.Navigation;
 
 import com.example.collectqr.EnterQrInfoActivity;
+import com.example.collectqr.R;
 import com.example.collectqr.ScanQRCodeActivity;
 import com.example.collectqr.databinding.FragmentMapViewBinding;
 import com.example.collectqr.model.MapPOI;
@@ -35,7 +34,6 @@ import com.mapbox.android.core.permissions.PermissionsManager;
 import com.mapbox.android.gestures.MoveGestureDetector;
 import com.mapbox.geojson.Point;
 import com.mapbox.maps.CameraOptions;
-import com.mapbox.maps.CameraState;
 import com.mapbox.maps.MapView;
 import com.mapbox.maps.Style;
 import com.mapbox.maps.plugin.LocationPuck2D;
@@ -67,14 +65,6 @@ import java.util.Map;
 public class MapViewFragment extends Fragment {
 
     private final String TAG = "MapViewFragment";
-    // From osmdroid example under Apache 2.0 License
-    // https://github.com/osmdroid/osmdroid
-    private SharedPreferences mPrefs;
-    private final static String PREFS_NAME = "com.example.collectqr.prefs";
-    private static final String PREFS_CAM_LAT = "cameraLatitude";
-    private static final String PREFS_CAM_LON = "cameraLongitude";
-    private static final String PREFS_CAM_ZOOM = "cameraZoom";
-    private static final String PREFS_CAM_PITCH = "cameraPitch";
     private FragmentMapViewBinding binding;
     private BottomSheetDialogFragment infoSheet;
 
@@ -96,28 +86,124 @@ public class MapViewFragment extends Fragment {
     private final OnIndicatorPositionChangedListener posChangedListener =
             new OnIndicatorPositionChangedListener() {
                 @Override
+
+/**
+ *
+ * On indicator position changed
+ *
+ * @param Point  the point
+ */
                 public void onIndicatorPositionChanged(@NonNull Point point) {
+
                     mapView.getMapboxMap().setCamera(new CameraOptions.Builder()
                             .center(point).build());
                     GesturesPlugin gestures = mapView.getPlugin(Plugin.Mapbox.MAPBOX_GESTURES_PLUGIN_ID);
                     assert gestures != null;
                     gestures.setFocalPoint(mapView.getMapboxMap().pixelForCoordinate(point));
+
+                    Location location = new Location("");
+                    location.setLongitude(point.longitude());
+                    location.setLatitude(point.latitude());
+
+                    mViewModel.getGeoLocations(location).observe(
+                            getViewLifecycleOwner(), this::addMapMarkers);
                 }
+
+
+                /**
+                 *
+                 * Add map markers
+                 *
+                 * @param POIList  the  POI list
+                 */
+                private void addMapMarkers(List<MapPOI> POIList) {
+
+
+                    if (mViewModel.lastPOILen != POIList.size()) {
+
+                        AnnotationPlugin annotationPlugin = mapView.getPlugin(Plugin.MAPBOX_ANNOTATION_PLUGIN_ID);
+                        assert annotationPlugin != null;
+                        CircleAnnotationManager circleAnnotationManager =
+                                (CircleAnnotationManager) annotationPlugin.createAnnotationManager(
+                                        AnnotationType.CircleAnnotation,
+                                        new AnnotationConfig()
+                                );
+
+                        List<CircleAnnotation> circleAnnotations = circleAnnotationManager.getAnnotations();
+                        circleAnnotationManager.addClickListener(poiClickListener);
+
+                        for (MapPOI mapPOI : POIList) {
+                            // Converting a map point's qr code hash to json
+                            // https://stackoverflow.com/a/12155874 by Ankur
+                            Map<String, String> dataMap = new HashMap<>();
+                            dataMap.put("sha256", mapPOI.getHash());
+
+                            // Parsing json
+                            // https://howtodoinjava.com/gson/gson-jsonparser/
+                            JsonElement dataJson = new Gson().toJsonTree(dataMap);
+
+
+                            // Create the annotation to display on the map and include the arbitrary data
+                            // (hash) as JSON data
+                            CircleAnnotationOptions circleAnnotationOptions =
+                                    new CircleAnnotationOptions()
+                                            .withData(dataJson)
+                                            .withPoint(mapPOI.getPoint())
+                                            .withCircleRadius(8.0)
+                                            .withCircleColor("#ee4e8b")
+                                            .withCircleStrokeWidth(2.0)
+                                            .withCircleStrokeColor("#ffffff");
+
+                            circleAnnotationManager.create(circleAnnotationOptions);
+                        }
+                        Log.d(TAG, "Points drawn ");
+                        return;
+                    }
+
+                    Log.d(TAG, "Didn't draw the points");
+
+                }
+
             };
     // Store reference and override the on-move listener
     private final OnMoveListener onMoveListener = new OnMoveListener() {
         @Override
+
+/**
+ *
+ * On move begin
+ *
+ * @param MoveGestureDetector  the move gesture detector
+ */
         public void onMoveBegin(@NonNull MoveGestureDetector moveGestureDetector) {
+
             onCameraTrackingDismissed();
         }
 
         @Override
+
+/**
+ *
+ * On move
+ *
+ * @param MoveGestureDetector  the move gesture detector
+ * @return boolean
+ */
         public boolean onMove(@NonNull MoveGestureDetector moveGestureDetector) {
+
             return false;
         }
 
         @Override
+
+/**
+ *
+ * On move end
+ *
+ * @param MoveGestureDetector  the move gesture detector
+ */
         public void onMoveEnd(@NonNull MoveGestureDetector moveGestureDetector) {
+
         }
     };
 
@@ -136,8 +222,10 @@ public class MapViewFragment extends Fragment {
     @NonNull
     @Contract(" -> new")
     public static MapViewFragment newInstance() {
+
         return new MapViewFragment();
     }
+
 
     /**
      * Setting up the map to be displayed in the fragment.
@@ -148,8 +236,10 @@ public class MapViewFragment extends Fragment {
      * @return An inflated view with its corresponding layout
      */
     @Override
+
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
+
 
         super.onCreateView(inflater, container, savedInstanceState);
         username = Preferences.loadUserName(requireContext());
@@ -161,44 +251,42 @@ public class MapViewFragment extends Fragment {
 
     }
 
-    private void getLocation() {
-        String locationFinePermission = Manifest.permission.ACCESS_FINE_LOCATION;
-        String locationCoarsePermission = Manifest.permission.ACCESS_COARSE_LOCATION;
-
-        if (ContextCompat.checkSelfPermission(requireContext(), locationFinePermission)
-                == PackageManager.PERMISSION_GRANTED
-                || ContextCompat.checkSelfPermission(requireContext(), locationCoarsePermission)
-                == PackageManager.PERMISSION_GRANTED) {
-            requestLocationUpdates();
-        } else {
-            permManager.requestLocationPermissions(requireActivity());
-        }
-    }
-
-    private void requestLocationUpdates() {
-        mViewModel.getLocationLiveData().observe(getViewLifecycleOwner(),
-                location -> lastKnownLocation = location);
-    }
-
 
     /**
      * On fragment creation, check that requisite location permissions have been granted.
      * If location permissions have been granted then prepare the map's settings.
      */
     private void checkPermissions() {
+
         if (PermissionsManager.areLocationPermissionsGranted(requireContext())) {
             onMapReady();
         } else {
             permManager = new PermissionsManager(new PermissionsListener() {
                 @Override
+
+/**
+ *
+ * On explanation needed
+ *
+ * @param list  the list
+ */
                 public void onExplanationNeeded(List<String> list) {
+
                     Toast.makeText(requireContext(),
                             "Location is used to move the map to where you are",
                             Toast.LENGTH_LONG).show();
                 }
 
                 @Override
+
+/**
+ *
+ * On permission result
+ *
+ * @param granted  the granted
+ */
                 public void onPermissionResult(boolean granted) {
+
                     if (granted) {
                         onMapReady();
                     } else {
@@ -210,10 +298,12 @@ public class MapViewFragment extends Fragment {
         }
     }
 
+
     /**
      * Setup the map's style, camera, and location/gesture listeners.
      */
     private void onMapReady() {
+
         mapView.getMapboxMap().setCamera(
                 new CameraOptions.Builder().zoom(14.0).pitch(40.0).build()
         );
@@ -228,6 +318,7 @@ public class MapViewFragment extends Fragment {
      * Add a onMoveListener for when the player manually moves the map camera.
      */
     private void setupGesturesListener() {
+
         gesturesPlugin = mapView.getPlugin(Plugin.Mapbox.MAPBOX_GESTURES_PLUGIN_ID);
         assert gesturesPlugin != null;
         gesturesPlugin.addOnMoveListener(onMoveListener);
@@ -239,6 +330,7 @@ public class MapViewFragment extends Fragment {
      * position.
      */
     private void initLocationComponent() {
+
         locationComponentPlugin =
                 mapView.getPlugin(Plugin.Mapbox.MAPBOX_LOCATION_COMPONENT_PLUGIN_ID);
 
@@ -271,14 +363,22 @@ public class MapViewFragment extends Fragment {
      * Sets actions on buttons making use of view binding.
      */
     private void setButtonsActions() {
+
         binding.fabLaunchQRScanner.setOnClickListener(view -> startScanner());
-        binding.fabGpsLockLocation.setOnClickListener(view -> onCameraTrackingRequested());
+
+        binding.fabGpsLockLocation.setOnClickListener(
+                view -> {
+                    NavController navController =  Navigation.findNavController(view);
+                }
+        );
     }
+
 
     /**
      * Start the QR code scanner activity.
      */
     private void startScanner() {
+
         Intent intent = new Intent(this.getActivity(), ScanQRCodeActivity.class);
         startActivityForResult(intent, 1);
     }
@@ -294,6 +394,7 @@ public class MapViewFragment extends Fragment {
      */
     @Override
     public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+
         super.onActivityResult(requestCode, resultCode, data);
         if (resultCode == Activity.RESULT_OK) {
             if (requestCode == 1) {
@@ -312,6 +413,7 @@ public class MapViewFragment extends Fragment {
      * Move the map's camera to the player's current location.
      */
     private void onCameraTrackingRequested() {
+
         Toast.makeText(requireContext(), "Moving to your location", Toast.LENGTH_SHORT).show();
 
         GesturesPlugin gesturesPlugin = mapView.getPlugin(Plugin.MAPBOX_GESTURES_PLUGIN_ID);
@@ -330,6 +432,7 @@ public class MapViewFragment extends Fragment {
      * When the map camera moves, stop the camera from tracking the player's movement.
      */
     private void onCameraTrackingDismissed() {
+
         Toast.makeText(requireContext(), "onCameraTrackingDismissed", Toast.LENGTH_SHORT).show();
 
         GesturesPlugin gesturesPlugin = mapView.getPlugin(Plugin.MAPBOX_GESTURES_PLUGIN_ID);
@@ -352,31 +455,18 @@ public class MapViewFragment extends Fragment {
      */
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+
         super.onViewCreated(view, savedInstanceState);
-        if (savedInstanceState != null) {
-            locationComponentPlugin.removeOnIndicatorPositionChangedListener(posChangedListener);
-            double lat = savedInstanceState.getDouble(PREFS_CAM_LAT);
-            double lon = savedInstanceState.getDouble(PREFS_CAM_LON);
-            double pitch = savedInstanceState.getDouble(PREFS_CAM_PITCH);
-            double zoom = savedInstanceState.getDouble(PREFS_CAM_ZOOM);
-            mapView.getMapboxMap().setCamera(
-                    new CameraOptions.Builder()
-                            .center(Point.fromLngLat(lon, lat))
-                            .pitch(pitch)
-                            .zoom(zoom)
-                            .build()
-            );
-        }
+
         mViewModel = new ViewModelProvider(this).get(MapViewViewModel.class);
-        mViewModel.getLocationLiveData().observe(getViewLifecycleOwner(), location -> {
-            mViewModel.getGeoLocations(location).observe(
-                    getViewLifecycleOwner(), this::addMapMarkers);
-        });
+//        mViewModel.getGeoLocations(location).observe(
+//                getViewLifecycleOwner(), this::addMapMarkers);
+
         setButtonsActions();
     }
 
 
-    private void addMapMarkers(@NonNull List<MapPOI> POIList) {
+    protected void addMapMarkers(@NonNull List<MapPOI> POIList) {
 
         if (mViewModel.lastPOILen != POIList.size()) {
 
@@ -422,30 +512,17 @@ public class MapViewFragment extends Fragment {
         Log.d(TAG, "Didn't draw the points");
     }
 
+
     /**
      * Based on: https://material.io/components/sheets-bottom/android#using-bottom-sheets
      *
      * @param circleAnnotation
      */
     private void showInfoSheet(CircleAnnotation circleAnnotation) {
-//        DocumentSnapshot document =  mViewModel.getDocumentFromPoint(
-//                new mapDataCallback() {
-//                    @Override
-//                    public void onCallback(DocumentSnapshot doc) {
-//                        Log.d("MapViewCallback", doc.getString("points"));
-//                    }
-//                },
-//                circleAnnotation);
+
 
         infoSheet = new MapInfoBottomSheet();
         infoSheet.show(requireActivity().getSupportFragmentManager(), infoSheet.getTag());
-
-//        int points = 0;
-//
-//         String strPoints = document.getString("points");
-//         if (strPoints != null) {
-//             points = Integer.parseInt(strPoints);
-//         }
 
     }
 
@@ -455,6 +532,7 @@ public class MapViewFragment extends Fragment {
      */
     @Override
     public void onDestroy() {
+
         super.onDestroy();
         GesturesPlugin gesturesPlugin = mapView.getPlugin(Plugin.MAPBOX_GESTURES_PLUGIN_ID);
         LocationComponentPlugin locationComponentPlugin =
@@ -478,9 +556,11 @@ public class MapViewFragment extends Fragment {
      * @deprecated
      */
     @Override
+
     public void onRequestPermissionsResult(int requestCode,
                                            @NonNull String[] permissions,
                                            @NonNull int[] grantResults) {
+
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         permManager.onRequestPermissionsResult(requestCode, permissions, grantResults);
     }
@@ -492,18 +572,9 @@ public class MapViewFragment extends Fragment {
      */
     @Override
     public void onConfigurationChanged(@NonNull Configuration newConfig) {
+
         super.onConfigurationChanged(newConfig);
         onMapReady();
     }
 
-    @Override
-    public void onSaveInstanceState(@NonNull Bundle outState) {
-        super.onSaveInstanceState(outState);
-        mViewModel.lastPOILen = 0;
-        CameraState cameraState = mapView.getMapboxMap().getCameraState();
-        outState.putDouble(PREFS_CAM_LAT, cameraState.getCenter().latitude());
-        outState.putDouble(PREFS_CAM_LON, cameraState.getCenter().longitude());
-        outState.putDouble(PREFS_CAM_ZOOM, cameraState.getZoom());
-        outState.putDouble(PREFS_CAM_PITCH, cameraState.getPitch());
-    }
 }

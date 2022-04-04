@@ -4,11 +4,14 @@ import static android.content.ContentValues.TAG;
 
 import android.util.ArrayMap;
 import android.util.Log;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 
 import com.example.collectqr.model.QRCode;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
@@ -23,6 +26,18 @@ import java.util.Map;
  * focus on the QRCode class
  */
 public class QRCodeController {
+    private FirebaseFirestore db;
+
+
+    /**
+     *
+     * It is a constructor.
+     *
+     */
+    public QRCodeController() {
+
+        db = FirebaseFirestore.getInstance();
+    }
 
     /**
      * Takes a given QR code, and writes all its relevant contents to firestore.
@@ -30,12 +45,11 @@ public class QRCodeController {
      * @param code the QR code to be stored to firestore
      */
     public void writeToFirestore(QRCode code) {
-        FirebaseFirestore db;
-        db = FirebaseFirestore.getInstance();
+
         final CollectionReference codeReference = db.collection("QRCodes");
 
         HashMap<String, Object> data = new HashMap<>();
-        data.put("sha256", code.getSha256());
+        data.put("sha", code.getSha256());
         if (code.getLatitude()!=null) {
             data.put("geohash", code.getGeoHash());
         } else {
@@ -89,11 +103,19 @@ public class QRCodeController {
      * @param username
      */
     public void writeToUserFirestore(QRCode qrCode, String username) {
-        FirebaseFirestore db = FirebaseFirestore.getInstance();
-        DocumentReference docRef = db.collection("Users").document(username).collection("scannedCodes").document(qrCode.getSha256());
+
+        DocumentReference docRef = db.collection("Users").document(username).collection("ScannedCodes").document(qrCode.getSha256());
         docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
             @Override
+
+/**
+ *
+ * On complete
+ *
+ * @param Task<DocumentSnapshot>  the task< document snapshot>
+ */
             public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+
                 if (task.isSuccessful()) {
                     DocumentSnapshot document = task.getResult();
                     if (document.exists()) {
@@ -109,19 +131,51 @@ public class QRCodeController {
                         userCodeReference.set(data);
                         db.collection("Users").document(username).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
                             @Override
+
+/**
+ *
+ * On complete
+ *
+ * @param Task<DocumentSnapshot>  the task< document snapshot>
+ */
                             public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+
                                 if (task.isSuccessful()) {
                                     DocumentSnapshot document = task.getResult();
                                     if (document.exists()) {
                                         Log.d(TAG, "DocumentSnapshot data: " + document.getData());
                                         Integer totalPoints = Integer.parseInt(document.get("total_points").toString());
-                                        Integer numCodes = Integer.parseInt(document.get("num_codes").toString());
+                                        Integer numCodes = Integer.parseInt(document.get("num_codes").toString()) + 1;
                                         Integer bestCode = Integer.parseInt(document.get("best_code").toString());
                                         DocumentReference documentReference = db.collection("Users").document(username);
                                         documentReference.update("total_points", totalPoints + qrCode.getPoints());
-                                        documentReference.update("num_codes", numCodes + 1);
+                                        documentReference.update("num_codes", numCodes);
                                         if (bestCode<qrCode.getPoints()) {
                                             documentReference.update("best_code", qrCode.getPoints());
+                                        }
+
+                                        //handle checking for achievements
+                                        //first, check if the user has scanned an achievement-worthy
+                                        //number of codes
+                                        if(numCodes == 1) {
+                                            documentReference.update("scan_1_code", true);
+                                        } else if(numCodes == 10) {
+                                            documentReference.update("scan_10_codes", true);
+                                        } else if(numCodes == 50) {
+                                            documentReference.update("scan_50_codes", true);
+                                        }
+
+                                        //then, check if the user's scan had an achievement-worthy
+                                        //number of points
+                                        Integer qrPoints = qrCode.getPoints();
+                                        if(qrPoints < 10) {
+                                            documentReference.update("scan_10_points", true);
+                                        }
+                                        if(qrPoints >= 100) {
+                                            documentReference.update("scan_100_points", true);
+                                        }
+                                        if (qrPoints >= 300) {
+                                            documentReference.update("scan_300_points", true);
                                         }
                                     } else {
                                         Log.d(TAG, "No such document");
@@ -145,42 +199,128 @@ public class QRCodeController {
      * @param username
      */
     public void writeToCodesFirestore(QRCode qrCode, String username) {
-        FirebaseFirestore db = FirebaseFirestore.getInstance();
+
         DocumentReference docRef = db.collection("QRCodes").document(qrCode.getSha256());
         docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-                @Override
-                public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                    if (task.isSuccessful()) {
-                        DocumentSnapshot document = task.getResult();
-                        if (document.exists()) {
-                            Log.d(TAG, "DocumentSnapshot data: " + document.getData());
-                            final CollectionReference commentsReference = db.collection("QRCodes").document(qrCode.getSha256()).collection("Comments");
+            @Override
 
-                            for(Map.Entry<String, String> comments : qrCode.getComments().entrySet()) {
-                                HashMap<String, String> comment = new HashMap<>();
-                                String key = comments.getKey();
-                                String value = comments.getValue();
-                                comment.put(key, value);
+/**
+ *
+ * On complete
+ *
+ * @param Task<DocumentSnapshot>  the task< document snapshot>
+ */
+            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
 
-                                commentsReference
-                                        .document(key)
-                                        .set(comment)
-                                        .addOnSuccessListener(aVoid -> Log.d(TAG, "Data has been added successfully!"))
-                                        .addOnFailureListener(e -> Log.d(TAG, "Data could not be added!" + e));
-                            }
-                        } else {
-                            Log.d(TAG, "No such document");
-                            writeToFirestore(qrCode);
+                if (task.isSuccessful()) {
+                    DocumentSnapshot document = task.getResult();
+                    if (document.exists()) {
+                        Log.d(TAG, "DocumentSnapshot data: " + document.getData());
+                        final CollectionReference commentsReference = db.collection("QRCodes").document(qrCode.getSha256()).collection("Comments");
+
+                        for(Map.Entry<String, String> comments : qrCode.getComments().entrySet()) {
+                            HashMap<String, String> comment = new HashMap<>();
+                            String key = comments.getKey();
+                            String value = comments.getValue();
+                            comment.put(key, value);
+
+                            commentsReference
+                                    .document(key)
+                                    .set(comment)
+                                    .addOnSuccessListener(aVoid -> Log.d(TAG, "Data has been added successfully!"))
+                                    .addOnFailureListener(e -> Log.d(TAG, "Data could not be added!" + e));
                         }
-                        final DocumentReference scannedByReference = db.collection("QRCodes").document(qrCode.getSha256()).collection("ScannedBy").document(username);
-                        ArrayMap<String, Object> data = new ArrayMap<>();
-                        data.put("username", username);
-                        data.put("date", qrCode.getDate());
-                        scannedByReference.set(data);
                     } else {
-                        Log.d(TAG, "get failed with ", task.getException());
+                        Log.d(TAG, "No such document");
+                        writeToFirestore(qrCode);
                     }
+                    final DocumentReference scannedByReference = db.collection("QRCodes").document(qrCode.getSha256()).collection("ScannedBy").document(username);
+                    ArrayMap<String, Object> data = new ArrayMap<>();
+                    data.put("username", username);
+                    data.put("date", qrCode.getDate());
+                    scannedByReference.set(data);
+                } else {
+                    Log.d(TAG, "get failed with ", task.getException());
                 }
-            });
+            }
+        });
+    }
+
+
+    /**
+     *
+     * Delete code from account
+     *
+     * @param code  the code
+     * @param secondBest  the second best
+     * @param username  the username
+     */
+    public void deleteCodeFromAccount(QRCode code, int secondBest, String username) {
+
+        // https://firebase.google.com/docs/firestore/manage-data/delete-data#delete_documents
+        db.collection("Users").document(username).collection("ScannedCodes").document(code.getSha256())
+                .delete()
+                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+
+/**
+ *
+ * On success
+ *
+ * @param aVoid  the a void
+ */
+                    public void onSuccess(Void aVoid) {
+
+                        Log.d(TAG, "DocumentSnapshot successfully deleted!");
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+
+/**
+ *
+ * On failure
+ *
+ * @param Exception  the exception
+ */
+                    public void onFailure(@NonNull Exception e) {
+
+                        Log.w(TAG, "Error deleting document", e);
+                    }
+                });
+        db.collection("Users").document(username).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+            @Override
+
+/**
+ *
+ * On complete
+ *
+ * @param Task<DocumentSnapshot>  the task< document snapshot>
+ */
+            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+
+                if (task.isSuccessful()) {
+                    DocumentSnapshot document = task.getResult();
+                    if (document.exists()) {
+                        Log.d(TAG, "DocumentSnapshot data: " + document.getData());
+                        Integer totalPoints = Integer.parseInt(document.get("total_points").toString());
+                        Integer numCodes = Integer.parseInt(document.get("num_codes").toString());
+                        Integer bestCode = Integer.parseInt(document.get("best_code").toString());
+                        DocumentReference documentReference = db.collection("Users").document(username);
+                        documentReference.update("total_points", totalPoints - code.getPoints());
+                        documentReference.update("num_codes", numCodes - 1);
+                        if (bestCode == code.getPoints()) {
+                            if (secondBest!=code.getPoints()) {
+                                documentReference.update("best_code", secondBest);
+                            }
+                        }
+                    } else {
+                        Log.d(TAG, "No such document");
+                    }
+                } else {
+                    Log.d(TAG, "get failed with ", task.getException());
+                }
+            }
+        });
     }
 }

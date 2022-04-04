@@ -36,48 +36,107 @@ public class ScanQRCodeActivity extends AppCompatActivity {
         scannerLiveView = findViewById(R.id.camView);
         scannedTextView = findViewById(R.id.scannedData);
 
+        // check for whether permissions granted or not
         if(checkPermission()){
             Toast.makeText(this, "Permission Granted..",Toast.LENGTH_SHORT).show();
         }else{
             requestPermission();
         }
 
+        // scanner activity begins and is waiting for qr code to be presented to camera
         scannerLiveView.setScannerViewEventListener(new ScannerLiveView.ScannerViewEventListener() {
             @Override
+
+/**
+ *
+ * On scanner started
+ *
+ * @param scanner  the scanner
+ */
             public void onScannerStarted(ScannerLiveView scanner) {
+
                 Toast.makeText(ScanQRCodeActivity.this, "Scanner Started...", Toast.LENGTH_SHORT).show();
             }
 
             @Override
+
+/**
+ *
+ * On scanner stopped
+ *
+ * @param scanner  the scanner
+ */
             public void onScannerStopped(ScannerLiveView scanner) {
+
                 Toast.makeText(ScanQRCodeActivity.this, "Scanner Stopped...", Toast.LENGTH_SHORT).show();
             }
 
             @Override
+
+/**
+ *
+ * On scanner error
+ *
+ * @param err  the err
+ */
             public void onScannerError(Throwable err) {
+
                 Toast.makeText(ScanQRCodeActivity.this, "Scanner Error Occurred Please Start Again...", Toast.LENGTH_SHORT).show();
             }
 
+            // if the qr code is scanned successfully, run the following block of code
             @Override
+
+/**
+ *
+ * On code scanned
+ *
+ * @param data  the data
+ */
             public void onCodeScanned(String data) {
-                scannedTextView.setText(data);
-                String sha = new HashConversion().convertToSHA256(data);
-                Intent intent = new Intent();
-                intent.putExtra("sha", sha);
-                // https://www.tutorialspoint.com/how-to-send-data-to-previous-activity-in-android
-                setResult(RESULT_OK, intent);
+
+                ////scannedTextView.setText(data);
+
+                if (data.contains(" GameStatus")) {
+                    Intent intent = new Intent(getApplicationContext(), DummyActivity.class);
+                    intent.putExtra("data", data);
+                    startActivity(intent);
+                }
+
+                else {
+                    String sha = new HashConversion().convertToSHA256(data);
+                    Intent intent = new Intent();
+                    intent.putExtra("sha", sha);
+                    // https://www.tutorialspoint.com/how-to-send-data-to-previous-activity-in-android
+                    setResult(RESULT_OK, intent);
+                }
                 finish();
             }
         });
     }
 
+
+    /**
+     *
+     * Check permission
+     *
+     * @return boolean
+     */
     private boolean checkPermission(){
+
         int cameraPermission = ContextCompat.checkSelfPermission(getApplicationContext(),CAMERA);
         int vibratePermission = ContextCompat.checkSelfPermission(getApplicationContext(),VIBRATE);
         return cameraPermission == PackageManager.PERMISSION_GRANTED && vibratePermission == PackageManager.PERMISSION_GRANTED;
     }
 
+
+    /**
+     *
+     * Request permission
+     *
+     */
     private void requestPermission(){
+
         int PERMISSION_CODE = 200;
         ActivityCompat.requestPermissions(this,new String[]{CAMERA,VIBRATE},PERMISSION_CODE);
     }
@@ -98,7 +157,17 @@ public class ScanQRCodeActivity extends AppCompatActivity {
     }
 
     @Override
+
+/**
+ *
+ * On request permissions result
+ *
+ * @param requestCode  the request code
+ * @param String[]  the string []
+ * @param int[]  the int []
+ */
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         if(grantResults.length > 0){
             boolean cameraAccepted = grantResults[0] == PackageManager.PERMISSION_GRANTED;

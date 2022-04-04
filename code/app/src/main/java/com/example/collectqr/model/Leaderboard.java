@@ -22,6 +22,7 @@ public class Leaderboard {
      * @param userList
      */
     public Leaderboard(String personalUsername, Integer personalScore, ArrayList<User> userList){
+
         this.personalUsername = personalUsername;
         this.personalScore = personalScore;
         this.leaderboardList = userList;
@@ -32,6 +33,7 @@ public class Leaderboard {
      * @return personalUsername
      */
     public String getPersonalUsername(){
+
         return personalUsername;
     }
 
@@ -40,6 +42,7 @@ public class Leaderboard {
      * @return personalUsername
      */
     public Integer getPersonalScore(){
+
         return personalScore;
     }
 }

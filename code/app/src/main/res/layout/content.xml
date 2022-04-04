@@ -6,7 +6,10 @@
     android:orientation="horizontal"
     android:clickable="true"
     android:descendantFocusability="blocksDescendants"
-    android:weightSum="1">
+    android:weightSum="1"
+    android:focusable="true"
+    android:foreground="?android:attr/selectableItemBackground"
+    >
     <!--
     // disable list component focusability
     // URL: https://stackoverflow.com/questions/7645880/listview-with-onitemclicklistener

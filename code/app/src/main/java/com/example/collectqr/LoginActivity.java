@@ -45,6 +45,7 @@ public class LoginActivity extends AppCompatActivity {
 
         ExtendedFloatingActionButton loginButton = findViewById(R.id.loginButton);
         ExtendedFloatingActionButton shuffleButton = findViewById(R.id.shuffleButton);
+        ExtendedFloatingActionButton qrScanner = findViewById(R.id.qrScanner);
         EditText usernameEditText = findViewById(R.id.usernameEditText);
         db = FirebaseFirestore.getInstance();
 
@@ -111,6 +112,16 @@ public class LoginActivity extends AppCompatActivity {
             Faker faker = new Faker();
             String randomName = faker.superhero().prefix()+faker.name().firstName();
             usernameEditText.setText(randomName);
+        });
+
+        qrScanner.setOnClickListener(view -> {
+            Intent intent = new Intent (this, ScanQRCodeLoginActivity.class);
+            startActivity(intent);
+        });
+
+        qrScanner.setOnClickListener(view -> {
+            Intent intent = new Intent (this, ScanQRCodeLoginActivity.class);
+            startActivity(intent);
         });
     }
 }
