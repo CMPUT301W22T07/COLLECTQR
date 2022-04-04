@@ -249,4 +249,17 @@ public class QRCode {
      * @param image
      */
     public void setQr_image(String image) { this.qr_image=image;}
+
+    /**
+     * Sets the latitude, longitude, and location of the QR Code
+     * using a given latitude and longitude
+     *
+     * @param latitude
+     * @param longitude
+     */
+    public void setAllLocations(Double latitude, Double longitude) {
+        this.latitude = latitude;
+        this.longitude = longitude;
+        this.location = new GeoLocation(latitude, longitude);
+    }
 }

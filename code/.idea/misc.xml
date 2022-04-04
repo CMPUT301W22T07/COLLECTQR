@@ -19,8 +19,10 @@
         <entry key="app/src/main/res/layout/dummy_activity.xml" value="0.18297101449275363" />
         <entry key="app/src/main/res/layout/edit_profile_dialog_fragment.xml" value="0.18297101449275363" />
         <entry key="app/src/main/res/layout/fragment_leaderboard.xml" value="0.1" />
+        <entry key="app/src/main/res/layout/fragment_view_qrcode.xml" value="0.23541666666666666" />
         <entry key="app/src/main/res/layout/fragment_view_user_profile.xml" value="0.26183746337890623" />
         <entry key="app/src/main/res/layout/profile_dialog_fragment.xml" value="0.25" />
+        <entry key="app/src/main/res/layout/qrcodes_comments_list_item.xml" value="0.23541666666666666" />
       </map>
     </option>
   </component>
@@ -37,7 +39,7 @@
   <component name="VisualizationToolProject">
     <option name="state">
       <ProjectState>
-        <option name="scale" value="0.26183746337890623" />
+        <option name="scale" value="0.23541666666666666" />
       </ProjectState>
     </option>
   </component>
