@@ -1,5 +1,7 @@
 package com.example.collectqr.model;
 
+import android.util.Log;
+
 import androidx.annotation.NonNull;
 
 import com.google.firebase.firestore.DocumentSnapshot;
@@ -21,6 +23,7 @@ public class MapPOI {
     //       *Controller classes.
     private final String HASH_FIELD = "sha256";
     private final String POINTS_FIELD = "points";
+    private final String LOGGING_TAG = "MapPOI";
 
     // Class variables
     private final Point point;
@@ -40,12 +43,18 @@ public class MapPOI {
         this.point = Point.fromLngLat(longitude, latitude);
         this.document = document;
         this.hash = document.getString(HASH_FIELD);
-        String strPoints = document.getString(POINTS_FIELD);
-
-        // Don't convert if the field is null
-        if (strPoints != null) {
-            this.intPoints = Integer.parseInt(strPoints);
+        try {
+            this.intPoints = document.getLong(POINTS_FIELD).intValue();
+        } catch (Exception e) {
+            Log.e(LOGGING_TAG, e.toString());
+            this.intPoints = 0;
         }
+//        String strPoints = document.getString(POINTS_FIELD);
+//
+//        // Don't convert if the field is null
+//        if (strPoints != null) {
+//            this.intPoints = Integer.parseInt(strPoints);
+//        }
 
         Map<String, String> dataMap = new HashMap<>();
         dataMap.put(HASH_FIELD, this.hash);
