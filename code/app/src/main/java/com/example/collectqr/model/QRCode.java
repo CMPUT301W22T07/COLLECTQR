@@ -20,7 +20,7 @@ public class QRCode {
     private GeoLocation location;
     private String qr_image;
     private Date date;
-    private final HashMap<String, String> scanned_by;
+    private final HashMap<String, Date> scanned_by;
     private final HashMap<String, String> comments;
 
     public QRCode(String sha256) {
@@ -81,7 +81,7 @@ public class QRCode {
      * @param  user the username of a user who scanned the QR Code
      * @param  date the date the user scanned the QR Code
      */
-    public void addScannedBy(String user, String date) {
+    public void addScannedBy(String user, Date date) {
         this.scanned_by.put(user, date);
     }
 
@@ -166,7 +166,7 @@ public class QRCode {
      *
      * @return A hashmap of the users who have scanned the QR code, along with the date they scanned
      */
-    public HashMap<String, String> getScanned_by() {
+    public HashMap<String, Date> getScanned_by() {
         return scanned_by;
     }
 

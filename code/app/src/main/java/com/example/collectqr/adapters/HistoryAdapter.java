@@ -123,6 +123,7 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.ViewHold
         StorageReference storageReference = storage.getReferenceFromUrl("gs://collectqr7.appspot.com/"+currentItem.getQr_image());
         Glide.with(viewGroup.getContext())
                 .load(storageReference)
+                .placeholder(R.drawable.ic_baseline_image_not_supported_24)
                 .into(viewHolder.getImageView());
     }
 

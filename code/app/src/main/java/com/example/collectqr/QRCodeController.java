@@ -17,6 +17,7 @@ import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -59,10 +60,10 @@ public class QRCodeController {
 
         final CollectionReference scannedByReference = db.collection("QRCodes").document(code.getSha256()).collection("ScannedBy");
 
-        for(Map.Entry<String, String> scans : code.getScanned_by().entrySet()) {
-            HashMap<String, String> scannedBy = new HashMap<>();
+        for(Map.Entry<String, Date> scans : code.getScanned_by().entrySet()) {
+            HashMap<String, Date> scannedBy = new HashMap<>();
             String key = scans.getKey();
-            String value = scans.getValue();
+            Date value = scans.getValue();
             scannedBy.put(key, value);
 
             scannedByReference

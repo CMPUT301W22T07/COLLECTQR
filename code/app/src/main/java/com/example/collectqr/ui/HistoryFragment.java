@@ -2,18 +2,21 @@ package com.example.collectqr.ui;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
-import android.view.MenuItem;
+import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+
+import androidx.annotation.CallSuper;
+import androidx.annotation.MainThread;
 import androidx.appcompat.widget.Toolbar;
 
 import androidx.fragment.app.Fragment;
-import androidx.recyclerview.selection.SelectionTracker;
+import androidx.navigation.NavController;
+import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.collectqr.MainAppActivity;
 import com.example.collectqr.adapters.HistoryAdapter;
 import com.example.collectqr.data.HistoryController;
 import com.example.collectqr.model.QRCode;
@@ -102,7 +105,12 @@ public class HistoryFragment extends Fragment {
         moreInfoButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                // TODO: go to QRCode
+                NavController navController = Navigation.findNavController(rootView);
+                Bundle bundle = new Bundle();
+                bundle.putString("sha", selectedCode.getSha256());
+                assert selectedCode.getSha256()!=null;
+                navController.navigate(R.id.navigation_qr_code_details, bundle);
+                refreshSelection();
             }
         });
         deleteButton.setOnClickListener(new View.OnClickListener() {
@@ -130,7 +138,7 @@ public class HistoryFragment extends Fragment {
                 QRCode code = controller.getData().get(position);
                 if (selectedCode==null) {
                     // select
-                    view.setBackground(getResources().getDrawable(R.drawable.outline_rectangle, getActivity().getTheme()));
+                    view.setBackground(getResources().getDrawable(R.drawable.list_selector, getActivity().getTheme()));
                     selectedCode = code;
                     selectedView = view;
                     showfabs();
@@ -143,7 +151,7 @@ public class HistoryFragment extends Fragment {
                 } else {
                     // select and unselect previous
                     selectedView.setBackgroundResource(R.drawable.white_rounded_rectangle);
-                    view.setBackground(getResources().getDrawable(R.drawable.outline_rectangle, getActivity().getTheme()));
+                    view.setBackground(getResources().getDrawable(R.drawable.list_selector, getActivity().getTheme()));
                     selectedCode = code;
                     selectedView = view;
                 }

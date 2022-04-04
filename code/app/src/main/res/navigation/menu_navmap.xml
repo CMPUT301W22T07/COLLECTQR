@@ -20,4 +20,11 @@
         android:name="com.example.collectqr.ui.HistoryFragment"
         android:label="@string/title_history"
         tools:layout="@layout/fragment_history" />
+
+    <fragment
+        android:id="@+id/navigation_qr_code_details"
+        android:name="com.example.collectqr.ViewQrCodeFragment"
+        android:label="@string/title_map"
+        app:argType="string"
+        tools:layout="@layout/fragment_view_qr_code" />
 </navigation>
