@@ -47,17 +47,22 @@ public class MapViewViewModel extends AndroidViewModel {
     // Class Variables
     private final FirebaseFirestore db = FirebaseFirestore.getInstance();
     private final List<MapPOI> POIList = new ArrayList<>();
-
-    private MapViewController mMapController;
+    private MutableLiveData<Location> locationLiveData;
     private MutableLiveData<List<MapPOI>> qrGeoLocations;
     public int lastPOILen = 0;
+
 
     public MapViewViewModel(@NonNull Application application) {
         super(application);
     }
 
 
-    public LiveData<List<MapPOI>> getGeoLocations(Location location) {
+    /**
+     * Get a list of
+     * @param location
+     * @return
+     */
+    public LiveData<List<MapPOI>> getPOIList(Location location) {
         if (qrGeoLocations == null && location != null) {
             qrGeoLocations = new MutableLiveData<>();
             loadGeoLocations(location);
@@ -123,6 +128,20 @@ public class MapViewViewModel extends AndroidViewModel {
         }
         qrGeoLocations.setValue(POIList);
         lastPOILen = listSize;
+    }
+
+
+    public void setLocation(Location location) {
+       if (locationLiveData == null) {
+           locationLiveData = new MutableLiveData<>();
+       }
+
+        locationLiveData.setValue(location);
+    }
+
+
+    public LiveData<Location> getLastKnownLocation() {
+        return locationLiveData;
     }
 
 

@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.content.res.Configuration;
 import android.location.Location;
 import android.os.Bundle;
+import android.util.ArrayMap;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -16,8 +17,11 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.content.res.AppCompatResources;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.navigation.NavController;
+import androidx.navigation.Navigation;
 
 import com.example.collectqr.EnterQrInfoActivity;
+import com.example.collectqr.R;
 import com.example.collectqr.ScanQRCodeActivity;
 import com.example.collectqr.databinding.FragmentMapViewBinding;
 import com.example.collectqr.model.MapPOI;
@@ -25,7 +29,9 @@ import com.example.collectqr.utilities.Preferences;
 import com.example.collectqr.viewmodels.MapViewViewModel;
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 import com.google.gson.Gson;
+import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import com.mapbox.android.core.permissions.PermissionsListener;
 import com.mapbox.android.core.permissions.PermissionsManager;
 import com.mapbox.android.gestures.MoveGestureDetector;
@@ -94,7 +100,9 @@ public class MapViewFragment extends Fragment {
                     location.setLongitude(point.longitude());
                     location.setLatitude(point.latitude());
 
-                    mViewModel.getGeoLocations(location).observe(
+                    mViewModel.setLocation(location);
+
+                    mViewModel.getPOIList(location).observe(
                             getViewLifecycleOwner(), this::addMapMarkers);
                 }
 
@@ -114,21 +122,11 @@ public class MapViewFragment extends Fragment {
                         circleAnnotationManager.addClickListener(poiClickListener);
 
                         for (MapPOI mapPOI : POIList) {
-                            // Converting a map point's qr code hash to json
-                            // https://stackoverflow.com/a/12155874 by Ankur
-                            Map<String, String> dataMap = new HashMap<>();
-                            dataMap.put("sha256", mapPOI.getHash());
-
-                            // Parsing json
-                            // https://howtodoinjava.com/gson/gson-jsonparser/
-                            JsonElement dataJson = new Gson().toJsonTree(dataMap);
-
-
                             // Create the annotation to display on the map and include the arbitrary data
                             // (hash) as JSON data
                             CircleAnnotationOptions circleAnnotationOptions =
                                     new CircleAnnotationOptions()
-                                            .withData(dataJson)
+                                            .withData(mapPOI.getDataJson())
                                             .withPoint(mapPOI.getPoint())
                                             .withCircleRadius(8.0)
                                             .withCircleColor("#ee4e8b")
@@ -400,11 +398,7 @@ public class MapViewFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-
         mViewModel = new ViewModelProvider(this).get(MapViewViewModel.class);
-//        mViewModel.getGeoLocations(location).observe(
-//                getViewLifecycleOwner(), this::addMapMarkers);
-
         setButtonsActions();
     }
 
@@ -461,10 +455,30 @@ public class MapViewFragment extends Fragment {
      *
      * @param circleAnnotation
      */
-    private void showInfoSheet(CircleAnnotation circleAnnotation) {
+    private void showInfoSheet(@NonNull CircleAnnotation circleAnnotation) {
+        //TODO
+        MapInfoDialogFragment.newInstance(30).show(getParentFragmentManager(), "dialog");
+//        JsonObject data = circleAnnotation.getJsonObjectCopy();
 
-        infoSheet = new MapInfoBottomSheet();
-        infoSheet.show(requireActivity().getSupportFragmentManager(), infoSheet.getTag());
+//        JsonElement bruh = data.get("Comments");
+        //data.get("Comments");
+//        Log.d("BRUH", data.toString());
+    }
+
+
+    @Override
+    public void onResume() {
+        super.onResume();
+
+        try {
+            Location location = mViewModel.getLastKnownLocation().getValue();
+            if (location != null) {
+                mViewModel.getPOIList(location).observe(getViewLifecycleOwner(),
+                        this::addMapMarkers);
+            }
+        } catch (Exception e) {
+            Log.e(TAG, e.toString());
+        }
 
     }
 
@@ -503,6 +517,7 @@ public class MapViewFragment extends Fragment {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         permManager.onRequestPermissionsResult(requestCode, permissions, grantResults);
     }
+
 
     /**
      * Respond to new system settings
