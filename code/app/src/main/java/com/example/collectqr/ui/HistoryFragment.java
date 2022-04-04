@@ -108,7 +108,7 @@ public class HistoryFragment extends Fragment {
                 NavController navController = Navigation.findNavController(rootView);
                 Bundle bundle = new Bundle();
                 bundle.putString("sha", selectedCode.getSha256());
-                assert selectedCode.getSha256()!=null;
+                bundle.putInt("points", selectedCode.getPoints());
                 navController.navigate(R.id.navigation_qr_code_details, bundle);
                 refreshSelection();
             }

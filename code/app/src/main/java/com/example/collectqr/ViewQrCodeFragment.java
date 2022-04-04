@@ -47,8 +47,7 @@ public class ViewQrCodeFragment extends Fragment {
     ArrayList<ScanCommentItem> scannedByData;
     ArrayList<ScanCommentItem> commentsData;
     ImageView image;
-    TextView points;
-    TextView distance;
+    TextView pointsView;
     Button delete;
     ListView scannedBy;
     ListView comments;
@@ -77,30 +76,30 @@ public class ViewQrCodeFragment extends Fragment {
         rootView = inflater.inflate(R.layout.fragment_view_qr_code, container, false);
 
         String sha = getArguments().getString("sha");
-        System.out.println(sha);
-
+        int points = getArguments().getInt("points");
 
         image = rootView.findViewById(R.id.qrcode_image);
-        points = rootView.findViewById(R.id.qrcode_points);
-        distance = rootView.findViewById(R.id.qrcode_distance);
+        pointsView = rootView.findViewById(R.id.qrcode_points);
         delete = rootView.findViewById(R.id.code_delete);
         scannedBy = rootView.findViewById(R.id.code_scanned_by);
         comments = rootView.findViewById(R.id.code_comments);
 
         boolean isAdmin = Preferences.loadAdminStatus(rootView.getContext());
-        if (isAdmin) {delete.setVisibility(View.VISIBLE);}
+        if (isAdmin) {
+            delete.setVisibility(View.VISIBLE);
+            delete.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    QRCodeController qrCodeController = new QRCodeController();
+                    qrCodeController.deleteCodeFromEverywhere(sha, points, scannedByData);
+                    getActivity().onBackPressed();
+                }
+            });
+        }
 
         downloadAndDisplayInfo(sha);
 
         return rootView;
-    }
-
-    @MainThread
-    @CallSuper
-    public void onPause() {
-        System.out.println("In onPause");
-        super.onPause();
-        //Navigation.findNavController(getView()).popBackStack();
     }
 
     private void setUpScannedByList() {
@@ -131,7 +130,7 @@ public class ViewQrCodeFragment extends Fragment {
         codeDoc.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
             @Override
             public void onSuccess(DocumentSnapshot documentSnapshot) {
-                points.setText(documentSnapshot.get("points").toString() + " points");
+                pointsView.setText(documentSnapshot.get("points").toString() + " points");
                 String imageName = documentSnapshot.getString("qr_image");
                 // https://firebase.google.com/docs/storage/android/download-files#downloading_images_with_firebaseui
                 FirebaseStorage storage = FirebaseStorage.getInstance("gs://collectqr7.appspot.com");

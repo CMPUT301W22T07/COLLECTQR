@@ -164,6 +164,6 @@ public class HistoryController {
                 secondBest = qrData.get(i).getPoints();
             }
         }
-        new QRCodeController().deleteCodeFromAccount(code, secondBest, username);
+        new QRCodeController().deleteCodeFromAccount(code.getSha256(), code.getPoints(), secondBest, username);
     }
 }
