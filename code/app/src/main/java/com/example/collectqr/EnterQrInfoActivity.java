@@ -1,6 +1,9 @@
 package com.example.collectqr;
 
+import android.Manifest;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.location.Location;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -9,9 +12,15 @@ import android.widget.Switch;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
 
+import com.example.collectqr.data.LocationRepository;
 import com.example.collectqr.model.QRCode;
 import com.example.collectqr.utilities.QRCodeScore;
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.mapbox.android.core.permissions.PermissionsManager;
 
 import java.util.Date;
 
@@ -24,6 +33,9 @@ public class EnterQrInfoActivity extends AppCompatActivity {
     private Button addImageButton;
     private EditText commentView;
     private QRCode qrCode;
+    private FusedLocationProviderClient fusedLocationClient;
+    private Double latitude = null;
+    private Double longitude = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,7 +61,35 @@ public class EnterQrInfoActivity extends AppCompatActivity {
         Integer points = qrCodeScore.calculateScore(qrCode.getSha256());
         qrCode.setPoints(points);
 
-        pointsView.setText(qrCode.getPoints().toString()+" points");
+        pointsView.setText(qrCode.getPoints().toString() + " points");
+
+        if (PermissionsManager.areLocationPermissionsGranted(getApplicationContext())) {
+            locationSwitch.setEnabled(true);
+        }
+
+        //get the location from the user, to be used if they want a location assigned with the code
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            // TODO: Consider calling
+            //    ActivityCompat#requestPermissions
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for ActivityCompat#requestPermissions for more details.
+            return;
+        }
+        fusedLocationClient.getLastLocation()
+                .addOnSuccessListener(this, new OnSuccessListener<Location>() {
+                    @Override
+                    public void onSuccess(Location location) {
+                        // Got last known location. In some rare situations this can be null.
+                        if (location != null) {
+                            latitude = location.getLatitude();
+                            longitude = location.getLongitude();
+                        }
+                    }
+                });
 
         // optional additions to the qr code post
         addImageButton.setOnClickListener(new View.OnClickListener() {
@@ -78,6 +118,9 @@ public class EnterQrInfoActivity extends AppCompatActivity {
             public void onClick(View view) {
 
                 qrCode.setQr_image("test.jpg");
+                if(locationSwitch.isChecked()) {
+                    qrCode.setAllLocations(latitude, longitude);
+                }
                 if (!commentView.getText().toString().equals("")) {
                     qrCode.addComment(username, commentView.getText().toString());
                 }

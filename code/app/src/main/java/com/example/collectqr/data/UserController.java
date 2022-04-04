@@ -32,6 +32,12 @@ public class UserController {
         data.put("email", user.getEmail());
         data.put("phone", user.getPhone());
         data.put("devices", user.getDevices());
+        data.put("scan_1_code", user.isScan_1_code());
+        data.put("scan_10_codes", user.isScan_10_codes());
+        data.put("scan_50_codes", user.isScan_50_codes());
+        data.put("scan_10_points", user.isScan_10_points());
+        data.put("scan_100_points", user.isScan_100_points());
+        data.put("scan_300_points", user.isScan_300_points());
 
         //Move stats from HashMap to db
         for (Map.Entry<String, Integer> stats : user.getStats().entrySet()) {

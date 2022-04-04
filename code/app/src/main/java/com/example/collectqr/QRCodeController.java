@@ -4,6 +4,7 @@ import static android.content.ContentValues.TAG;
 
 import android.util.ArrayMap;
 import android.util.Log;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 
@@ -125,13 +126,37 @@ public class QRCodeController {
                                     if (document.exists()) {
                                         Log.d(TAG, "DocumentSnapshot data: " + document.getData());
                                         Integer totalPoints = Integer.parseInt(document.get("total_points").toString());
-                                        Integer numCodes = Integer.parseInt(document.get("num_codes").toString());
+                                        Integer numCodes = Integer.parseInt(document.get("num_codes").toString()) + 1;
                                         Integer bestCode = Integer.parseInt(document.get("best_code").toString());
                                         DocumentReference documentReference = db.collection("Users").document(username);
                                         documentReference.update("total_points", totalPoints + qrCode.getPoints());
-                                        documentReference.update("num_codes", numCodes + 1);
+                                        documentReference.update("num_codes", numCodes);
                                         if (bestCode < qrCode.getPoints()) {
                                             documentReference.update("best_code", qrCode.getPoints());
+                                        }
+
+                                        //handle checking for achievements
+                                        //first, check if the user has scanned an achievement-worthy
+                                        //number of codes
+                                        if(numCodes == 1) {
+                                            documentReference.update("scan_1_code", true);
+                                        } else if(numCodes == 10) {
+                                            documentReference.update("scan_10_codes", true);
+                                        } else if(numCodes == 50) {
+                                            documentReference.update("scan_50_codes", true);
+                                        }
+
+                                        //then, check if the user's scan had an achievement-worthy
+                                        //number of points
+                                        Integer qrPoints = qrCode.getPoints();
+                                        if(qrPoints < 10) {
+                                            documentReference.update("scan_10_points", true);
+                                        }
+                                        if(qrPoints >= 100) {
+                                            documentReference.update("scan_100_points", true);
+                                        }
+                                        if (qrPoints >= 300) {
+                                            documentReference.update("scan_300_points", true);
                                         }
                                     } else {
                                         Log.d(TAG, "No such document");
