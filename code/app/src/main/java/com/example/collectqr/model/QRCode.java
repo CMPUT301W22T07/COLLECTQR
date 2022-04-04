@@ -241,8 +241,14 @@ public class QRCode {
      * @param longitude
      */
     public void setAllLocations(Double latitude, Double longitude) {
-        this.latitude = latitude;
-        this.longitude = longitude;
-        this.location = new GeoLocation(latitude, longitude);
+        if(latitude == null || longitude == null) {
+            this.latitude = null;
+            this.longitude = null;
+            this.location = null;
+        } else {
+            this.latitude = latitude;
+            this.longitude = longitude;
+            this.location = new GeoLocation(latitude, longitude);
+        }
     }
 }
