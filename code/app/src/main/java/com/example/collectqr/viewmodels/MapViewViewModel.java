@@ -5,6 +5,7 @@ import android.location.Location;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
@@ -50,6 +51,7 @@ public class MapViewViewModel extends AndroidViewModel {
     private MutableLiveData<Location> locationLiveData;
     private MutableLiveData<List<MapPOI>> qrGeoLocations;
     public int lastPOILen = 0;
+    public Boolean dataLoaded = false;
 
 
     public MapViewViewModel(@NonNull Application application) {
@@ -142,6 +144,11 @@ public class MapViewViewModel extends AndroidViewModel {
 
     public LiveData<Location> getLastKnownLocation() {
         return locationLiveData;
+    }
+
+    @Nullable
+    public List<MapPOI> getPOIList() {
+        return qrGeoLocations.getValue();
     }
 
 
