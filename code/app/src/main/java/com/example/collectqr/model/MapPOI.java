@@ -28,7 +28,7 @@ public class MapPOI {
      * It is a constructor.
      *
      * @param point  the point
-     * @param DocumentSnapshot  the document snapshot
+     * @param document  the document snapshot
      */
     public MapPOI(Point point, @NonNull DocumentSnapshot document) {
 
@@ -44,7 +44,7 @@ public class MapPOI {
      *
      * @param longitude  the longitude
      * @param latitude  the latitude
-     * @param DocumentSnapshot  the document snapshot
+     * @param document  the document snapshot
      */
     public MapPOI(double longitude, double latitude, @NonNull DocumentSnapshot document) {
 
