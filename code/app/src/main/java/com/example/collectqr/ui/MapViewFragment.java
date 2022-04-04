@@ -126,7 +126,7 @@ public class MapViewFragment extends Fragment {
                             // (hash) as JSON data
                             CircleAnnotationOptions circleAnnotationOptions =
                                     new CircleAnnotationOptions()
-                                            .withData(mapPOI.getDataJson())
+                                            .withData(mapPOI.getJsonData())
                                             .withPoint(mapPOI.getPoint())
                                             .withCircleRadius(8.0)
                                             .withCircleColor("#ee4e8b")
@@ -456,13 +456,15 @@ public class MapViewFragment extends Fragment {
      * @param circleAnnotation
      */
     private void showInfoSheet(@NonNull CircleAnnotation circleAnnotation) {
-        //TODO
-        MapInfoDialogFragment.newInstance(30).show(getParentFragmentManager(), "dialog");
-//        JsonObject data = circleAnnotation.getJsonObjectCopy();
+        JsonObject annotationData = circleAnnotation.getData().getAsJsonObject();
+        String hash = annotationData.get("sha256").getAsString();
+        int intPoints = annotationData.get("points").getAsInt();
 
-//        JsonElement bruh = data.get("Comments");
-        //data.get("Comments");
-//        Log.d("BRUH", data.toString());
+        NavController navController = Navigation.findNavController(requireView());
+        Bundle bundle = new Bundle();
+        bundle.putString("sha", hash);
+        bundle.putInt("points", intPoints);
+        navController.navigate(R.id.navigation_qr_code_details, bundle);
     }
 
 

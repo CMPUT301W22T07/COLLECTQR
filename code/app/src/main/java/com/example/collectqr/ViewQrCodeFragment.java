@@ -163,9 +163,13 @@ public class ViewQrCodeFragment extends Fragment {
                             for (QueryDocumentSnapshot document : task.getResult()) {
                                 Log.d(TAG, document.getId() + " => " + document.getData());
                                 for (int i=0; i<scannedByData.size(); i++) {
-                                    if (scannedByData.get(i).getUser().equals(document.getId())) {
-                                        scannedByData.get(i).setComment(document.getString(document.getId()));
-                                        commentsData.add(scannedByData.get(i));
+                                    try {
+                                        if (scannedByData.get(i).getUser().equals(document.getId())) {
+                                            scannedByData.get(i).setComment(document.getString(document.getId()));
+                                            commentsData.add(scannedByData.get(i));
+                                        }
+                                    } catch (Exception e) {
+                                        Log.e(TAG,e.toString());
                                     }
                                 }
                             }
