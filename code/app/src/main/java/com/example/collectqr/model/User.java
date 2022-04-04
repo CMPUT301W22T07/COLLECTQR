@@ -24,55 +24,6 @@ public class User {
     private boolean scan_100_points;
     private boolean scan_300_points;
 
-    public boolean isScan_1_code() {
-        return scan_1_code;
-    }
-
-    public void setScan_1_code(boolean scan_1_code) {
-        this.scan_1_code = scan_1_code;
-    }
-
-    public boolean isScan_10_codes() {
-        return scan_10_codes;
-    }
-
-    public void setScan_10_codes(boolean scan_10_codes) {
-        this.scan_10_codes = scan_10_codes;
-    }
-
-    public boolean isScan_50_codes() {
-        return scan_50_codes;
-    }
-
-    public void setScan_50_codes(boolean scan_50_codes) {
-        this.scan_50_codes = scan_50_codes;
-    }
-
-    public boolean isScan_10_points() {
-        return scan_10_points;
-    }
-
-    public void setScan_10_points(boolean scan_10_points) {
-        this.scan_10_points = scan_10_points;
-    }
-
-    public boolean isScan_100_points() {
-        return scan_100_points;
-    }
-
-    public void setScan_100_points(boolean scan_100_points) {
-        this.scan_100_points = scan_100_points;
-    }
-
-    public boolean isScan_300_points() {
-        return scan_300_points;
-    }
-
-    public void setScan_300_points(boolean scan_300_points) {
-        this.scan_300_points = scan_300_points;
-    }
-
-
     /**
      *
      * It is a constructor.
@@ -230,5 +181,107 @@ public class User {
         stats.replace("num_codes", num_codes);
         stats.replace("total_points", total_points);
         stats.replace("best_code", best_code);
+    }
+
+    /**
+     * Returns whether the user has the scan_1_code achievement or not
+     *
+     * @return  whether the user has the achievement or not
+     */
+    public boolean isScan_1_code() {
+        return scan_1_code;
+    }
+
+    /**
+     * Sets whether the user has the scan_1_code achievement or not
+     *
+     */
+    public void setScan_1_code(boolean scan_1_code) {
+        this.scan_1_code = scan_1_code;
+    }
+
+    /**
+     * Returns whether the user has the scan_10_codes achievement or not
+     *
+     * @return  whether the user has the achievement or not
+     */
+    public boolean isScan_10_codes() {
+        return scan_10_codes;
+    }
+
+    /**
+     * Sets whether the user has the scan_10_codes achievement or not
+     *
+     */
+    public void setScan_10_codes(boolean scan_10_codes) {
+        this.scan_10_codes = scan_10_codes;
+    }
+
+    /**
+     * Returns whether the user has the scan_50_codes achievement or not
+     *
+     * @return  whether the user has the achievement or not
+     */
+    public boolean isScan_50_codes() {
+        return scan_50_codes;
+    }
+
+    /**
+     * Sets whether the user has the scan_50_codes achievement or not
+     *
+     */
+    public void setScan_50_codes(boolean scan_50_codes) {
+        this.scan_50_codes = scan_50_codes;
+    }
+
+    /**
+     * Returns whether the user has the scan_10_points achievement or not
+     *
+     * @return  whether the user has the achievement or not
+     */
+    public boolean isScan_10_points() {
+        return scan_10_points;
+    }
+
+    /**
+     * Sets whether the user has the scan_10_points achievement or not
+     *
+     */
+    public void setScan_10_points(boolean scan_10_points) {
+        this.scan_10_points = scan_10_points;
+    }
+
+    /**
+     * Returns whether the user has the scan_100_points achievement or not
+     *
+     * @return  whether the user has the achievement or not
+     */
+    public boolean isScan_100_points() {
+        return scan_100_points;
+    }
+
+    /**
+     * Sets whether the user has the scan_100_points achievement or not
+     *
+     */
+    public void setScan_100_points(boolean scan_100_points) {
+        this.scan_100_points = scan_100_points;
+    }
+
+    /**
+     * Returns whether the user has the scan_300_points achievement or not
+     *
+     * @return  whether the user has the achievement or not
+     */
+    public boolean isScan_300_points() {
+        return scan_300_points;
+    }
+
+    /**
+     * Sets whether the user has the scan_300_points achievement or not
+     *
+     */
+    public void setScan_300_points(boolean scan_300_points) {
+        this.scan_300_points = scan_300_points;
     }
 }
