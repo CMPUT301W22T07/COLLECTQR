@@ -40,7 +40,7 @@ public class MapViewViewModel extends AndroidViewModel {
      */
 
     // Constants
-    public final Double MAX_RADIUS = 5000.0;    // 50KM search radius max
+    public final Double MAX_RADIUS = 50000.0;    // 500KM search radius max
     public final String COLLECTION = "QRCodes"; // Collection to query
     public final String ORDERING = "geohash";   // How to order the documents
     public final String LOGGER_TAG = "MapViewController";
