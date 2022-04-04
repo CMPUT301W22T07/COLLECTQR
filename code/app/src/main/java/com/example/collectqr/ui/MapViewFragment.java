@@ -136,6 +136,7 @@ public class MapViewFragment extends Fragment {
                             circleAnnotationManager.create(circleAnnotationOptions);
                         }
                         Log.d(TAG, "Points drawn ");
+                        mViewModel.dataLoaded = true;           // TODO: use setter
                         return;
                     }
 
@@ -399,9 +400,52 @@ public class MapViewFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         mViewModel = new ViewModelProvider(this).get(MapViewViewModel.class);
+        if (mViewModel.dataLoaded) {
+            addMapMarkers(mViewModel.getPOIList(), true);
+        }
         setButtonsActions();
     }
 
+    protected void addMapMarkers(@NonNull List<MapPOI> POIList, Boolean forceRedraw) {
+
+        if (forceRedraw) {
+            AnnotationPlugin annotationPlugin = mapView.getPlugin(Plugin.MAPBOX_ANNOTATION_PLUGIN_ID);
+            assert annotationPlugin != null;
+            CircleAnnotationManager circleAnnotationManager =
+                    (CircleAnnotationManager) annotationPlugin.createAnnotationManager(
+                            AnnotationType.CircleAnnotation,
+                            new AnnotationConfig()
+                    );
+
+            List<CircleAnnotation> circleAnnotations = circleAnnotationManager.getAnnotations();
+            circleAnnotationManager.addClickListener(poiClickListener);
+
+            for (MapPOI mapPOI : POIList) {
+                // Converting a map point's qr code hash to json
+                // https://stackoverflow.com/a/12155874 by Ankur
+                Map<String, String> dataMap = new HashMap<>();
+                dataMap.put("sha256", mapPOI.getHash());
+
+                // Parsing json
+                // https://howtodoinjava.com/gson/gson-jsonparser/
+                JsonElement dataJson = new Gson().toJsonTree(dataMap);
+
+
+                // Create the annotation to display on the map and include the arbitrary data
+                // (hash) as JSON data
+                CircleAnnotationOptions circleAnnotationOptions =
+                        new CircleAnnotationOptions()
+                                .withData(dataJson)
+                                .withPoint(mapPOI.getPoint())
+                                .withCircleRadius(8.0)
+                                .withCircleColor("#ee4e8b")
+                                .withCircleStrokeWidth(2.0)
+                                .withCircleStrokeColor("#ffffff");
+
+                circleAnnotationManager.create(circleAnnotationOptions);
+            }
+        }
+    }
 
     protected void addMapMarkers(@NonNull List<MapPOI> POIList) {
 

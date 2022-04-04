@@ -66,12 +66,6 @@ public class MapPOI {
             Log.e(LOGGING_TAG, e.toString());
             this.intPoints = 0;
         }
-//        String strPoints = document.getString(POINTS_FIELD);
-//
-//        // Don't convert if the field is null
-//        if (strPoints != null) {
-//            this.intPoints = Integer.parseInt(strPoints);
-//        }
 
         Map<String, String> dataMap = new HashMap<>();
         dataMap.put(HASH_FIELD, this.hash);
