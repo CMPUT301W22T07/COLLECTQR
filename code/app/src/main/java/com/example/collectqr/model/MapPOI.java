@@ -59,7 +59,7 @@ public class MapPOI {
 
         this.point = Point.fromLngLat(longitude, latitude);
         this.document = document;
-        this.hash = document.getString(HASH_FIELD);
+        this.hash = document.getId();
         try {
             this.intPoints = document.getLong(POINTS_FIELD).intValue();
         } catch (Exception e) {
