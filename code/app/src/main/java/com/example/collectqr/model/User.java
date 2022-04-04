@@ -16,12 +16,73 @@ public class User {
     private ArrayList<String> devices;
     private HashMap<String, Integer> stats;
     private final HashMap<String, HashMap<String, Object>> codes_scanned; //sha : date scanned
+    //achievements
+    private boolean scan_1_code;
+    private boolean scan_10_codes;
+    private boolean scan_50_codes;
+    private boolean scan_10_points;
+    private boolean scan_100_points;
+    private boolean scan_300_points;
+
+    public boolean isScan_1_code() {
+        return scan_1_code;
+    }
+
+    public void setScan_1_code(boolean scan_1_code) {
+        this.scan_1_code = scan_1_code;
+    }
+
+    public boolean isScan_10_codes() {
+        return scan_10_codes;
+    }
+
+    public void setScan_10_codes(boolean scan_10_codes) {
+        this.scan_10_codes = scan_10_codes;
+    }
+
+    public boolean isScan_50_codes() {
+        return scan_50_codes;
+    }
+
+    public void setScan_50_codes(boolean scan_50_codes) {
+        this.scan_50_codes = scan_50_codes;
+    }
+
+    public boolean isScan_10_points() {
+        return scan_10_points;
+    }
+
+    public void setScan_10_points(boolean scan_10_points) {
+        this.scan_10_points = scan_10_points;
+    }
+
+    public boolean isScan_100_points() {
+        return scan_100_points;
+    }
+
+    public void setScan_100_points(boolean scan_100_points) {
+        this.scan_100_points = scan_100_points;
+    }
+
+    public boolean isScan_300_points() {
+        return scan_300_points;
+    }
+
+    public void setScan_300_points(boolean scan_300_points) {
+        this.scan_300_points = scan_300_points;
+    }
 
     public User(String username) {
         this.username = username;
         this.email = "";
         this.phone = "";
         this.devices = new ArrayList<>();
+        this.scan_1_code=false;
+        this.scan_10_codes=false;
+        this.scan_50_codes=false;
+        this.scan_10_points=false;
+        this.scan_100_points=false;
+        this.scan_300_points=false;
 
         HashMap<String, Integer> stats = new HashMap<>();
         stats.put("num_codes", 0);
