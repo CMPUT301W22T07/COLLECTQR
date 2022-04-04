@@ -421,21 +421,11 @@ public class MapViewFragment extends Fragment {
             circleAnnotationManager.addClickListener(poiClickListener);
 
             for (MapPOI mapPOI : POIList) {
-                // Converting a map point's qr code hash to json
-                // https://stackoverflow.com/a/12155874 by Ankur
-                Map<String, String> dataMap = new HashMap<>();
-                dataMap.put("sha256", mapPOI.getHash());
-
-                // Parsing json
-                // https://howtodoinjava.com/gson/gson-jsonparser/
-                JsonElement dataJson = new Gson().toJsonTree(dataMap);
-
-
                 // Create the annotation to display on the map and include the arbitrary data
                 // (hash) as JSON data
                 CircleAnnotationOptions circleAnnotationOptions =
                         new CircleAnnotationOptions()
-                                .withData(dataJson)
+                                .withData(mapPOI.getJsonData())
                                 .withPoint(mapPOI.getPoint())
                                 .withCircleRadius(8.0)
                                 .withCircleColor("#ee4e8b")
@@ -446,6 +436,7 @@ public class MapViewFragment extends Fragment {
             }
         }
     }
+
 
     protected void addMapMarkers(@NonNull List<MapPOI> POIList) {
 
