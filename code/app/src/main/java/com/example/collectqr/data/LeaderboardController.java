@@ -155,17 +155,23 @@ public class LeaderboardController {
         });
     }
 
+    /**
+     * gets a users best code points in a region from the db
+     * @param scannedCodesCollection
+     * @param name
+     * @return best (int of best scoring code in the region)
+     */
     private int getRegionBest(@NonNull CollectionReference scannedCodesCollection, String name){
         AtomicInteger best = new AtomicInteger();
         scannedCodesCollection.addSnapshotListener((value, error) -> {
             assert value != null;
-            for (QueryDocumentSnapshot d : value) {
+            for (QueryDocumentSnapshot codeDoc : value) {
                 Log.d("REGIONBESTQUERY", "Getting scanned codes by: " + name);
-                if (d.get("points") != null){
+                if (codeDoc.getData().get("points") != null){
                     //&& d.get("geohash") != null) {
 
-                    int points = Integer.parseInt(String.valueOf(d.getData().get("points")));
-                    //String geohash = d.get("geohash").toString();
+                    int points = Integer.parseInt(String.valueOf(codeDoc.getData().get("points")));
+                    //String geohash = codeDoc.get("geohash").toString();
 
                     if (points >= best.get()){
                             //&& (geohash == region)) {
