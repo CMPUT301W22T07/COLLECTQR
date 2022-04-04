@@ -30,14 +30,15 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class LeaderboardController {
     private String username;
     private FirebaseFirestore db;
-    private String currentCategory="most_points";
+    private String currentCategory = "most_points";
+    private int userRegionBest;
 
     /**
      * saves instance of Firestore and current user's username
      *
      * @param username of the current user
      */
-    public LeaderboardController(String username){
+    public LeaderboardController(String username) {
 
         this.username = username;
         db = FirebaseFirestore.getInstance();
@@ -46,10 +47,9 @@ public class LeaderboardController {
 
 
     /**
-     *
      * Sets the current category
      *
-     * @param category  the category
+     * @param category the category
      */
     public void setCurrentCategory(String category) {
 
@@ -61,33 +61,18 @@ public class LeaderboardController {
      * Downloads the data into the ArrayList sorts it and notifies the adapter
      * Updates the views that represent the current users rank and points based on the updates in the data
      *
-     * @param dataLists
-     *      this is a map of lists
-     * @param adapters
-     *      this is a map of adapters
-     * @param score
-     *      this is the view that will display the user's score
-     * @param rank
-     *      this is the view that will display the user's rank
+     * @param dataLists this is a map of lists
+     * @param adapters  this is a map of adapters
+     * @param score     this is the view that will display the user's score
+     * @param rank      this is the view that will display the user's rank
      */
     public void downloadData(ArrayMap<String, ArrayList<User>> dataLists, ArrayMap<String, LeaderboardRecyclerAdapter> adapters, TextView score, TextView rank) {
-
         LeaderboardController controller = this;
         db.collection("Users")
                 .addSnapshotListener(new EventListener<QuerySnapshot>() {
                     @Override
-
-
-/**
- *
- * On event
- *
- * @param QuerySnapshot  the query snapshot
- * @param FirebaseFirestoreException  the firebase firestore exception
- */
                     public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable
                             FirebaseFirestoreException error) {
-
                         dataLists.get("most_points").clear();
                         dataLists.get("most_codes").clear();
                         dataLists.get("best_code").clear();
@@ -101,8 +86,12 @@ public class LeaderboardController {
                             int bestCode = Integer.parseInt(String.valueOf(doc.getData().get("best_code")));
 
                             // get best code from region
+                            userRegionBest = 0;
                             CollectionReference scannedCodesCollection = doc.getReference().collection("ScannedCodes");
-                            int regionBest = getRegionBest(scannedCodesCollection, name);
+                            getRegionBest(scannedCodesCollection, name);
+                            int regionBest = userRegionBest;
+                            System.out.println(regionBest);
+
 
                             User userObj = new User(name);
                             userObj.updateScore(numCodes, totalPoints, bestCode, regionBest);
@@ -113,24 +102,24 @@ public class LeaderboardController {
                         }
                         controller.sortLists(dataLists);
 
-                        for (int i=0; i<dataLists.get(currentCategory).size(); i++) {
+                        for (int i = 0; i < dataLists.get(currentCategory).size(); i++) {
                             User item = dataLists.get(currentCategory).get(i);
                             if (item.getUsername().equals(username)) {
                                 if (currentCategory.equals("most_points")) {
                                     score.setText(item.getStats().get("total_points") + " points");
-                                    String rankStr = Integer.toString(i+1);
+                                    String rankStr = Integer.toString(i + 1);
                                     rank.setText("#" + rankStr);
                                 } else if (currentCategory.equals("most_codes")) {
                                     score.setText(item.getStats().get("num_codes") + " codes");
-                                    String rankStr = Integer.toString(i+1);
+                                    String rankStr = Integer.toString(i + 1);
                                     rank.setText("#" + rankStr);
                                 } else if (currentCategory.equals("best_code")) {
                                     score.setText(item.getStats().get("best_code") + " points");
-                                    String rankStr = Integer.toString(i+1);
+                                    String rankStr = Integer.toString(i + 1);
                                     rank.setText("#" + rankStr);
                                 } else if (currentCategory.equals("region_best")) {
                                     score.setText(item.getStats().get("region_best") + " points");
-                                    String rankStr = Integer.toString(i+1);
+                                    String rankStr = Integer.toString(i + 1);
                                     rank.setText("#" + rankStr);
                                 }
                             }
@@ -145,93 +134,91 @@ public class LeaderboardController {
 
     /**
      * Sorts the arrays used in the leaderboard by their category
-     * @param dataLists
-     *      this is a map of lists to be sorted
+     *
+     * @param dataLists this is a map of lists to be sorted
      */
     private void sortLists(ArrayMap<String, ArrayList<User>> dataLists) {
 
         dataLists.get("most_points").sort(new Comparator<User>() {
             @Override
 
-/**
- *
- * Compare
- *
- * @param user  the user
- * @param t1  the t1
- * @return int
- */
+            /**
+             *
+             * Compare
+             *
+             * @param user  the user
+             * @param t1  the t1
+             * @return int
+             */
             public int compare(User user, User t1) {
 
-                return t1.getStats().get("total_points")-user.getStats().get("total_points");
+                return t1.getStats().get("total_points") - user.getStats().get("total_points");
             }
         });
         dataLists.get("most_codes").sort(new Comparator<User>() {
             @Override
 
-/**
- *
- * Compare
- *
- * @param user  the user
- * @param t1  the t1
- * @return int
- */
+            /**
+             *
+             * Compare
+             *
+             * @param user  the user
+             * @param t1  the t1
+             * @return int
+             */
             public int compare(User user, User t1) {
 
-                return t1.getStats().get("num_codes")-user.getStats().get("num_codes");
+                return t1.getStats().get("num_codes") - user.getStats().get("num_codes");
             }
         });
         dataLists.get("best_code").sort(new Comparator<User>() {
             @Override
 
-/**
- *
- * Compare
- *
- * @param user  the user
- * @param t1  the t1
- * @return int
- */
+            /**
+             *
+             * Compare
+             *
+             * @param user  the user
+             * @param t1  the t1
+             * @return int
+             */
             public int compare(User user, User t1) {
 
-                return t1.getStats().get("best_code")-user.getStats().get("best_code");
+                return t1.getStats().get("best_code") - user.getStats().get("best_code");
             }
         });
         dataLists.get("region_best").sort(new Comparator<User>() {
             @Override
-            public int compare(User user, User t1){
-                return t1.getStats().get("region_best")-user.getStats().get("region_best");
+            public int compare(User user, User t1) {
+                return t1.getStats().get("region_best") - user.getStats().get("region_best");
             }
         });
     }
 
+
     /**
      * gets a users best code points in a region from the db
+     *
      * @param scannedCodesCollection
      * @param name
      * @return best (int of best scoring code in the region)
      */
-    private int getRegionBest(@NonNull CollectionReference scannedCodesCollection, String name){
-        AtomicInteger best = new AtomicInteger();
+    private void getRegionBest(@NonNull CollectionReference scannedCodesCollection, String name) {
         scannedCodesCollection.addSnapshotListener((value, error) -> {
+            userRegionBest = 0;
             assert value != null;
             for (QueryDocumentSnapshot codeDoc : value) {
-                Log.d("REGIONBESTQUERY", "Getting scanned codes by: " + name);
-                if (codeDoc.getData().get("points") != null){
-                    //&& d.get("geohash") != null) {
-
+                Log.d("REGIONBESTQUERY", "Getting scanned codes by: " + name + " " +
+                        codeDoc.getId() + " " + String.valueOf(codeDoc.get("points")) +
+                        " best: " + String.valueOf(userRegionBest));
+                if (codeDoc.getData().get("points") != null) {
                     int points = Integer.parseInt(String.valueOf(codeDoc.getData().get("points")));
-                    //String geohash = codeDoc.get("geohash").toString();
-
-                    if (points >= best.get()){
-                            //&& (geohash == region)) {
-                        best.set(points);
+                    if (points >= userRegionBest) {
+                        userRegionBest = points;
                     }
-
                 }
             }
         });
-        return best.get();
     }
 }
+
