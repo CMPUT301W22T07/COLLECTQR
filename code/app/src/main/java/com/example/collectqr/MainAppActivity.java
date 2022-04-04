@@ -260,6 +260,10 @@ public class MainAppActivity extends AppCompatActivity {
                     appBarMenu.findItem(R.id.sort_history).setVisible(false);
                     appBarMenu.findItem(R.id.user_search).setVisible(true);
                     return;
+                default:
+                    appBarMenu.findItem(R.id.user_profile).setVisible(false);
+                    appBarMenu.findItem(R.id.sort_history).setVisible(false);
+                    appBarMenu.findItem(R.id.user_search).setVisible(false);
             }
         }
         return;
