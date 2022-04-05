@@ -133,12 +133,10 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.ViewHold
         return new ViewHolder(view, this.listener);
     }
 
-
-
     /**
      * Replace the contents of a view (invoked by the layout manager)
-     * @param viewHolder  the view holder
-     * @param int  the int
+     * @param viewHolder
+     * @param position
      */
     @Override
     public void onBindViewHolder(ViewHolder viewHolder, final int position) {
