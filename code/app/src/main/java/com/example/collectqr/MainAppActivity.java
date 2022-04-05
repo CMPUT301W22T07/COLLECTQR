@@ -5,8 +5,6 @@ import static android.content.ContentValues.TAG;
 import android.annotation.SuppressLint;
 import android.app.ActivityManager;
 import android.content.Context;
-import android.app.SearchManager;
-import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.provider.Settings;
@@ -14,24 +12,18 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.SearchView;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.splashscreen.SplashScreen;
 import androidx.navigation.NavController;
 import androidx.navigation.NavDestination;
 import androidx.navigation.Navigation;
-import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
 
-import com.example.collectqr.data.UserController;
 import com.example.collectqr.databinding.ActivityAppBinding;
-import com.example.collectqr.model.User;
-import com.example.collectqr.ui.HistoryFragment;
 import com.example.collectqr.ui.ProfileDialogFragment;
 import com.example.collectqr.utilities.Preferences;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -74,19 +66,19 @@ public class MainAppActivity extends AppCompatActivity {
         https://developer.android.com/training/appbar/setting-up#add-toolbar
         https://stackoverflow.com/a/42837106
         StackOverflow, Author tahsinRupam
+        https://stackoverflow.com/a/46928058
+        StackOverflow, Author: iman hoshmand
         */
-        toolbar = (Toolbar) findViewById(R.id.topAppBar);
+        toolbar = findViewById(R.id.topAppBar);
         setSupportActionBar(toolbar);
+        toolbar.setNavigationOnClickListener(view -> onBackPressed());
         setUpProfileButton();
 
         /* Bottom Navigation Boilerplate from Android Studio
            Supplementary source: https://developer.android.com/guide/navigation/navigation-ui#java
          */
-        //AppBarConfiguration appBarConfiguration = new AppBarConfiguration.Builder(
-        //        R.id.navigation_leaderboard, R.id.navigation_map, R.id.navigation_history).build();
         NavController navController =
                 Navigation.findNavController(this, R.id.nav_host_fragment_container_main);
-        //NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
         NavigationUI.setupWithNavController(binding.bottomnavContainer, navController);
 
         /*
@@ -95,17 +87,7 @@ public class MainAppActivity extends AppCompatActivity {
          */
         navController.addOnDestinationChangedListener(new NavController.OnDestinationChangedListener() {
             @Override
-
-/**
- *
- * On destination changed
- *
- * @param NavController  the nav controller
- * @param NavDestination  the nav destination
- * @param Bundle  the bundle
- */
             public void onDestinationChanged(@NonNull NavController navController, @NonNull NavDestination navDestination, @Nullable Bundle bundle) {
-
                 matchTopBar(navDestination.getId());
             }
         });
@@ -117,16 +99,7 @@ public class MainAppActivity extends AppCompatActivity {
     https://youtu.be/CRmfdVYWOhc
      */
     @Override
-
-/**
- *
- * On create options menu
- *
- * @param menu  the menu
- * @return boolean
- */
     public boolean onCreateOptionsMenu(Menu menu) {
-
         appBarMenu = menu;
         getMenuInflater().inflate(R.menu.top_app_bar, menu);
         return true;
@@ -150,13 +123,6 @@ public class MainAppActivity extends AppCompatActivity {
                 .get()
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                     @Override
-
-/**
- *
- * On complete
- *
- * @param Task<QuerySnapshot>  the task< query snapshot>
- */
                     public void onComplete(@NonNull Task<QuerySnapshot> task) {
 
                         if (task.isSuccessful()) {
@@ -246,6 +212,7 @@ public class MainAppActivity extends AppCompatActivity {
                     appBarMenu.findItem(R.id.user_search).setVisible(false);
                     appBarMenu.findItem(R.id.sort_history).setVisible(false);
                     appBarMenu.findItem(R.id.user_profile).setVisible(true);
+                    getSupportActionBar().setDisplayHomeAsUpEnabled(false);
                     setUpProfileButton();
                     return;
 
@@ -253,20 +220,22 @@ public class MainAppActivity extends AppCompatActivity {
                     appBarMenu.findItem(R.id.user_search).setVisible(false);
                     appBarMenu.findItem(R.id.user_profile).setVisible(false);
                     appBarMenu.findItem(R.id.sort_history).setVisible(true);
+                    getSupportActionBar().setDisplayHomeAsUpEnabled(false);
                     return;
 
                 case R.id.navigation_leaderboard:
                     appBarMenu.findItem(R.id.user_profile).setVisible(false);
                     appBarMenu.findItem(R.id.sort_history).setVisible(false);
                     appBarMenu.findItem(R.id.user_search).setVisible(true);
+                    getSupportActionBar().setDisplayHomeAsUpEnabled(false);
                     return;
                 default:
                     appBarMenu.findItem(R.id.user_profile).setVisible(false);
                     appBarMenu.findItem(R.id.sort_history).setVisible(false);
                     appBarMenu.findItem(R.id.user_search).setVisible(false);
+                    getSupportActionBar().setDisplayHomeAsUpEnabled(true);
             }
         }
-        return;
     }
 
 
@@ -284,16 +253,7 @@ public class MainAppActivity extends AppCompatActivity {
          */
         toolbar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
             @Override
-
-/**
- *
- * On menu item click
- *
- * @param item  the item
- * @return boolean
- */
             public boolean onMenuItemClick(MenuItem item) {
-
                 new ProfileDialogFragment().show(getSupportFragmentManager(), "DISPLAY_PROFILE");
                 return true;
             }
