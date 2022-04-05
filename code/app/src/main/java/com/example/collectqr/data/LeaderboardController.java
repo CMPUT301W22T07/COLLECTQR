@@ -43,15 +43,20 @@ public class LeaderboardController {
 
     }
 
-
     /**
+     * Returns the current category
      *
+     * @return String  current category
+     */
+    public String getCurrentCategory() {
+        return this.currentCategory;
+    }
+    /**
      * Sets the current category
      *
      * @param category  the category
      */
     public void setCurrentCategory(String category) {
-
         this.currentCategory = category;
     }
     /**
@@ -74,15 +79,6 @@ public class LeaderboardController {
         db.collection("Users")
                 .addSnapshotListener(new EventListener<QuerySnapshot>() {
                     @Override
-
-
-/**
- *
- * On event
- *
- * @param QuerySnapshot  the query snapshot
- * @param FirebaseFirestoreException  the firebase firestore exception
- */
                     public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable
                             FirebaseFirestoreException error) {
 
@@ -135,15 +131,6 @@ public class LeaderboardController {
 
         dataLists.get("most_points").sort(new Comparator<User>() {
             @Override
-
-/**
- *
- * Compare
- *
- * @param user  the user
- * @param t1  the t1
- * @return int
- */
             public int compare(User user, User t1) {
 
                 return t1.getStats().get("total_points")-user.getStats().get("total_points");
@@ -151,15 +138,6 @@ public class LeaderboardController {
         });
         dataLists.get("most_codes").sort(new Comparator<User>() {
             @Override
-
-/**
- *
- * Compare
- *
- * @param user  the user
- * @param t1  the t1
- * @return int
- */
             public int compare(User user, User t1) {
 
                 return t1.getStats().get("num_codes")-user.getStats().get("num_codes");
@@ -167,17 +145,7 @@ public class LeaderboardController {
         });
         dataLists.get("best_code").sort(new Comparator<User>() {
             @Override
-
-/**
- *
- * Compare
- *
- * @param user  the user
- * @param t1  the t1
- * @return int
- */
             public int compare(User user, User t1) {
-
                 return t1.getStats().get("best_code")-user.getStats().get("best_code");
             }
         });
