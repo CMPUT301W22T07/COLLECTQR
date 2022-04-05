@@ -4,12 +4,14 @@ import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.navigation.NavController;
+import androidx.navigation.Navigation;
 
 
 /**
  * The class Dummy activity extends application compat activity
  */
-public class DummyActivity extends AppCompatActivity {
+public class RedirectActivity extends AppCompatActivity {
 
     private String data;
 
