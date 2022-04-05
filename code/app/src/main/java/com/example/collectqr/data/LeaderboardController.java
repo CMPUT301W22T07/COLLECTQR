@@ -2,13 +2,19 @@ package com.example.collectqr.data;
 
 import static android.content.ContentValues.TAG;
 
+import android.Manifest;
+import android.content.Context;
+import android.content.pm.PackageManager;
 import android.graphics.Region;
+import android.location.Location;
+import android.location.LocationManager;
 import android.util.ArrayMap;
 import android.util.Log;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.app.ActivityCompat;
 
 import com.example.collectqr.adapters.LeaderboardRecyclerAdapter;
 import com.example.collectqr.model.User;
@@ -35,6 +41,7 @@ public class LeaderboardController {
     private FirebaseFirestore db;
     private String currentCategory = "most_points";
     private int userRegionBest;
+    protected LocationManager locationManager;
 
     /**
      * saves instance of Firestore and current user's username
@@ -69,7 +76,7 @@ public class LeaderboardController {
      * @param score     this is the view that will display the user's score
      * @param rank      this is the view that will display the user's rank
      */
-    public void downloadData(ArrayMap<String, ArrayList<User>> dataLists, ArrayMap<String, LeaderboardRecyclerAdapter> adapters, TextView score, TextView rank) {
+    public void downloadData(ArrayMap<String, ArrayList<User>> dataLists, ArrayMap<String, LeaderboardRecyclerAdapter> adapters, TextView score, TextView rank, int userLat, int userLon) {
         LeaderboardController controller = this;
         db.collection("Users")
                 .addSnapshotListener(new EventListener<QuerySnapshot>() {
@@ -89,17 +96,14 @@ public class LeaderboardController {
                             int numCodes = Integer.parseInt(String.valueOf(doc.getData().get("num_codes")));
                             int bestCode = Integer.parseInt(String.valueOf(doc.getData().get("best_code")));
 
-                            // get best code from region
-                            // setup futuretask to wait for asynchronous query of getRegionBest
-                            int regionBest;
                             userRegionBest = 0;
                             CollectionReference scannedCodesCollection = doc.getReference().collection("ScannedCodes");
 
-                            getRegionBruh(scannedCodesCollection, userRegionBruh -> {
+                            getRegionBest(scannedCodesCollection, userLat, userLon, userRegionBest -> {
                                 User userObj = new User(name);
-                                System.out.println("adding user object with stats: numCodes-" + numCodes +
-                                        " totalPoints-" + totalPoints + " bestCode-" + bestCode + " regionBest-" + userRegionBruh);
-                                userObj.updateScore(numCodes, totalPoints, bestCode, userRegionBruh);
+                                System.out.println("adding user object with stats: username- " + name + " numCodes-" + numCodes +
+                                        " totalPoints-" + totalPoints + " bestCode-" + bestCode + " regionBest-" + userRegionBest);
+                                userObj.updateScore(numCodes, totalPoints, bestCode, userRegionBest);
                                 dataLists.get("most_points").add(userObj);
                                 dataLists.get("most_codes").add(userObj);
                                 dataLists.get("best_code").add(userObj);
@@ -209,33 +213,6 @@ public class LeaderboardController {
         });
     }
 
-
-    /**
-     * gets a users best code points in a region from the db
-     *
-     * @param scannedCodesCollection
-     * @param name
-     * @return best (int of best scoring code in the region)
-     */
-    private void getRegionBest(@NonNull CollectionReference scannedCodesCollection, String name) {
-        scannedCodesCollection.addSnapshotListener((value, error) -> {
-            userRegionBest = 0;
-            assert value != null;
-            for (QueryDocumentSnapshot codeDoc : value) {
-                Log.d("REGIONBESTQUERY", "Getting scanned codes by: " + name + " " +
-                        codeDoc.getId() + " " + String.valueOf(codeDoc.get("points")) +
-                        " best: " + String.valueOf(userRegionBest));
-                if (codeDoc.getData().get("points") != null) {
-                    int points = Integer.parseInt(String.valueOf(codeDoc.getData().get("points")));
-                    if (points >= userRegionBest) {
-                        userRegionBest = points;
-                    }
-                }
-            }
-        });
-    }
-
-
     /**
      * Resolving async issues with a callback.
      * https://stackoverflow.com/a/48500679 by Alex Mamo
@@ -243,7 +220,7 @@ public class LeaderboardController {
      * @param scannedCodesCollection
      * @param regionBestCallback
      */
-    private void getRegionBruh(@NonNull CollectionReference scannedCodesCollection,
+    private void getRegionBest(@NonNull CollectionReference scannedCodesCollection, int userLat, int userLon,
                                RegionBestCallback regionBestCallback) {
         scannedCodesCollection.addSnapshotListener((value, error) -> {
             userRegionBest = 0;
@@ -251,8 +228,20 @@ public class LeaderboardController {
             for (QueryDocumentSnapshot codeDoc : value) {
                 if (codeDoc.getData().get("points") != null) {
                     int points = Integer.parseInt(String.valueOf(codeDoc.getData().get("points")));
-                    if (points >= userRegionBest) {
-                        userRegionBest = points;
+                    String lat = String.valueOf(codeDoc.getData().get("latitude"));
+                    String lon = String.valueOf(codeDoc.getData().get("longitude"));
+
+                    System.out.println("lat: " + lat + " lon: " + lon);
+                    // compare code location with user location
+                    if ((lat != "null") && (lon != "null") && (lat.length() >=1) && (lon.length() >=1)){
+                        if ((Double.parseDouble(lat) <= userLat + 1) && (Double.parseDouble(lat) >= userLat - 1)){
+                            if ((Double.parseDouble(lon) <= userLon + 1) && (Double.parseDouble(lon) >= userLon -1)){
+                                // user is within 1 degree of lat/long from code (about 60km)
+                                if (points >= userRegionBest) {
+                                    userRegionBest = points;
+                                }
+                            }
+                        }
                     }
                 }
             }
@@ -265,3 +254,4 @@ public class LeaderboardController {
 interface RegionBestCallback {
     void onCallback(int userRegionBest);
 }
+
