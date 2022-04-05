@@ -11,6 +11,10 @@
         <entry key="..\:/Users/daryn/AndroidStudioProjects/COLLECTQR/code/app/src/main/res/layout/content.xml" value="0.22826086956521738" />
         <entry key="..\:/Users/daryn/AndroidStudioProjects/COLLECTQR/code/app/src/main/res/layout/history_item.xml" value="0.22826086956521738" />
         <entry key="..\:/Users/daryn/AndroidStudioProjects/COLLECTQR/code/app/src/main/res/layout/history_page_activity.xml" value="0.22826086956521738" />
+        <entry key="app/src/main/res/drawable/achievment_icon.xml" value="0.1955" />
+        <entry key="app/src/main/res/drawable/button_back.xml" value="0.1955" />
+        <entry key="app/src/main/res/drawable/leaderboard_personal_background.xml" value="0.1955" />
+        <entry key="app/src/main/res/drawable/white_rounded_rectangle.xml" value="0.1955" />
         <entry key="app/src/main/res/layout/activity_app.xml" value="0.18297101449275363" />
         <entry key="app/src/main/res/layout/activity_enter_qr_info.xml" value="0.23541666666666666" />
         <entry key="app/src/main/res/layout/activity_generate_qrcode.xml" value="0.25" />
@@ -20,6 +24,7 @@
         <entry key="app/src/main/res/layout/dummy_activity.xml" value="0.18297101449275363" />
         <entry key="app/src/main/res/layout/edit_profile_dialog_fragment.xml" value="0.18297101449275363" />
         <entry key="app/src/main/res/layout/fragment_leaderboard.xml" value="0.1" />
+        <entry key="app/src/main/res/layout/fragment_view_achievements.xml" value="0.25" />
         <entry key="app/src/main/res/layout/fragment_view_qrcode.xml" value="0.23541666666666666" />
         <entry key="app/src/main/res/layout/fragment_view_user_profile.xml" value="0.26183746337890623" />
         <entry key="app/src/main/res/layout/profile_dialog_fragment.xml" value="0.25" />
@@ -36,12 +41,5 @@
   </component>
   <component name="ProjectType">
     <option name="id" value="Android" />
-  </component>
-  <component name="VisualizationToolProject">
-    <option name="state">
-      <ProjectState>
-        <option name="scale" value="0.23541666666666666" />
-      </ProjectState>
-    </option>
   </component>
 </project>
