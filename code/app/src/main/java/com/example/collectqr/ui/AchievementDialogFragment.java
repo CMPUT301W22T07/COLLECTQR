@@ -41,7 +41,8 @@ import java.util.Map;
 // Modified from Lab 3 Instructions - Fragments.pdf
 
 /**
- * The class Edit profile dialog fragment extends dialog fragment
+ * A dialog fragment which displays the user's list of currently held achievements,
+ * accessible from the user's profile
  */
 public class AchievementDialogFragment extends DialogFragment {
     AchievementsAdapter adapter;
@@ -49,23 +50,22 @@ public class AchievementDialogFragment extends DialogFragment {
     @NonNull
     @Override
 
-/**
- *
- * On create dialog
- *
- * @param Bundle  the bundle
- * @return Dialog
- */
+    /**
+    *
+    * On create dialog
+    * @return Dialog
+    */
     public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
-
         super.onCreate(savedInstanceState);
         View rootView = LayoutInflater.from(getActivity()).inflate(R.layout.fragment_view_achievements, null);
 
+        //get access and define importance variables
         String username = Preferences.loadUserName(this.getContext());
         ListView achievementsList = rootView.findViewById(R.id.user_achievements_list);
         ArrayList achievementDataList = new ArrayList<>();
 
 
+        //create and display the dialog fragment
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
 
         AlertDialog dialog = builder
@@ -78,6 +78,7 @@ public class AchievementDialogFragment extends DialogFragment {
         StackOverflow, Author: Mohamed AbdelraZek
         https://stackoverflow.com/a/67540989
          */
+        //set the background to a white rectangle
         dialog.getWindow().setBackgroundDrawable(getResources().getDrawable(R.drawable.white_rounded_rectangle));
 
         /*
