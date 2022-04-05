@@ -2,12 +2,20 @@ package com.example.collectqr.data;
 
 import static android.content.ContentValues.TAG;
 
+import android.Manifest;
+import android.content.Context;
+import android.content.pm.PackageManager;
+import android.graphics.Region;
+import android.location.Location;
+import android.location.LocationManager;
+
 import android.util.ArrayMap;
 import android.util.Log;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.app.ActivityCompat;
 
 import com.example.collectqr.adapters.LeaderboardRecyclerAdapter;
 import com.example.collectqr.model.User;
@@ -29,6 +37,7 @@ public class LeaderboardController {
     private FirebaseFirestore db;
     private String currentCategory = "most_points";
     private int userRegionBest;
+    protected LocationManager locationManager;
 
     /**
      * saves instance of Firestore and current user's username
@@ -69,8 +78,9 @@ public class LeaderboardController {
      * @param score     this is the view that will display the user's score
      * @param rank      this is the view that will display the user's rank
      */
-    public void downloadData(ArrayMap<String, ArrayList<User>> dataLists, ArrayMap<String, LeaderboardRecyclerAdapter> adapters,
-                             TextView score, TextView rank) {
+  
+    public void downloadData(ArrayMap<String, ArrayList<User>> dataLists, ArrayMap<String, LeaderboardRecyclerAdapter> adapters, TextView score, TextView rank, int userLat, int userLon) {
+
         LeaderboardController controller = this;
         db.collection("Users")
                 .addSnapshotListener(new EventListener<QuerySnapshot>() {
@@ -82,6 +92,7 @@ public class LeaderboardController {
                         dataLists.get("most_points").clear();
                         dataLists.get("most_codes").clear();
                         dataLists.get("best_code").clear();
+                        dataLists.get("region_best").clear();
                         for (QueryDocumentSnapshot doc : queryDocumentSnapshots) {
                             Log.d(TAG, String.valueOf(doc.getData().get("username")));
                             String name = String.valueOf(doc.getData().get("username"));
@@ -91,17 +102,13 @@ public class LeaderboardController {
                             int numCodes = Integer.parseInt(String.valueOf(doc.getData().get("num_codes")));
                             int bestCode = Integer.parseInt(String.valueOf(doc.getData().get("best_code")));
 
-                            // get best code from region
-                            // setup futuretask to wait for asynchronous query of getRegionBest
-                            int regionBest;
                             userRegionBest = 0;
                             CollectionReference scannedCodesCollection =
                                     doc.getReference().collection("ScannedCodes");
 
-                            // Get the best code in the region and add to list
-                            getRegionBest(scannedCodesCollection, userRegionBest -> {
+                            getRegionBest(scannedCodesCollection, userLat, userLon, userRegionBest -> {
                                 User userObj = new User(name);
-                                System.out.println("adding user object with stats: numCodes-" + numCodes +
+                                System.out.println("adding user object with stats: username- " + name + " numCodes-" + numCodes +
                                         " totalPoints-" + totalPoints + " bestCode-" + bestCode + " regionBest-" + userRegionBest);
                                 userObj.updateScore(numCodes, totalPoints, bestCode, userRegionBest);
                                 dataLists.get("most_points").add(userObj);
@@ -118,6 +125,7 @@ public class LeaderboardController {
                                 adapters.get("region_best").notifyDataSetChanged();
                             });
                         }
+                        controller.sortLists(dataLists);
                         System.out.println("sorting data lists");
 
                         // display the data in the persistent user card based on the updated lists
@@ -194,7 +202,7 @@ public class LeaderboardController {
      * @param scannedCodesCollection A collection reference of scanned codes in Firestore
      * @param regionBestCallback     The interface to return the query result to once completed
      */
-    private void getRegionBest(@NonNull CollectionReference scannedCodesCollection,
+    private void getRegionBest(@NonNull CollectionReference scannedCodesCollection, int userLat, int userLon,
                                RegionBestCallback regionBestCallback) {
         scannedCodesCollection.addSnapshotListener((value, error) -> {
             userRegionBest = 0;
@@ -202,8 +210,20 @@ public class LeaderboardController {
             for (QueryDocumentSnapshot codeDoc : value) {
                 if (codeDoc.getData().get("points") != null) {
                     int points = Integer.parseInt(String.valueOf(codeDoc.getData().get("points")));
-                    if (points >= userRegionBest) {
-                        userRegionBest = points;
+                    String lat = String.valueOf(codeDoc.getData().get("latitude"));
+                    String lon = String.valueOf(codeDoc.getData().get("longitude"));
+
+                    System.out.println("lat: " + lat + " lon: " + lon);
+                    // compare code location with user location
+                    if ((lat != "null") && (lon != "null") && (lat.length() >=1) && (lon.length() >=1)){
+                        if ((Double.parseDouble(lat) <= userLat + 1) && (Double.parseDouble(lat) >= userLat - 1)){
+                            if ((Double.parseDouble(lon) <= userLon + 1) && (Double.parseDouble(lon) >= userLon -1)){
+                                // user is within 1 degree of lat/long from code (about 60km)
+                                if (points >= userRegionBest) {
+                                    userRegionBest = points;
+                                }
+                            }
+                        }
                     }
                 }
             }
@@ -221,3 +241,4 @@ public class LeaderboardController {
 interface RegionBestCallback {
     void onCallback(int userRegionBest);
 }
+
