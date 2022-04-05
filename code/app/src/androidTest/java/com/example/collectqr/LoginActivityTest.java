@@ -6,7 +6,9 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertTrue;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.provider.Settings;
 import android.util.Log;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -29,10 +31,14 @@ import org.junit.Test;
 
 /**
  * The class Login activity test
+ * @NOTE: This should only be run after you have deleted your own
+ * account from the database, to prevent any logging out/logging in issues
+ * or, ideally, run on a separate device specifically for testing
  */
 public class LoginActivityTest {
     private Solo solo;
     FirebaseFirestore db;
+    private static boolean setupDone = false;
 
     @Rule
     public ActivityTestRule rule = new ActivityTestRule(MainAppActivity.class, true, true);
@@ -76,7 +82,6 @@ public class LoginActivityTest {
     public void checkLoginSuccess() {
 
         solo.assertCurrentActivity("Wrong Activity", MainAppActivity.class);
-        //solo.assertCurrentActivity("Wrong Activity", LoginActivity.class);
         solo.enterText((EditText) solo.getView(R.id.usernameEditText), "111testinguser111");
         solo.clickOnButton("Login");
         solo.sleep(10000); //wait 10 seconds for firebase and sharedpreferences to update
@@ -94,7 +99,6 @@ public class LoginActivityTest {
     public void checkLoginFail() {
 
         solo.assertCurrentActivity("Wrong Activity", MainAppActivity.class);
-        //solo.assertCurrentActivity("Wrong Activity", LoginActivity.class);
         solo.enterText((EditText) solo.getView(R.id.usernameEditText), "GeneralEd");
         solo.clickOnButton("Login");
         solo.sleep(10000); //wait 10 seconds for firebase and sharedpreferences to update
@@ -115,6 +119,7 @@ public class LoginActivityTest {
         solo.assertCurrentActivity("Wrong Activity", MainAppActivity.class);
         //solo.assertCurrentActivity("Wrong Activity", LoginActivity.class);
         solo.clickOnButton("Give me a name!");
+        solo.sleep(1000); //sleep to help with syncing
         TextView textBox = (TextView) solo.getView(R.id.usernameEditText);
         assertFalse("strings not equal", textBox.getText().toString().equals(""));
     }

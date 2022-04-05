@@ -1,7 +1,6 @@
 package com.example.collectqr;
 
 import static android.content.ContentValues.TAG;
-
 import static org.junit.Assert.fail;
 
 import android.util.Log;
@@ -9,7 +8,6 @@ import android.util.Log;
 import androidx.annotation.NonNull;
 
 import com.example.collectqr.data.UserController;
-import com.example.collectqr.model.User;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -19,37 +17,43 @@ import org.junit.Test;
 
 import java.util.concurrent.TimeUnit;
 
-
 /**
- * The class User controller test
+ * Test to check the addAdminUser() function of the UserController.
+ * It has been placed in a separate file from the UserControllerTest, as putting them together
+ * causes asynchronous related testing issues
  */
-public class UserControllerTest {
+public class AddAdminTest {
     FirebaseFirestore db;
 
     @Test
 
 /**
  *
- * Test write to firebase
+ * Test add admin user
  *
  */
-    public void testWriteToFirebase() {
+    public void testAddAdminUser() {
 
-        User testUser = new User("usernamefortesting");
+        String device_id = "fakedeviceid";
         UserController controller = new UserController();
-        controller.writeToFirestore(testUser);
+        controller.addAdminUser(device_id);
+        try {
+            TimeUnit.SECONDS.sleep(10);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
 
         db = FirebaseFirestore.getInstance();
-        db.collection("Users")
-                .whereEqualTo("username", "usernamefortesting")
+        db.collection("Admins")
+                .whereEqualTo("device_id", "fakedeviceid")
                 .get()
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {
                         if (task.getResult().isEmpty()) {
-                            //user doesn't exist
+                            //admin doesn't exist
                             fail();
                         } else {
-                            //user exists
+                            //admin exists
                             return;
                         }
                     } else {
@@ -59,19 +63,10 @@ public class UserControllerTest {
     }
 
     @After
-
-/**
- *
- * Tear down
- *
- * @param Exception  the exception
- * @throws   Exception
- */
     public void tearDown() throws Exception {
-
         db = FirebaseFirestore.getInstance();
-        //delete added user
-        db.collection("Users").document("usernamefortesting")
+        //delete added admin
+        db.collection("Admins").document("fakedeviceid")
                 .delete()
                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
@@ -102,4 +97,5 @@ public class UserControllerTest {
                     }
                 });
     }
+
 }
