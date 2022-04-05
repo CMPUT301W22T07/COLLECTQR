@@ -30,6 +30,7 @@ public class UserUnitTest {
         fakeMap.put("num_codes", 0);
         fakeMap.put("total_points", 0);
         fakeMap.put("best_code", 0);
+        fakeMap.put("region_best", 0);
         assert(user.getStats().equals(fakeMap));
         assertEquals(new HashMap<>(), user.getCodes_scanned());
     }
@@ -46,7 +47,7 @@ public class UserUnitTest {
         user.setScan_100_points(true);
         user.setScan_300_points(true);
         user.addDevice("fake_device");
-        user.updateScore(1, 1, 1);
+        user.updateScore(1, 1, 1, 1);
 
         assertEquals("fake_email", user.getEmail());
         assertEquals("fake_phone", user.getPhone());
@@ -61,6 +62,7 @@ public class UserUnitTest {
         fakeMap.put("num_codes", 1);
         fakeMap.put("total_points", 1);
         fakeMap.put("best_code", 1);
+        fakeMap.put("region_best", 1);
         assert(user.getStats().equals(fakeMap));
         assertEquals(new HashMap<>(), user.getCodes_scanned());
     }
