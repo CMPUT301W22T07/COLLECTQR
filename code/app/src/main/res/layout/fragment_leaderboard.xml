@@ -32,6 +32,12 @@
             android:layout_height="wrap_content"
             android:text="Best Code" />
 
+        <com.google.android.material.tabs.TabItem
+            android:id="@+id/leaderboard_tab_region_best"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Regional Best" />
+
 
     </com.google.android.material.tabs.TabLayout>
 

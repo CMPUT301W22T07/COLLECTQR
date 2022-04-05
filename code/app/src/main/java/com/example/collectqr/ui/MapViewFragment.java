@@ -246,28 +246,7 @@ public class MapViewFragment extends Fragment {
                     initLocationComponent();
                     setupGesturesListener();
                 });
-
-        // https://developer.android.com/guide/topics/ui/look-and-feel/darktheme#java
-        // https://stackoverflow.com/a/41451143 by harshithdwivedi
-        int currentTheme = getResources().getConfiguration().uiMode & Configuration.UI_MODE_NIGHT_MASK;
-        switch (currentTheme) {
-            case Configuration.UI_MODE_NIGHT_NO:
-                mapView.getMapboxMap().loadStyleUri(Style.MAPBOX_STREETS,
-                        style -> {
-                            initLocationComponent();
-                            setupGesturesListener();
-                        });
-                break;
-            case Configuration.UI_MODE_NIGHT_YES:
-                mapView.getMapboxMap().loadStyleUri(Style.DARK,
-                        style -> {
-                            initLocationComponent();
-                            setupGesturesListener();
-                        });
-                break;
-        }
     }
-
 
     /**
      * Add a onMoveListener for when the player manually moves the map camera.

@@ -11,6 +11,7 @@ import com.example.collectqr.R;
 import com.example.collectqr.model.User;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 // https://developer.android.com/guide/topics/ui/layout/recyclerview#implement-adapter
 /**
@@ -170,21 +171,23 @@ public class LeaderboardRecyclerAdapter extends RecyclerView.Adapter<Leaderboard
         // contents of the view with that element
         User user = data.get(position);
 
-        // set TextView for each list element
-        TextView userName = viewGroup.findViewById(R.id.username_text);
-        TextView userScore = viewGroup.findViewById(R.id.score_text);
-        TextView userRank = viewGroup.findViewById(R.id.rank_text);
-
         viewHolder.getUserName().setText(user.getUsername());
         if (category.equals("most_points")) {
+            // gets users total points
             viewHolder.getUserScore().setText(user.getStats().get("total_points") + " points");
         } else if (category.equals("most_codes")) {
+            // gets users number of codes scanned
             viewHolder.getUserScore().setText(user.getStats().get("num_codes") + " codes");
         } else if (category.equals("best_code")) {
+            // gets users best single code score
             viewHolder.getUserScore().setText(user.getStats().get("best_code") + " points");
+        } else if (category.equals("region_best")) {
+            // gets users highest scoring code from region
+            viewHolder.getUserScore().setText(user.getStats().get("region_best") + " points");
         }
         // index of user in sorted list plus 1 = rank
-        viewHolder.getUserRank().setText(Integer.toString(data.indexOf(user)+1));
+        String rankStr = Integer.toString(data.indexOf(user)+1);
+        viewHolder.getUserRank().setText("#" + rankStr);
     }
 
     /**
