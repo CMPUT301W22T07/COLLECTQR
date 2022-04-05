@@ -107,13 +107,6 @@ public class QRCodeController {
         DocumentReference docRef = db.collection("Users").document(username).collection("ScannedCodes").document(qrCode.getSha256());
         docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
             @Override
-
-/**
- *
- * On complete
- *
- * @param Task<DocumentSnapshot>  the task< document snapshot>
- */
             public void onComplete(@NonNull Task<DocumentSnapshot> task) {
 
                 if (task.isSuccessful()) {
@@ -128,18 +121,17 @@ public class QRCodeController {
                         data.put("date", qrCode.getDate());
                         data.put("points", qrCode.getPoints());
                         data.put("image", qrCode.getQr_image());
+                        if (qrCode.getLatitude()!=null) {
+                            data.put("geohash", qrCode.getGeoHash());
+                        } else {
+                            data.put("geohash", "");
+                        }
+                        data.put("latitude", qrCode.getLatitudeAsString());
+                        data.put("longitude", qrCode.getLongitudeAsString());
                         userCodeReference.set(data);
                         db.collection("Users").document(username).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
                             @Override
-
-/**
- *
- * On complete
- *
- * @param Task<DocumentSnapshot>  the task< document snapshot>
- */
                             public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-
                                 if (task.isSuccessful()) {
                                     DocumentSnapshot document = task.getResult();
                                     if (document.exists()) {
@@ -203,15 +195,7 @@ public class QRCodeController {
         DocumentReference docRef = db.collection("QRCodes").document(qrCode.getSha256());
         docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
             @Override
-
-/**
- *
- * On complete
- *
- * @param Task<DocumentSnapshot>  the task< document snapshot>
- */
             public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-
                 if (task.isSuccessful()) {
                     DocumentSnapshot document = task.getResult();
                     if (document.exists()) {
@@ -262,13 +246,6 @@ public class QRCodeController {
                 .delete()
                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
-
-/**
- *
- * On success
- *
- * @param aVoid  the a void
- */
                     public void onSuccess(Void aVoid) {
 
                         Log.d(TAG, "DocumentSnapshot successfully deleted!");
@@ -276,29 +253,13 @@ public class QRCodeController {
                 })
                 .addOnFailureListener(new OnFailureListener() {
                     @Override
-
-/**
- *
- * On failure
- *
- * @param Exception  the exception
- */
                     public void onFailure(@NonNull Exception e) {
-
                         Log.w(TAG, "Error deleting document", e);
                     }
                 });
         db.collection("Users").document(username).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
             @Override
-
-/**
- *
- * On complete
- *
- * @param Task<DocumentSnapshot>  the task< document snapshot>
- */
             public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-
                 if (task.isSuccessful()) {
                     DocumentSnapshot document = task.getResult();
                     if (document.exists()) {
