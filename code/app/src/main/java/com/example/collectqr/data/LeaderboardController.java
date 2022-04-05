@@ -2,6 +2,7 @@ package com.example.collectqr.data;
 
 import static android.content.ContentValues.TAG;
 
+import android.graphics.Region;
 import android.util.ArrayMap;
 import android.util.Log;
 import android.widget.TextView;
@@ -89,22 +90,20 @@ public class LeaderboardController {
 
                             // get best code from region
                             // setup futuretask to wait for asynchronous query of getRegionBest
+                            int regionBest;
                             userRegionBest = 0;
                             CollectionReference scannedCodesCollection = doc.getReference().collection("ScannedCodes");
-                            getRegionBest(scannedCodesCollection, name);
-                            System.out.println("Finished getRegionBest Call: " + userRegionBest);
 
-                            int regionBest = userRegionBest;
-                            System.out.println("Region best for " + name + ": " + regionBest);
-
-                            User userObj = new User(name);
-                            System.out.println("adding user object with stats: numCodes-" + numCodes +
-                                    " totalPoints-" + totalPoints + " bestCode-" + bestCode + " regionBest-" + regionBest);
-                            userObj.updateScore(numCodes, totalPoints, bestCode, regionBest);
-                            dataLists.get("most_points").add(userObj);
-                            dataLists.get("most_codes").add(userObj);
-                            dataLists.get("best_code").add(userObj);
-                            dataLists.get("region_best").add(userObj);
+                            getRegionBruh(scannedCodesCollection, userRegionBruh -> {
+                                User userObj = new User(name);
+                                System.out.println("adding user object with stats: numCodes-" + numCodes +
+                                        " totalPoints-" + totalPoints + " bestCode-" + bestCode + " regionBest-" + userRegionBruh);
+                                userObj.updateScore(numCodes, totalPoints, bestCode, userRegionBruh);
+                                dataLists.get("most_points").add(userObj);
+                                dataLists.get("most_codes").add(userObj);
+                                dataLists.get("best_code").add(userObj);
+                                dataLists.get("region_best").add(userObj);
+                            });
                         }
                         System.out.println("sorting data lists");
                         controller.sortLists(dataLists);
@@ -228,5 +227,33 @@ public class LeaderboardController {
             }
         });
     }
+
+
+    /**
+     * Resolving async issues with a callback.
+     * https://stackoverflow.com/a/48500679 by Alex Mamo
+     * @param scannedCodesCollection
+     * @param regionBestCallback
+     */
+    private void getRegionBruh(@NonNull CollectionReference scannedCodesCollection,
+                               RegionBestCallback regionBestCallback) {
+        scannedCodesCollection.addSnapshotListener((value, error) -> {
+            userRegionBest = 0;
+            assert value != null;
+            for (QueryDocumentSnapshot codeDoc : value) {
+                if (codeDoc.getData().get("points") != null) {
+                    int points = Integer.parseInt(String.valueOf(codeDoc.getData().get("points")));
+                    if (points >= userRegionBest) {
+                        userRegionBest = points;
+                    }
+                }
+            }
+            regionBestCallback.onCallback(userRegionBest);
+        });
+
+    }
 }
 
+interface RegionBestCallback {
+    void onCallback(int userRegionBest);
+}
