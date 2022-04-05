@@ -35,31 +35,22 @@ public final class LocationRepository extends LiveData<Location> {
     private final LocationRequest locationRequest;
 
 
-
     /**
-     *
-     * Location repository
-     *
+     * LocationRepository constructor
      * @param context  the context
-     * @return public
      */
     public LocationRepository(Context context) {
-
         int ONE_MINUTE = 60000;
         locationRequest = LocationRequest.create();
         locationRequest.setInterval(ONE_MINUTE);
         locationRequest.setFastestInterval(ONE_MINUTE / 4);
         locationRequest.setPriority(LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY);
-
-
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(context);
     }
 
 
     /**
-     *
      * Location repository
-     *
      * @param context  the context
      * @return LocationRepository
      */
@@ -71,7 +62,6 @@ public final class LocationRepository extends LiveData<Location> {
         return sSoleInstance;
     }
 
-
     @SuppressLint("MissingPermission")
     @Override
     protected void onActive() {
@@ -80,35 +70,21 @@ public final class LocationRepository extends LiveData<Location> {
         startLocationUpdates();
     }
 
-
     @Override
     protected void onInactive() {
         super.onInactive();
         fusedLocationProviderClient.removeLocationUpdates(locationCallback());
     }
 
-
     /**
-     *
      * Location callback
-     *
      * @return LocationCallback
      */
     private LocationCallback locationCallback() {
-
         return new LocationCallback() {
             @Override
-
-/**
- *
- * On location result
- *
- * @param LocationResult  the location result
- */
             public void onLocationResult(@NonNull LocationResult locationResult) {
-
                 super.onLocationResult(locationResult);
-
                 for (Location location : locationResult.getLocations()) {
                     setLocationData(location);
                 }
@@ -116,29 +92,19 @@ public final class LocationRepository extends LiveData<Location> {
         };
     }
 
-
-
     /**
-     *
      * Sets the location data
-     *
      * @param location  the location
      */
     private void setLocationData(Location location) {
-
         setValue(location);
     }
 
-
+    /**
+     * Start location updates
+     */
     @SuppressLint("MissingPermission")
-
-/**
- *
- * Start location updates
- *
- */
     private void startLocationUpdates() {
-
         fusedLocationProviderClient.requestLocationUpdates(locationRequest, locationCallback(), null);
     }
 
