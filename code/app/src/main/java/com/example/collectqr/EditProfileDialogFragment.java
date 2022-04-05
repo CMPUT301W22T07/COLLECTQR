@@ -69,25 +69,11 @@ public class EditProfileDialogFragment extends DialogFragment {
          */
         dialog.setOnShowListener(new DialogInterface.OnShowListener() {
             @Override
-
-/**
- *
- * On show
- *
- * @param dialogInterface  the dialog interface
- */
             public void onShow(DialogInterface dialogInterface) {
 
                 Button button = ((AlertDialog) dialog).getButton(AlertDialog.BUTTON_POSITIVE);
                 button.setOnClickListener(new View.OnClickListener() {
                     @Override
-
-/**
- *
- * On click
- *
- * @param view  the view
- */
                     public void onClick(View view) {
 
                         String email = emailField.getText().toString();

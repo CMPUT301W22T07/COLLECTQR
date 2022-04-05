@@ -1,10 +1,12 @@
 package com.example.collectqr.ui;
 
+
 import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+
 import android.graphics.Color;
 import android.location.Location;
 import android.location.LocationListener;
@@ -15,8 +17,10 @@ import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.appcompat.widget.SearchView;
 import androidx.appcompat.widget.Toolbar;
@@ -27,13 +31,9 @@ import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.collectqr.DummyActivity;
-import com.example.collectqr.GenerateQRCodeActivity;
-import com.example.collectqr.MainAppActivity;
 import com.example.collectqr.R;
 import com.example.collectqr.adapters.LeaderboardRecyclerAdapter;
 import com.example.collectqr.data.LeaderboardController;
-import com.example.collectqr.model.QRCode;
 import com.example.collectqr.utilities.Preferences;
 import com.example.collectqr.model.User;
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -43,6 +43,7 @@ import com.google.android.material.tabs.TabLayout;
 import com.mapbox.android.core.permissions.PermissionsManager;
 
 import java.util.ArrayList;
+import java.util.Locale;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -61,6 +62,7 @@ public class LeaderboardFragment extends Fragment{
     private String mParam2;
 
     private FusedLocationProviderClient fusedLocationClient;
+    private View rootView;
     private LeaderboardController leaderboardController;
     private RecyclerView leaderboardList;
     private String username;
@@ -148,21 +150,21 @@ public class LeaderboardFragment extends Fragment{
         }
 
         // Inflate the layout for this fragment
-        View leaderboardView = inflater.inflate(R.layout.fragment_leaderboard, container, false);
+        rootView = inflater.inflate(R.layout.fragment_leaderboard, container, false);
 
         // gets signed in user's username from shared preferences
-        username = Preferences.loadUserName(leaderboardView.getContext());
+        username = Preferences.loadUserName(rootView.getContext());
         leaderboardController = new LeaderboardController(username);
 
         // save views as variables
-        leaderboardList = leaderboardView.findViewById(R.id.leaderboard_list);
-        personalUsername = leaderboardView.findViewById(R.id.personal_username_text);
-        personalScore = leaderboardView.findViewById(R.id.personal_score_text);
-        personalRank = leaderboardView.findViewById(R.id.personal_rank_text);
-        tabs = leaderboardView.findViewById(R.id.leaderboard_tabs);
+        leaderboardList = rootView.findViewById(R.id.leaderboard_list);
+        personalUsername = rootView.findViewById(R.id.personal_username_text);
+        personalScore = rootView.findViewById(R.id.personal_score_text);
+        personalRank = rootView.findViewById(R.id.personal_rank_text);
+        tabs = rootView.findViewById(R.id.leaderboard_tabs);
 
         //get access to persistent UI element
-        LinearLayout persistentPlayerInfo = leaderboardView.findViewById(R.id.persistent_user_score);
+        LinearLayout persistentPlayerInfo = rootView.findViewById(R.id.persistent_user_score);
 
         dataLists = new ArrayMap<>();
         dataLists.put("most_points", new ArrayList<>());
@@ -193,15 +195,7 @@ public class LeaderboardFragment extends Fragment{
             @Override
             public boolean onMenuItemClick(MenuItem menuItem) {
                 if (menuItem.getItemId()==R.id.user_search) {
-                    /*
-                    SearchView searchView = (SearchView) menuItem.getActionView();
-                    searchView.setOnSearchClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View view) {
-                             scrollToUser(searchView.getQuery().toString());
-                        }
-                    });
-                     */
+                    setUpSearchView(menuItem);
                 }
                 return false;
             }
@@ -220,7 +214,53 @@ public class LeaderboardFragment extends Fragment{
 
         personalUsername.setText(username);
 
-        return leaderboardView;
+        return rootView;
+    }
+
+    private void setUpSearchView(MenuItem searchItem) {
+        SearchView searchView = (SearchView) searchItem.getActionView();
+        /*
+        StackOverflow, Author CoolMind
+        https://stackoverflow.com/a/26251197
+         */
+        EditText txtSearch = ((EditText)searchView.findViewById(androidx.appcompat.R.id.search_src_text));
+        txtSearch.setHint("Enter a username");
+        txtSearch.setHintTextColor(Color.LTGRAY);
+        txtSearch.setTextColor(Color.WHITE);
+        /*
+        Youtube video, Author: Coding in Flow
+        https://www.youtube.com/watch?v=sJ-Z9G0SDhc
+         */
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                String correctQuery = "";
+                query = query.trim().toLowerCase(Locale.ROOT);
+                boolean valid = false;
+                ArrayList<User> listToSearch = dataLists.get(leaderboardController.getCurrentCategory());
+                for (int i=0; i<listToSearch.size(); i++) {
+                    if (listToSearch.get(i).getUsername().toLowerCase().equals(query)) {
+                        valid = true;
+                        correctQuery = listToSearch.get(i).getUsername();
+                    }
+                }
+                if (valid) {
+                    NavController navController = Navigation.findNavController(getActivity(), R.id.nav_host_fragment_container_main);
+                    Bundle bundle = new Bundle();
+                    bundle.putString("username", correctQuery);
+                    searchItem.collapseActionView();
+                    navController.navigate(R.id.navigation_user_profile, bundle);
+                } else {
+                    Toast toast = Toast.makeText(getContext(), "User does not exist", Toast.LENGTH_SHORT);
+                    toast.show();
+                }
+                return false;
+            }
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                return false;
+            }
+        });
     }
 
     private void setOnRecyclerItemClickListener() {
@@ -229,7 +269,7 @@ public class LeaderboardFragment extends Fragment{
                 @Override
                 public void onRecyclerItemClick(int position, String key) {
                     String userToView = dataLists.get(key).get(position).getUsername();
-                    //Navigate the User Profile of the user that was clicked on
+                    //Navigate to the User Profile of the user that was clicked on
                     NavController navController =  Navigation.findNavController(getView());
                     Bundle bundle = new Bundle();
                     bundle.putString("username", userToView);
@@ -237,31 +277,6 @@ public class LeaderboardFragment extends Fragment{
                 }
             });
         }
-    }
-
-    public boolean scrollToUser(String username) {
-        // TODO: scroll to
-        ArrayList<User> list = null;
-        switch (tabs.getSelectedTabPosition()) {
-            case 0:
-                list = dataLists.get("most_points");
-                break;
-            case 1:
-                list = dataLists.get("most_codes");
-                break;
-            case 2:
-                list = dataLists.get("best_code");
-                break;
-        }
-        if (list != null) {
-            for (int i = 0; i < list.size(); i++) {
-                if (list.get(i).getUsername().equals(username)) {
-                    leaderboardList.scrollToPosition(15);
-                }
-            }
-            return true;
-        }
-        return false;
     }
 
     public void updatePersonalCard(String currentCategory) {

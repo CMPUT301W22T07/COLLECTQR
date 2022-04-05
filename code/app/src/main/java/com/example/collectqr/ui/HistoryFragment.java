@@ -2,18 +2,17 @@ package com.example.collectqr.ui;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 import androidx.appcompat.widget.Toolbar;
 
 import androidx.fragment.app.Fragment;
-import androidx.recyclerview.selection.SelectionTracker;
+import androidx.navigation.NavController;
+import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.collectqr.MainAppActivity;
 import com.example.collectqr.adapters.HistoryAdapter;
 import com.example.collectqr.data.HistoryController;
 import com.example.collectqr.model.QRCode;
@@ -36,15 +35,7 @@ public class HistoryFragment extends Fragment {
     private FloatingActionButton moreInfoButton;
     private FloatingActionButton deleteButton;
 
-
-    /**
-     *
-     * History fragment
-     *
-     * @return public
-     */
     public HistoryFragment() {
-
         // Required empty public constructor
     }
 
@@ -54,7 +45,6 @@ public class HistoryFragment extends Fragment {
      */
     @Override
     public void onCreate(Bundle savedInstanceState) {
-
         super.onCreate(savedInstanceState);
     }
 
@@ -66,10 +56,8 @@ public class HistoryFragment extends Fragment {
      * @return
      */
     @Override
-
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-
         /*
         https://stackoverflow.com/a/31096444
         StackOverflow, Author: The Dude
@@ -101,74 +89,35 @@ public class HistoryFragment extends Fragment {
         return rootView;
     }
 
-
-    /**
-     *
-     * Showfabs
-     *
-     */
     private void showfabs() {
-
         moreInfoButton.setVisibility(View.VISIBLE);
         deleteButton.setVisibility(View.VISIBLE);
     }
-
-    /**
-     *
-     * Hidefabs
-     *
-     */
     private void hidefabs() {
-
         moreInfoButton.setVisibility(View.INVISIBLE);
         deleteButton.setVisibility(View.INVISIBLE);
     }
-
-    /**
-     *
-     * Sets the up fabs
-     *
-     */
     private void setUpFabs() {
-
         moreInfoButton.setOnClickListener(new View.OnClickListener() {
             @Override
-
-/**
- *
- * On click
- *
- * @param view  the view
- */
             public void onClick(View view) {
-
-                // TODO: go to QRCode
+                NavController navController = Navigation.findNavController(rootView);
+                Bundle bundle = new Bundle();
+                bundle.putString("sha", selectedCode.getSha256());
+                bundle.putInt("points", selectedCode.getPoints());
+                navController.navigate(R.id.navigation_qr_code_details, bundle);
+                refreshSelection();
             }
         });
         deleteButton.setOnClickListener(new View.OnClickListener() {
             @Override
-
-/**
- *
- * On click
- *
- * @param view  the view
- */
             public void onClick(View view) {
-
                 controller.deleteCode(selectedCode);
                 refreshSelection();
             }
         });
     }
-
-    /**
-     *
-     * Sets the up recycler view
-     *
-     */
     private void setUpRecyclerView() {
-
         /*
         https://youtu.be/17NbUcEts9c
         https://youtu.be/bhhs4bwYyhc
@@ -181,20 +130,11 @@ public class HistoryFragment extends Fragment {
         recyclerView.setAdapter(controller.getAdapter());
         controller.getAdapter().setOnItemClickListener(new HistoryAdapter.OnRecyclerItemClickListener() {
             @Override
-
-/**
- *
- * On recycler item click
- *
- * @param position  the position
- * @param view  the view
- */
             public void onRecyclerItemClick(int position, View view) {
-
                 QRCode code = controller.getData().get(position);
                 if (selectedCode==null) {
                     // select
-                    view.setBackground(getResources().getDrawable(R.drawable.outline_rectangle, getActivity().getTheme()));
+                    view.setBackground(getResources().getDrawable(R.drawable.list_selector, getActivity().getTheme()));
                     selectedCode = code;
                     selectedView = view;
                     showfabs();
@@ -207,7 +147,7 @@ public class HistoryFragment extends Fragment {
                 } else {
                     // select and unselect previous
                     selectedView.setBackgroundResource(R.drawable.white_rounded_rectangle);
-                    view.setBackground(getResources().getDrawable(R.drawable.outline_rectangle, getActivity().getTheme()));
+                    view.setBackground(getResources().getDrawable(R.drawable.list_selector, getActivity().getTheme()));
                     selectedCode = code;
                     selectedView = view;
                 }
@@ -220,7 +160,6 @@ public class HistoryFragment extends Fragment {
      * Sets up onClickListeners to handle user input
      */
     private void createSortSheetDialog() {
-
         /*
         YouTube video
         Author: Code Vendanam
@@ -236,15 +175,7 @@ public class HistoryFragment extends Fragment {
         TextView byDateDescend = sortSheet.findViewById(R.id.history_sort_date_descend);
         byPointsAscend.setOnClickListener(new View.OnClickListener() {
             @Override
-
-/**
- *
- * On click
- *
- * @param view  the view
- */
             public void onClick(View view) {
-
                 controller.sortQrData("points_ascend");
                 refreshSelection();
                 sortSheet.dismiss();
@@ -252,15 +183,7 @@ public class HistoryFragment extends Fragment {
         });
         byPointsDescend.setOnClickListener(new View.OnClickListener() {
             @Override
-
-/**
- *
- * On click
- *
- * @param view  the view
- */
             public void onClick(View view) {
-
                 controller.sortQrData("points_descend");
                 refreshSelection();
                 sortSheet.dismiss();
@@ -268,15 +191,7 @@ public class HistoryFragment extends Fragment {
         });
         byDateDescend.setOnClickListener(new View.OnClickListener() {
             @Override
-
-/**
- *
- * On click
- *
- * @param view  the view
- */
             public void onClick(View view) {
-
                 controller.sortQrData("date_descend");
                 refreshSelection();
                 sortSheet.dismiss();

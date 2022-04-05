@@ -40,13 +40,10 @@ public class HistoryController {
 
 
     /**
-     *
-     * It is a constructor.
-     *
+     * HistoryController controller
      * @param username  the username
      */
     public HistoryController(String username) {
-
         this.username = username;
         db = FirebaseFirestore.getInstance();
         qrData = new ArrayList<>();
@@ -60,19 +57,15 @@ public class HistoryController {
      *      THis is the adapter to be used to control the RecyclerView on the HistoryFragment
      */
     public HistoryAdapter getAdapter() {
-
         return adapter;
     }
 
 
     /**
-     *
-     * Gets the data
-     *
+     * Returns the data to be displayed
      * @return the data
      */
     public ArrayList<QRCode> getData() {
-
         return qrData;
     }
 
@@ -84,28 +77,15 @@ public class HistoryController {
      * @param numCodes
      */
     public void setStatsBarData(TextView totalPoints, TextView numCodes) {
-
         //https://firebase.google.com/docs/firestore/query-data/listen
         DocumentReference docRef = db.collection("Users").document(username);
         docRef.addSnapshotListener(new EventListener<DocumentSnapshot>() {
             @Override
-
-
-/**
- *
- * On event
- *
- * @param DocumentSnapshot  the document snapshot
- * @param @Nullable  the @ nullable
- */
-            public void onEvent(@Nullable DocumentSnapshot snapshot,
-                                @Nullable FirebaseFirestoreException e) {
-
+            public void onEvent(@Nullable DocumentSnapshot snapshot, @Nullable FirebaseFirestoreException e) {
                 if (e != null) {
                     Log.w(TAG, "Listen failed.", e);
                     return;
                 }
-
                 if (snapshot != null && snapshot.exists()) {
                     Log.d(TAG, "Current data: " + snapshot.getData());
                     totalPoints.setText(snapshot.get("total_points") + "\nTotal Points");
@@ -120,28 +100,15 @@ public class HistoryController {
     /**
      * Downloads all the QR codes scanned by the user from the database
      * and sets up a snapshot listener to keep the data up to date
-     * users this data to populate an ArrayList with elements of type QRCode
      * Calls a function to sort the list and notifies the adapter using the list as its data
      */
     private void startDataDownloader() {
-
         // Code from Lab 5
         HistoryController controller = this;
         db.collection("Users").document(username).collection("ScannedCodes")
                 .addSnapshotListener(new EventListener<QuerySnapshot>() {
                     @Override
-
-
-/**
- *
- * On event
- *
- * @param QuerySnapshot  the query snapshot
- * @param FirebaseFirestoreException  the firebase firestore exception
- */
-                    public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable
-                            FirebaseFirestoreException error) {
-
+                    public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException error) {
                         qrData.clear();
                         for (QueryDocumentSnapshot doc : queryDocumentSnapshots) {
                             Log.d(TAG, String.valueOf(doc.getData().get("sha")));
@@ -164,7 +131,6 @@ public class HistoryController {
      *      This is the string representing the order in which the list should be sorted
      */
     public void sortQrData(String sortBy) {
-
         /*
         https://www.geeksforgeeks.org/how-to-sort-an-arraylist-of-objects-by-property-in-java/
         Article Contributed By: sparshgupta
@@ -174,51 +140,21 @@ public class HistoryController {
         if (sortBy.equals("points_ascend")) {
             qrData.sort(new Comparator<QRCode>() {
                 @Override
-
-/**
- *
- * Compare
- *
- * @param qrcode1  the qrcode1
- * @param qrcode2  the qrcode2
- * @return int
- */
                 public int compare(QRCode qrcode1, QRCode qrcode2) {
-
                     return qrcode1.getPoints() - qrcode2.getPoints();
                 }
             });
         } else if (sortBy.equals("points_descend")) {
             qrData.sort(new Comparator<QRCode>() {
                 @Override
-
-/**
- *
- * Compare
- *
- * @param qrcode1  the qrcode1
- * @param qrcode2  the qrcode2
- * @return int
- */
                 public int compare(QRCode qrcode1, QRCode qrcode2) {
-
                     return qrcode2.getPoints() - qrcode1.getPoints();
                 }
             });
         } else if (sortBy.equals("date_descend")) {
             qrData.sort(new Comparator<QRCode>() {
                 @Override
-
-/**
- *
- * Compare
- *
- * @param qrcode1  the qrcode1
- * @param qrcode2  the qrcode2
- * @return int
- */
                 public int compare(QRCode qrcode1, QRCode qrcode2) {
-
                     return qrcode2.getDate().compareTo(qrcode1.getDate());
                 }
             });
@@ -229,19 +165,16 @@ public class HistoryController {
 
 
     /**
-     *
-     * Delete code
-     *
+     * Deletes the code from history
      * @param code  the code
      */
     public void deleteCode(QRCode code) {
-
         int secondBest = 0;
         for (int i=0; i<qrData.size(); i++) {
             if (qrData.get(i).getSha256()!=code.getSha256() && qrData.get(i).getPoints() > secondBest) {
                 secondBest = qrData.get(i).getPoints();
             }
         }
-        new QRCodeController().deleteCodeFromAccount(code, secondBest, username);
+        new QRCodeController().deleteCodeFromAccount(code.getSha256(), code.getPoints(), secondBest, username);
     }
 }

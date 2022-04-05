@@ -130,7 +130,9 @@ public class ProfileDialogFragment extends DialogFragment {
  */
             public void onClick(View view) {
 
-                // TODO: implement achievements
+                // Modified from Lab 3 Participation Exercise Hints
+                AchievementDialogFragment achievmentFragment = new AchievementDialogFragment();
+                achievmentFragment.show(getActivity().getSupportFragmentManager(), "ACHIEVEMENTS");
             }
         });
 
