@@ -1,7 +1,14 @@
 package com.example.collectqr.ui;
 
+import android.Manifest;
+import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Color;
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
 import android.os.Bundle;
 import android.util.ArrayMap;
 import android.view.LayoutInflater;
@@ -13,6 +20,7 @@ import android.widget.TextView;
 
 import androidx.appcompat.widget.SearchView;
 import androidx.appcompat.widget.Toolbar;
+import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
@@ -28,7 +36,11 @@ import com.example.collectqr.data.LeaderboardController;
 import com.example.collectqr.model.QRCode;
 import com.example.collectqr.utilities.Preferences;
 import com.example.collectqr.model.User;
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.tabs.TabLayout;
+import com.mapbox.android.core.permissions.PermissionsManager;
 
 import java.util.ArrayList;
 
@@ -37,7 +49,7 @@ import java.util.ArrayList;
  * Use the {@link LeaderboardFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class LeaderboardFragment extends Fragment {
+public class LeaderboardFragment extends Fragment{
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -48,6 +60,7 @@ public class LeaderboardFragment extends Fragment {
     private String mParam1;
     private String mParam2;
 
+    private FusedLocationProviderClient fusedLocationClient;
     private LeaderboardController leaderboardController;
     private RecyclerView leaderboardList;
     private String username;
@@ -57,7 +70,9 @@ public class LeaderboardFragment extends Fragment {
     private TextView personalScore;
     private TextView personalRank;
     private TabLayout tabs;
-
+    private Double latitude;
+    private Double longitude;
+    private Context context;
 
     public LeaderboardFragment() {
         // Required empty public constructor
@@ -110,6 +125,28 @@ public class LeaderboardFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
+        context = container.getContext();
+
+        // get user location
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(context);
+        if (ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
+                && ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED){
+            latitude = Double.valueOf(0);
+            longitude = Double.valueOf(0);
+        } else {
+            fusedLocationClient.getLastLocation()
+                    .addOnSuccessListener((Activity) context, new OnSuccessListener<Location>() {
+                        @Override
+                        public void onSuccess(Location location) {
+                            // Got last known location. In some rare situations this can be null.
+                            if (location != null) {
+                                latitude = location.getLatitude();
+                                longitude = location.getLongitude();
+                            }
+                        }
+                    });
+        }
+
         // Inflate the layout for this fragment
         View leaderboardView = inflater.inflate(R.layout.fragment_leaderboard, container, false);
 
@@ -143,7 +180,7 @@ public class LeaderboardFragment extends Fragment {
         leaderboardList.setLayoutManager(layoutManager);
         leaderboardList.setAdapter(adapterLists.get("most_points"));
 
-        leaderboardController.downloadData(dataLists, adapterLists, personalScore, personalRank);
+        leaderboardController.downloadData(dataLists, adapterLists, personalScore, personalRank, latitude, longitude);
 
 
         setOnRecyclerItemClickListener();
