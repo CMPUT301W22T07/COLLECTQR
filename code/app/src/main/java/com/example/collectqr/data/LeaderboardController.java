@@ -76,7 +76,7 @@ public class LeaderboardController {
      * @param score     this is the view that will display the user's score
      * @param rank      this is the view that will display the user's rank
      */
-    public void downloadData(ArrayMap<String, ArrayList<User>> dataLists, ArrayMap<String, LeaderboardRecyclerAdapter> adapters, TextView score, TextView rank, Double userLat, Double userLon) {
+    public void downloadData(ArrayMap<String, ArrayList<User>> dataLists, ArrayMap<String, LeaderboardRecyclerAdapter> adapters, TextView score, TextView rank, int userLat, int userLon) {
         LeaderboardController controller = this;
         db.collection("Users")
                 .addSnapshotListener(new EventListener<QuerySnapshot>() {
@@ -217,7 +217,7 @@ public class LeaderboardController {
      * @param scannedCodesCollection
      * @param regionBestCallback
      */
-    private void getRegionBest(@NonNull CollectionReference scannedCodesCollection, Double userLat, Double userLon,
+    private void getRegionBest(@NonNull CollectionReference scannedCodesCollection, int userLat, int userLon,
                                RegionBestCallback regionBestCallback) {
         scannedCodesCollection.addSnapshotListener((value, error) -> {
             userRegionBest = 0;

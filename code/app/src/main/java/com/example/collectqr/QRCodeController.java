@@ -124,6 +124,8 @@ public class QRCodeController {
                         Log.d(TAG, "No such document");
                         final DocumentReference userCodeReference = db.collection("Users").document(username).collection("ScannedCodes").document(qrCode.getSha256());
                         ArrayMap<String, Object> data = new ArrayMap<>();
+                        data.put("latitude", qrCode.getLatitude().toString());
+                        data.put("longitude", qrCode.getLongitude().toString());
                         data.put("sha", qrCode.getSha256());
                         data.put("date", qrCode.getDate());
                         data.put("points", qrCode.getPoints());

@@ -70,8 +70,8 @@ public class LeaderboardFragment extends Fragment{
     private TextView personalScore;
     private TextView personalRank;
     private TabLayout tabs;
-    private Double latitude;
-    private Double longitude;
+    private int latitude;
+    private int longitude;
     private Context context;
 
     public LeaderboardFragment() {
@@ -131,8 +131,8 @@ public class LeaderboardFragment extends Fragment{
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(context);
         if (ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
                 && ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED){
-            latitude = Double.valueOf(0);
-            longitude = Double.valueOf(0);
+            latitude = 0;
+            longitude = 0;
         } else {
             fusedLocationClient.getLastLocation()
                     .addOnSuccessListener((Activity) context, new OnSuccessListener<Location>() {
@@ -140,8 +140,8 @@ public class LeaderboardFragment extends Fragment{
                         public void onSuccess(Location location) {
                             // Got last known location. In some rare situations this can be null.
                             if (location != null) {
-                                latitude = location.getLatitude();
-                                longitude = location.getLongitude();
+                                latitude = (int) location.getLatitude();
+                                longitude = (int) location.getLongitude();
                             }
                         }
                     });
