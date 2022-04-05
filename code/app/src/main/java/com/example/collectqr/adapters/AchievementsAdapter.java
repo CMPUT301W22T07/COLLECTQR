@@ -16,6 +16,10 @@ import com.example.collectqr.model.AchievementItem;
 
 import java.util.ArrayList;
 
+/**
+ * A class that overwrites the default ArrayAdapter, to be used
+ * with the custom AchievementItem class
+ */
 public class AchievementsAdapter extends ArrayAdapter<AchievementItem> {
     private ArrayList<AchievementItem> achievements;
     private Context context;
