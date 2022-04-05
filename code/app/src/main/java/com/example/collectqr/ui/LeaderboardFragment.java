@@ -3,9 +3,7 @@ package com.example.collectqr.ui;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.util.ArrayMap;
-import android.view.Gravity;
 import android.view.LayoutInflater;
-import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -22,16 +20,11 @@ import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.collectqr.DummyActivity;
-import com.example.collectqr.GenerateQRCodeActivity;
-import com.example.collectqr.MainAppActivity;
 import com.example.collectqr.R;
 import com.example.collectqr.adapters.LeaderboardRecyclerAdapter;
 import com.example.collectqr.data.LeaderboardController;
-import com.example.collectqr.model.QRCode;
 import com.example.collectqr.utilities.Preferences;
 import com.example.collectqr.model.User;
-import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.tabs.TabLayout;
 
 import java.util.ArrayList;
@@ -234,7 +227,7 @@ public class LeaderboardFragment extends Fragment {
                 @Override
                 public void onRecyclerItemClick(int position, String key) {
                     String userToView = dataLists.get(key).get(position).getUsername();
-                    //Navigate the User Profile of the user that was clicked on
+                    //Navigate to the User Profile of the user that was clicked on
                     NavController navController =  Navigation.findNavController(getView());
                     Bundle bundle = new Bundle();
                     bundle.putString("username", userToView);

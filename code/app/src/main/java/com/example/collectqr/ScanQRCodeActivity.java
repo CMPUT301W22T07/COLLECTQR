@@ -7,13 +7,12 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
-import androidx.navigation.NavController;
-import androidx.navigation.Navigation;
 
 import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -30,6 +29,7 @@ public class ScanQRCodeActivity extends AppCompatActivity {
 
     private ScannerLiveView scannerLiveView;
     private TextView scannedTextView;
+    private View view = getCurrentFocus();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -98,10 +98,8 @@ public class ScanQRCodeActivity extends AppCompatActivity {
  */
             public void onCodeScanned(String data) {
 
-                ////scannedTextView.setText(data);
-                System.out.println(data);
-
                 if (data.contains(" GameStatus")) {
+                    //Navigate to the User Profile of the user whose GameStatus code was scanned
                     String userToView = data.substring(0,data.indexOf(' '));
                     Intent intent = new Intent();
                     intent.putExtra("sha", "");
