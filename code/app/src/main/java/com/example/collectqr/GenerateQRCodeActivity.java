@@ -1,6 +1,7 @@
 package com.example.collectqr;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 
 import android.content.Context;
 import android.content.Intent;
@@ -45,6 +46,22 @@ public class GenerateQRCodeActivity extends AppCompatActivity {
         qrGenTxt2 = findViewById(R.id.qrGenTxt2);
         qrCodeImageView = findViewById(R.id.QRCodeImg);
 
+        /*
+        https://developer.android.com/training/appbar/setting-up#add-toolbar
+        https://stackoverflow.com/a/42837106
+        StackOverflow, Author tahsinRupam
+        https://stackoverflow.com/a/46928058
+        StackOverflow, Author: iman hoshmand
+        */
+        Toolbar toolbar = (Toolbar) findViewById(R.id.topAppBar);
+        setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                onBackPressed();
+            }
+        });
 
         // gets string of username + LogIn identifier
         qrCodeText = Preferences.loadUserName(this) + " LogIn";

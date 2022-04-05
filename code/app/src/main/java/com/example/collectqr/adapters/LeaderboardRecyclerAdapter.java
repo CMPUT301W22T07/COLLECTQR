@@ -11,11 +11,12 @@ import com.example.collectqr.R;
 import com.example.collectqr.model.User;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 
 // https://developer.android.com/guide/topics/ui/layout/recyclerview#implement-adapter
 /**
- * A custom RecyclerView.Adapter for the leaderboard screen
+ * A custom adapter, specifically for displaying the views in the RecyclerView
+ * which are displayed in the leaderboard screen
+ * extends RecyclerView.Adapter
  */
 public class LeaderboardRecyclerAdapter extends RecyclerView.Adapter<LeaderboardRecyclerAdapter.ViewHolder> {
 
@@ -34,9 +35,7 @@ public class LeaderboardRecyclerAdapter extends RecyclerView.Adapter<Leaderboard
 
 
     /**
-     *
      * Sets the on item click listener
-     *
      * @param listener  the listener
      */
     public void setOnItemClickListener(LeaderboardRecyclerAdapter.OnRecyclerItemClickListener listener) {
@@ -55,34 +54,22 @@ public class LeaderboardRecyclerAdapter extends RecyclerView.Adapter<Leaderboard
 
 
         /**
-         *
          * View holder
-         *
          * @param view  the view
          * @param listener  the listener
          * @param category  the category
          * @return public
          */
         public ViewHolder(View view, OnRecyclerItemClickListener listener, String category) {
-
             super(view);
-            // Define click listener for the ViewHolder's View
-
             userName = view.findViewById(R.id.username_text);
             userScore = view.findViewById(R.id.score_text);
             userRank = view.findViewById(R.id.rank_text);
 
+            // Define click listener for the ViewHolder's View
             view.setOnClickListener(new View.OnClickListener() {
                 @Override
-
-/**
- *
- * On click
- *
- * @param view  the view
- */
                 public void onClick(View view) {
-
                     if (listener != null) {
                         int position = getAdapterPosition();
                         if (position != RecyclerView.NO_POSITION) {
@@ -95,49 +82,33 @@ public class LeaderboardRecyclerAdapter extends RecyclerView.Adapter<Leaderboard
 
 
         /**
-         *
          * Gets the user name
-         *
          * @return the user name
          */
-        public TextView getUserName() {
-
-            return userName;
-        }
+        public TextView getUserName() { return userName; }
 
 
         /**
-         *
          * Gets the user score
-         *
          * @return the user score
          */
-        public TextView getUserScore() {
-
-            return userScore;
-        }
+        public TextView getUserScore() { return userScore; }
 
 
         /**
-         *
          * Gets the user rank
-         *
          * @return the user rank
          */
-        public TextView getUserRank() {
-
-            return userRank;
-        }
+        public TextView getUserRank() { return userRank; }
     }
+
 
     /**
      * Initializes the dataset of the Adapter.
-     *
      * @param data
      * @param category
      */
     public LeaderboardRecyclerAdapter(ArrayList<User> data, String category) {
-
         this.data = data;
         this.category = category;
     }
@@ -150,7 +121,6 @@ public class LeaderboardRecyclerAdapter extends RecyclerView.Adapter<Leaderboard
      */
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup viewGroup, int viewType) {
-
         // Create a new view, which defines the UI of the list item
         this.viewGroup = viewGroup;
         View view = LayoutInflater.from(viewGroup.getContext())
@@ -160,34 +130,29 @@ public class LeaderboardRecyclerAdapter extends RecyclerView.Adapter<Leaderboard
 
     /**
      * Replaces the contents of a view (invoked by the layout manager)
-     *
      * @param viewHolder
      * @param position
      */
     @Override
     public void onBindViewHolder(ViewHolder viewHolder, final int position) {
-
         // Get element from your dataset at this position and replace the
         // contents of the view with that element
         User user = data.get(position);
+        // set TextView for each list element
+        TextView userName = viewGroup.findViewById(R.id.username_text);
+        TextView userScore = viewGroup.findViewById(R.id.score_text);
+        TextView userRank = viewGroup.findViewById(R.id.rank_text);
 
         viewHolder.getUserName().setText(user.getUsername());
         if (category.equals("most_points")) {
-            // gets users total points
             viewHolder.getUserScore().setText(user.getStats().get("total_points") + " points");
         } else if (category.equals("most_codes")) {
-            // gets users number of codes scanned
             viewHolder.getUserScore().setText(user.getStats().get("num_codes") + " codes");
         } else if (category.equals("best_code")) {
-            // gets users best single code score
             viewHolder.getUserScore().setText(user.getStats().get("best_code") + " points");
-        } else if (category.equals("region_best")) {
-            // gets users highest scoring code from region
-            viewHolder.getUserScore().setText(user.getStats().get("region_best") + " points");
         }
         // index of user in sorted list plus 1 = rank
-        String rankStr = Integer.toString(data.indexOf(user)+1);
-        viewHolder.getUserRank().setText("#" + rankStr);
+        viewHolder.getUserRank().setText(Integer.toString(data.indexOf(user)+1));
     }
 
     /**
@@ -196,7 +161,6 @@ public class LeaderboardRecyclerAdapter extends RecyclerView.Adapter<Leaderboard
      */
     @Override
     public int getItemCount() {
-
         return data.size();
     }
 }

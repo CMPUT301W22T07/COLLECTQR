@@ -26,9 +26,7 @@ import java.util.concurrent.FutureTask;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
- * LeaderboardController class
- * reads users and their desired fields from Firestore,
- * specifically for user by the leaderboard
+ * Controls and manages the data needed for LeaderboardFragement
  */
 public class LeaderboardController {
     private String username;
@@ -38,24 +36,26 @@ public class LeaderboardController {
 
     /**
      * saves instance of Firestore and current user's username
-     *
      * @param username of the current user
      */
     public LeaderboardController(String username) {
-
         this.username = username;
         db = FirebaseFirestore.getInstance();
 
     }
 
-
+    /**
+     * Returns the current category
+     * @return String  current category
+     */
+    public String getCurrentCategory() {
+        return this.currentCategory;
+    }
     /**
      * Sets the current category
-     *
      * @param category the category
      */
     public void setCurrentCategory(String category) {
-
         this.currentCategory = category;
     }
 
@@ -69,13 +69,16 @@ public class LeaderboardController {
      * @param score     this is the view that will display the user's score
      * @param rank      this is the view that will display the user's rank
      */
-    public void downloadData(ArrayMap<String, ArrayList<User>> dataLists, ArrayMap<String, LeaderboardRecyclerAdapter> adapters, TextView score, TextView rank) {
+    public void downloadData(ArrayMap<String, ArrayList<User>> dataLists, ArrayMap<String, LeaderboardRecyclerAdapter> adapters,
+                             TextView score, TextView rank) {
         LeaderboardController controller = this;
         db.collection("Users")
                 .addSnapshotListener(new EventListener<QuerySnapshot>() {
                     @Override
                     public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable
                             FirebaseFirestoreException error) {
+
+                        // populate the data lists
                         dataLists.get("most_points").clear();
                         dataLists.get("most_codes").clear();
                         dataLists.get("best_code").clear();
@@ -113,7 +116,8 @@ public class LeaderboardController {
                         }
                         System.out.println("sorting data lists");
 
-                        for (int i = 0; i < dataLists.get(currentCategory).size(); i++) {
+                        // display the data in the persistent user card based on the updated lists
+                        for (int i=0; i<dataLists.get(currentCategory).size(); i++) {
                             User item = dataLists.get(currentCategory).get(i);
                             if (item.getUsername().equals(username)) {
                                 if (currentCategory.equals("most_points")) {
@@ -135,7 +139,7 @@ public class LeaderboardController {
                                 }
                             }
                         }
-                        System.out.println("notifying adapters of data change");
+                        // notify the adapter that use the data that data has changed
                         adapters.get("most_points").notifyDataSetChanged();
                         adapters.get("most_codes").notifyDataSetChanged();
                         adapters.get("best_code").notifyDataSetChanged();
@@ -150,53 +154,22 @@ public class LeaderboardController {
      * @param dataLists this is a map of lists to be sorted
      */
     private void sortLists(ArrayMap<String, ArrayList<User>> dataLists) {
-
         dataLists.get("most_points").sort(new Comparator<User>() {
             @Override
-
-            /**
-             *
-             * Compare
-             *
-             * @param user  the user
-             * @param t1  the t1
-             * @return int
-             */
             public int compare(User user, User t1) {
-
-                return t1.getStats().get("total_points") - user.getStats().get("total_points");
+                return t1.getStats().get("total_points")-user.getStats().get("total_points");
             }
         });
         dataLists.get("most_codes").sort(new Comparator<User>() {
             @Override
-
-            /**
-             *
-             * Compare
-             *
-             * @param user  the user
-             * @param t1  the t1
-             * @return int
-             */
             public int compare(User user, User t1) {
-
-                return t1.getStats().get("num_codes") - user.getStats().get("num_codes");
+                return t1.getStats().get("num_codes")-user.getStats().get("num_codes");
             }
         });
         dataLists.get("best_code").sort(new Comparator<User>() {
             @Override
-
-            /**
-             *
-             * Compare
-             *
-             * @param user  the user
-             * @param t1  the t1
-             * @return int
-             */
             public int compare(User user, User t1) {
-
-                return t1.getStats().get("best_code") - user.getStats().get("best_code");
+                return t1.getStats().get("best_code")-user.getStats().get("best_code");
             }
         });
         dataLists.get("region_best").sort(new Comparator<User>() {
