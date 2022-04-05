@@ -93,11 +93,11 @@ public class LeaderboardController {
                             userRegionBest = 0;
                             CollectionReference scannedCodesCollection = doc.getReference().collection("ScannedCodes");
 
-                            getRegionBruh(scannedCodesCollection, userRegionBruh -> {
+                            getRegionBest(scannedCodesCollection, userRegionBest -> {
                                 User userObj = new User(name);
-                                System.out.println("adding user object with stats: numCodes-" + numCodes +
-                                        " totalPoints-" + totalPoints + " bestCode-" + bestCode + " regionBest-" + userRegionBruh);
-                                userObj.updateScore(numCodes, totalPoints, bestCode, userRegionBruh);
+                                System.out.println("adding user object with stats: username- " + name + " numCodes-" + numCodes +
+                                        " totalPoints-" + totalPoints + " bestCode-" + bestCode + " regionBest-" + userRegionBest);
+                                userObj.updateScore(numCodes, totalPoints, bestCode, userRegionBest);
                                 dataLists.get("most_points").add(userObj);
                                 dataLists.get("most_codes").add(userObj);
                                 dataLists.get("best_code").add(userObj);
@@ -206,41 +206,13 @@ public class LeaderboardController {
         });
     }
 
-
-    /**
-     * gets a users best code points in a region from the db
-     *
-     * @param scannedCodesCollection
-     * @param name
-     * @return best (int of best scoring code in the region)
-     */
-    private void getRegionBest(@NonNull CollectionReference scannedCodesCollection, String name, FutureTask<Object> ft) {
-        scannedCodesCollection.addSnapshotListener((value, error) -> {
-            userRegionBest = 0;
-            ft.run();
-            assert value != null;
-            for (QueryDocumentSnapshot codeDoc : value) {
-                Log.d("REGIONBESTQUERY", "Getting scanned codes by: " + name + " " +
-                        codeDoc.getId() + " " + String.valueOf(codeDoc.get("points")) +
-                        " best: " + String.valueOf(userRegionBest));
-                if (codeDoc.getData().get("points") != null) {
-                    int points = Integer.parseInt(String.valueOf(codeDoc.getData().get("points")));
-                    if (points >= userRegionBest) {
-                        userRegionBest = points;
-                    }
-                }
-            }
-        });
-    }
-
-
     /**
      * Resolving async issues with a callback.
      * https://stackoverflow.com/a/48500679 by Alex Mamo
      * @param scannedCodesCollection
      * @param regionBestCallback
      */
-    private void getRegionBruh(@NonNull CollectionReference scannedCodesCollection,
+    private void getRegionBest(@NonNull CollectionReference scannedCodesCollection,
                                RegionBestCallback regionBestCallback) {
         scannedCodesCollection.addSnapshotListener((value, error) -> {
             userRegionBest = 0;

@@ -145,9 +145,11 @@ public class LeaderboardFragment extends Fragment {
 
         leaderboardController.downloadData(dataLists, adapterLists, personalScore, personalRank);
 
+
         setOnRecyclerItemClickListener();
 
         setTabListeners();
+
 
         Toolbar toolbar = (Toolbar) getActivity().findViewById(R.id.topAppBar);
         toolbar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
