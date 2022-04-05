@@ -7,10 +7,13 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import androidx.navigation.NavController;
+import androidx.navigation.Navigation;
 
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -27,6 +30,7 @@ public class ScanQRCodeActivity extends AppCompatActivity {
 
     private ScannerLiveView scannerLiveView;
     private TextView scannedTextView;
+    private View view = getCurrentFocus();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -98,9 +102,11 @@ public class ScanQRCodeActivity extends AppCompatActivity {
                 ////scannedTextView.setText(data);
 
                 if (data.contains(" GameStatus")) {
-                    Intent intent = new Intent(getApplicationContext(), DummyActivity.class);
-                    intent.putExtra("data", data);
-                    startActivity(intent);
+                    //Navigate to the User Profile of the user that was clicked on
+                    NavController navController =  Navigation.findNavController(getCurrentFocus());
+                    Bundle bundle = new Bundle();
+                    bundle.putString("username", data.replace(" GameStatus", ""));
+                    navController.navigate(R.id.navigation_user_profile, bundle);
                 }
 
                 else {
