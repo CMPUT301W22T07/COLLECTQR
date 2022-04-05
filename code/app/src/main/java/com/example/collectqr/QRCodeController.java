@@ -113,10 +113,19 @@ public class QRCodeController {
                         Log.d(TAG, "No such document");
                         final DocumentReference userCodeReference = db.collection("Users").document(username).collection("ScannedCodes").document(qrCode.getSha256());
                         ArrayMap<String, Object> data = new ArrayMap<>();
+                        data.put("latitude", qrCode.getLatitude().toString());
+                        data.put("longitude", qrCode.getLongitude().toString());
                         data.put("sha", qrCode.getSha256());
                         data.put("date", qrCode.getDate());
                         data.put("points", qrCode.getPoints());
                         data.put("image", qrCode.getQr_image());
+                        if (qrCode.getLatitude()!=null) {
+                            data.put("geohash", qrCode.getGeoHash());
+                        } else {
+                            data.put("geohash", "");
+                        }
+                        data.put("latitude", qrCode.getLatitudeAsString());
+                        data.put("longitude", qrCode.getLongitudeAsString());
                         userCodeReference.set(data);
                         db.collection("Users").document(username).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
                             @Override
