@@ -29,29 +29,34 @@ public class MapPOI {
     private final Point point;
     private final DocumentSnapshot document;
     private String hash;
-    private int intPoints = 0;
+    private int intPoints;
     private JsonElement jsonData;
 
     /**
+     * Construct a map point-of-interest with a Point location
      *
-     * It is a constructor.
-     *
-     * @param point  the point
-     * @param document  the document snapshot
+     * @param point    the point
+     * @param document the document snapshot
      */
 
     public MapPOI(Point point, @NonNull DocumentSnapshot document) {
+
         this.point = point;
         this.document = document;
         this.hash = document.getString(HASH_FIELD);
+        try {
+            this.intPoints = document.getLong(POINTS_FIELD).intValue();
+        } catch (Exception e) {
+            Log.e(LOGGING_TAG, e.toString());
+            this.intPoints = 0;
+        }
     }
 
 
     /**
+     * Construct a map point-of-interest with a latitude a longitude
      *
-     * It is a constructor.
-     *
-     * @param longitude  the longitude
+     * @param longitude the longitude
      * @param latitude  the latitude
      * @param document  the document snapshot
      */
@@ -75,6 +80,11 @@ public class MapPOI {
     }
 
 
+    /**
+     * Return all data about this map POI as JSON
+     *
+     * @return JsonElement of map data
+     */
     public JsonElement getJsonData() {
         return jsonData;
     }
@@ -84,10 +94,21 @@ public class MapPOI {
     }
 
 
+    /**
+     * Return an integer of the point value of this POI
+     *
+     * @return an int of QR code score
+     */
     public int getPoints() {
         return intPoints;
     }
 
+
+    /**
+     * Return the hash of value of the QR code, used for searching Firestore
+     *
+     * @return a string of the QR code's hash
+     */
     public String getHash() {
         return hash;
     }
