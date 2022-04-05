@@ -19,7 +19,7 @@
         <entry key="app/src/main/res/layout/activity_enter_qr_info.xml" value="0.23541666666666666" />
         <entry key="app/src/main/res/layout/activity_generate_qrcode.xml" value="0.25" />
         <entry key="app/src/main/res/layout/activity_home_qrcode.xml" value="0.18297101449275363" />
-        <entry key="app/src/main/res/layout/activity_login.xml" value="0.1" />
+        <entry key="app/src/main/res/layout/activity_login.xml" value="0.25" />
         <entry key="app/src/main/res/layout/activity_scan_qrcode.xml" value="0.18297101449275363" />
         <entry key="app/src/main/res/layout/dummy_activity.xml" value="0.18297101449275363" />
         <entry key="app/src/main/res/layout/edit_profile_dialog_fragment.xml" value="0.18297101449275363" />
