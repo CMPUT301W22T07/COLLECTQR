@@ -22,9 +22,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 
 /**
- * LeaderboardController class
- * reads users and their desired fields from Firestore,
- * specifically for user by the leaderboard
+ * Controls and manages the data needed for LeaderboardFragement
  */
 public class LeaderboardController {
     private String username;
@@ -33,11 +31,9 @@ public class LeaderboardController {
 
     /**
      * saves instance of Firestore and current user's username
-     *
      * @param username of the current user
      */
     public LeaderboardController(String username){
-
         this.username = username;
         db = FirebaseFirestore.getInstance();
 
@@ -45,7 +41,6 @@ public class LeaderboardController {
 
     /**
      * Returns the current category
-     *
      * @return String  current category
      */
     public String getCurrentCategory() {
@@ -53,12 +48,12 @@ public class LeaderboardController {
     }
     /**
      * Sets the current category
-     *
      * @param category  the category
      */
     public void setCurrentCategory(String category) {
         this.currentCategory = category;
     }
+
     /**
      * Takes an empty ArrayList and the adapter of the ListView
      * Downloads the data into the ArrayList sorts it and notifies the adapter
@@ -73,8 +68,8 @@ public class LeaderboardController {
      * @param rank
      *      this is the view that will display the user's rank
      */
-    public void downloadData(ArrayMap<String, ArrayList<User>> dataLists, ArrayMap<String, LeaderboardRecyclerAdapter> adapters, TextView score, TextView rank) {
-
+    public void downloadData(ArrayMap<String, ArrayList<User>> dataLists, ArrayMap<String, LeaderboardRecyclerAdapter> adapters,
+                             TextView score, TextView rank) {
         LeaderboardController controller = this;
         db.collection("Users")
                 .addSnapshotListener(new EventListener<QuerySnapshot>() {
@@ -82,6 +77,7 @@ public class LeaderboardController {
                     public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable
                             FirebaseFirestoreException error) {
 
+                        // populate the data lists
                         dataLists.get("most_points").clear();
                         dataLists.get("most_codes").clear();
                         dataLists.get("best_code").clear();
@@ -98,8 +94,9 @@ public class LeaderboardController {
                             dataLists.get("most_codes").add(userObj);
                             dataLists.get("best_code").add(userObj);
                         }
-                        controller.sortLists(dataLists);
+                        controller.sortLists(dataLists); // sort the lists
 
+                        // display the data in the persistent user card based on the updated lists
                         for (int i=0; i<dataLists.get(currentCategory).size(); i++) {
                             User item = dataLists.get(currentCategory).get(i);
                             if (item.getUsername().equals(username)) {
@@ -115,6 +112,7 @@ public class LeaderboardController {
                                 }
                             }
                         }
+                        // notify the adapter that use the data that data has changed
                         adapters.get("most_points").notifyDataSetChanged();
                         adapters.get("most_codes").notifyDataSetChanged();
                         adapters.get("best_code").notifyDataSetChanged();
@@ -128,18 +126,15 @@ public class LeaderboardController {
      *      this is a map of lists to be sorted
      */
     private void sortLists(ArrayMap<String, ArrayList<User>> dataLists) {
-
         dataLists.get("most_points").sort(new Comparator<User>() {
             @Override
             public int compare(User user, User t1) {
-
                 return t1.getStats().get("total_points")-user.getStats().get("total_points");
             }
         });
         dataLists.get("most_codes").sort(new Comparator<User>() {
             @Override
             public int compare(User user, User t1) {
-
                 return t1.getStats().get("num_codes")-user.getStats().get("num_codes");
             }
         });

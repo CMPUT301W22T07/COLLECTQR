@@ -1,31 +1,28 @@
 package com.example.collectqr.adapters;
 
 
-import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.example.collectqr.model.QRCode;
 import com.example.collectqr.R;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
-import com.google.rpc.context.AttributeContext;
 
 import java.util.ArrayList;
-import java.util.ResourceBundle;
 
 
 // https://developer.android.com/guide/topics/ui/layout/recyclerview#implement-adapter
 
 /**
- * A custom adapter, specifically for storing and displaying the views in the RecyclerView
+ * A custom adapter, specifically for displaying the views in the RecyclerView
  * which represent the user's QR code history
+ * extends RecyclerView.Adapter
  */
 public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.ViewHolder> {
 
@@ -38,21 +35,21 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.ViewHold
     YouTube Video, Author: Coding in Flow
     https://youtu.be/bhhs4bwYyhc
      */
+    /**
+     * Interface for an OnRecyclerItemClickListener
+     */
     public interface OnRecyclerItemClickListener {
         void onRecyclerItemClick(int position, View view);
     }
-
-
     /**
-     *
      * Sets the on item click listener
-     *
      * @param listener  the listener
      */
     public void setOnItemClickListener(OnRecyclerItemClickListener listener) {
-
         this.listener = listener;
     }
+
+
     /**
      * Provide a reference to the type of views that you are using
      * (custom ViewHolder).
@@ -62,14 +59,10 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.ViewHold
         private TextView pointsView;
         private TextView dateView;
 
-
         /**
-         *
-         * View holder
-         *
+         * View holder constructor
          * @param view  the view
          * @param listener  the listener
-         * @return public
          */
         public ViewHolder(View view, OnRecyclerItemClickListener listener) {
             super(view);
@@ -93,35 +86,22 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.ViewHold
             });
         }
 
-
         /**
-         *
          * Gets the points view
-         *
          * @return the points view
          */
-        public TextView getPointsView() {
-
-            return pointsView;
-        }
+        public TextView getPointsView() { return pointsView; }
 
 
         /**
-         *
          * Gets the date view
-         *
          * @return the date view
          */
-        public TextView getDateView() {
-
-            return dateView;
-        }
+        public TextView getDateView() { return dateView; }
 
 
         /**
-         *
          * Gets the image view
-         *
          * @return the image view
          */
         public ImageView getImageView() {
@@ -129,24 +109,22 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.ViewHold
         }
     }
 
+
     /**
-     * Initialize the dataset of the Adapter.
+     * HistoryAdapter constructor
      */
     public HistoryAdapter(ArrayList<QRCode> qrHistoryData) {
         this.qrHistoryData = qrHistoryData;
 
     }
 
-    // Create new views (invoked by the layout manager)
-    @Override
     /**
-     *
-     * On create view holder
-     *
+     * Create new views (invoked by the layout manager)
      * @param viewGroup  the view group
      * @param viewType  the view type
      * @return ViewHolder
      */
+    @Override
     public ViewHolder onCreateViewHolder(ViewGroup viewGroup, int viewType) {
         // Create a new view, which defines the UI of the list item
         this.viewGroup = viewGroup;
@@ -155,15 +133,14 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.ViewHold
         return new ViewHolder(view, this.listener);
     }
 
-    // Replace the contents of a view (invoked by the layout manager)
-    @Override
+
+
     /**
-     *
-     * On bind view holder
-     *
+     * Replace the contents of a view (invoked by the layout manager)
      * @param viewHolder  the view holder
      * @param int  the int
      */
+    @Override
     public void onBindViewHolder(ViewHolder viewHolder, final int position) {
         // Get element from your dataset at this position and replace the
         // contents of the view with that element
@@ -174,6 +151,8 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.ViewHold
                 scannedOn.substring(11, 16),
                 scannedOn.substring(4, 10),
                 scannedOn.substring(23)));
+
+        // download the image and display it
         // https://firebase.google.com/docs/storage/android/download-files#downloading_images_with_firebaseui
         FirebaseStorage storage = FirebaseStorage.getInstance("gs://collectqr7.appspot.com");
         StorageReference storageReference = storage.getReferenceFromUrl("gs://collectqr7.appspot.com/"+currentItem.getQr_image());
@@ -182,14 +161,11 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.ViewHold
                 .into(viewHolder.getImageView());
     }
 
-    // Return the size of your dataset (invoked by the layout manager)
-    @Override
     /**
-     *
-     * Gets the item count
-     *
+     * Return the size of your dataset (invoked by the layout manager)
      * @return the item count
      */
+    @Override
     public int getItemCount() {
         return qrHistoryData.size();
     }
