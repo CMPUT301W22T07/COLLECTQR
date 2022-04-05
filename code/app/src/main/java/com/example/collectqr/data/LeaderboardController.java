@@ -79,6 +79,7 @@ public class LeaderboardController {
                         dataLists.get("most_points").clear();
                         dataLists.get("most_codes").clear();
                         dataLists.get("best_code").clear();
+                        dataLists.get("region_best").clear();
                         for (QueryDocumentSnapshot doc : queryDocumentSnapshots) {
                             Log.d(TAG, String.valueOf(doc.getData().get("username")));
                             String name = String.valueOf(doc.getData().get("username"));
@@ -111,6 +112,7 @@ public class LeaderboardController {
                                 adapters.get("region_best").notifyDataSetChanged();
                             });
                         }
+                        controller.sortLists(dataLists);
                         System.out.println("sorting data lists");
 
                         for (int i = 0; i < dataLists.get(currentCategory).size(); i++) {
@@ -237,6 +239,7 @@ public class LeaderboardController {
     /**
      * Resolving async issues with a callback.
      * https://stackoverflow.com/a/48500679 by Alex Mamo
+     *
      * @param scannedCodesCollection
      * @param regionBestCallback
      */
