@@ -7,7 +7,10 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import androidx.navigation.NavController;
+import androidx.navigation.Navigation;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
@@ -96,13 +99,16 @@ public class ScanQRCodeActivity extends AppCompatActivity {
             public void onCodeScanned(String data) {
 
                 ////scannedTextView.setText(data);
+                System.out.println(data);
 
                 if (data.contains(" GameStatus")) {
-                    Intent intent = new Intent(getApplicationContext(), DummyActivity.class);
-                    intent.putExtra("data", data);
-                    startActivity(intent);
+                    String userToView = data.substring(0,data.indexOf(' '));
+                    Intent intent = new Intent();
+                    intent.putExtra("sha", "");
+                    intent.putExtra("user_to_view", userToView);
+                    setResult(Activity.RESULT_OK, intent);
+                    finish();
                 }
-
                 else {
                     String sha = new HashConversion().convertToSHA256(data);
                     Intent intent = new Intent();

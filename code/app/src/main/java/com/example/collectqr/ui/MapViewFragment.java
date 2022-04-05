@@ -323,10 +323,19 @@ public class MapViewFragment extends Fragment {
         if (resultCode == Activity.RESULT_OK) {
             if (requestCode == 1) {
                 if (data != null) {
-                    Intent intent = new Intent(this.getActivity(), EnterQrInfoActivity.class);
-                    intent.putExtra("sha", data.getStringExtra("sha"));
-                    intent.putExtra("username", username);
-                    startActivity(intent);
+                    if (!data.getStringExtra("sha").isEmpty()) {
+                        Intent intent = new Intent(this.getActivity(), EnterQrInfoActivity.class);
+                        intent.putExtra("sha", data.getStringExtra("sha"));
+                        intent.putExtra("username", username);
+                        startActivity(intent);
+                    } else {
+                        String returnValue = data.getStringExtra("user_to_view");
+                        System.out.println("RETURN VALUE: " + returnValue);
+                        NavController navController =  Navigation.findNavController(getView());
+                        Bundle bundle = new Bundle();
+                        bundle.putString("username", returnValue);
+                        navController.navigate(R.id.navigation_user_profile, bundle);
+                    }
                 }
             }
         }
