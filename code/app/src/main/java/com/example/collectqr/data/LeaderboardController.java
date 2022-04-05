@@ -103,10 +103,15 @@ public class LeaderboardController {
                                 dataLists.get("most_codes").add(userObj);
                                 dataLists.get("best_code").add(userObj);
                                 dataLists.get("region_best").add(userObj);
+
+                                controller.sortLists(dataLists);
+                                adapters.get("most_points").notifyDataSetChanged();
+                                adapters.get("most_codes").notifyDataSetChanged();
+                                adapters.get("best_code").notifyDataSetChanged();
+                                adapters.get("region_best").notifyDataSetChanged();
                             });
                         }
                         System.out.println("sorting data lists");
-                        controller.sortLists(dataLists);
 
                         for (int i = 0; i < dataLists.get(currentCategory).size(); i++) {
                             User item = dataLists.get(currentCategory).get(i);
