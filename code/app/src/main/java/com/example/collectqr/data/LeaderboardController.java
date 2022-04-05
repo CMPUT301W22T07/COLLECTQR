@@ -2,7 +2,6 @@ package com.example.collectqr.data;
 
 import static android.content.ContentValues.TAG;
 
-import android.graphics.Region;
 import android.util.ArrayMap;
 import android.util.Log;
 import android.widget.TextView;
@@ -21,9 +20,6 @@ import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.FutureTask;
-import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Controls and manages the data needed for LeaderboardFragement
@@ -36,6 +32,7 @@ public class LeaderboardController {
 
     /**
      * saves instance of Firestore and current user's username
+     *
      * @param username of the current user
      */
     public LeaderboardController(String username) {
@@ -46,13 +43,16 @@ public class LeaderboardController {
 
     /**
      * Returns the current category
+     *
      * @return String  current category
      */
     public String getCurrentCategory() {
         return this.currentCategory;
     }
+
     /**
      * Sets the current category
+     *
      * @param category the category
      */
     public void setCurrentCategory(String category) {
@@ -95,18 +95,22 @@ public class LeaderboardController {
                             // setup futuretask to wait for asynchronous query of getRegionBest
                             int regionBest;
                             userRegionBest = 0;
-                            CollectionReference scannedCodesCollection = doc.getReference().collection("ScannedCodes");
+                            CollectionReference scannedCodesCollection =
+                                    doc.getReference().collection("ScannedCodes");
 
-                            getRegionBruh(scannedCodesCollection, userRegionBruh -> {
+                            // Get the best code in the region and add to list
+                            getRegionBest(scannedCodesCollection, userRegionBest -> {
                                 User userObj = new User(name);
                                 System.out.println("adding user object with stats: numCodes-" + numCodes +
-                                        " totalPoints-" + totalPoints + " bestCode-" + bestCode + " regionBest-" + userRegionBruh);
-                                userObj.updateScore(numCodes, totalPoints, bestCode, userRegionBruh);
+                                        " totalPoints-" + totalPoints + " bestCode-" + bestCode + " regionBest-" + userRegionBest);
+                                userObj.updateScore(numCodes, totalPoints, bestCode, userRegionBest);
                                 dataLists.get("most_points").add(userObj);
                                 dataLists.get("most_codes").add(userObj);
                                 dataLists.get("best_code").add(userObj);
                                 dataLists.get("region_best").add(userObj);
 
+                                // A cheat, resort the list and notify adapters again, inside of
+                                // this async task.
                                 controller.sortLists(dataLists);
                                 adapters.get("most_points").notifyDataSetChanged();
                                 adapters.get("most_codes").notifyDataSetChanged();
@@ -117,7 +121,7 @@ public class LeaderboardController {
                         System.out.println("sorting data lists");
 
                         // display the data in the persistent user card based on the updated lists
-                        for (int i=0; i<dataLists.get(currentCategory).size(); i++) {
+                        for (int i = 0; i < dataLists.get(currentCategory).size(); i++) {
                             User item = dataLists.get(currentCategory).get(i);
                             if (item.getUsername().equals(username)) {
                                 if (currentCategory.equals("most_points")) {
@@ -148,6 +152,7 @@ public class LeaderboardController {
                 });
     }
 
+
     /**
      * Sorts the arrays used in the leaderboard by their category
      *
@@ -157,19 +162,19 @@ public class LeaderboardController {
         dataLists.get("most_points").sort(new Comparator<User>() {
             @Override
             public int compare(User user, User t1) {
-                return t1.getStats().get("total_points")-user.getStats().get("total_points");
+                return t1.getStats().get("total_points") - user.getStats().get("total_points");
             }
         });
         dataLists.get("most_codes").sort(new Comparator<User>() {
             @Override
             public int compare(User user, User t1) {
-                return t1.getStats().get("num_codes")-user.getStats().get("num_codes");
+                return t1.getStats().get("num_codes") - user.getStats().get("num_codes");
             }
         });
         dataLists.get("best_code").sort(new Comparator<User>() {
             @Override
             public int compare(User user, User t1) {
-                return t1.getStats().get("best_code")-user.getStats().get("best_code");
+                return t1.getStats().get("best_code") - user.getStats().get("best_code");
             }
         });
         dataLists.get("region_best").sort(new Comparator<User>() {
@@ -182,38 +187,14 @@ public class LeaderboardController {
 
 
     /**
-     * gets a users best code points in a region from the db
-     *
-     * @param scannedCodesCollection
-     * @param name
-     * @return best (int of best scoring code in the region)
-     */
-    private void getRegionBest(@NonNull CollectionReference scannedCodesCollection, String name) {
-        scannedCodesCollection.addSnapshotListener((value, error) -> {
-            userRegionBest = 0;
-            assert value != null;
-            for (QueryDocumentSnapshot codeDoc : value) {
-                Log.d("REGIONBESTQUERY", "Getting scanned codes by: " + name + " " +
-                        codeDoc.getId() + " " + String.valueOf(codeDoc.get("points")) +
-                        " best: " + String.valueOf(userRegionBest));
-                if (codeDoc.getData().get("points") != null) {
-                    int points = Integer.parseInt(String.valueOf(codeDoc.getData().get("points")));
-                    if (points >= userRegionBest) {
-                        userRegionBest = points;
-                    }
-                }
-            }
-        });
-    }
-
-
-    /**
+     * Gets a users best code points in a region from the db
      * Resolving async issues with a callback.
      * https://stackoverflow.com/a/48500679 by Alex Mamo
-     * @param scannedCodesCollection
-     * @param regionBestCallback
+     *
+     * @param scannedCodesCollection A collection reference of scanned codes in Firestore
+     * @param regionBestCallback     The interface to return the query result to once completed
      */
-    private void getRegionBruh(@NonNull CollectionReference scannedCodesCollection,
+    private void getRegionBest(@NonNull CollectionReference scannedCodesCollection,
                                RegionBestCallback regionBestCallback) {
         scannedCodesCollection.addSnapshotListener((value, error) -> {
             userRegionBest = 0;
@@ -232,6 +213,11 @@ public class LeaderboardController {
     }
 }
 
+
+/**
+ * A callback interface to get the best code in the region.
+ * https://stackoverflow.com/a/48500679 by Alex Mamo
+ */
 interface RegionBestCallback {
     void onCallback(int userRegionBest);
 }
