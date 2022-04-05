@@ -246,28 +246,7 @@ public class MapViewFragment extends Fragment {
                     initLocationComponent();
                     setupGesturesListener();
                 });
-
-        // https://developer.android.com/guide/topics/ui/look-and-feel/darktheme#java
-        // https://stackoverflow.com/a/41451143 by harshithdwivedi
-        int currentTheme = getResources().getConfiguration().uiMode & Configuration.UI_MODE_NIGHT_MASK;
-        switch (currentTheme) {
-            case Configuration.UI_MODE_NIGHT_NO:
-                mapView.getMapboxMap().loadStyleUri(Style.MAPBOX_STREETS,
-                        style -> {
-                            initLocationComponent();
-                            setupGesturesListener();
-                        });
-                break;
-            case Configuration.UI_MODE_NIGHT_YES:
-                mapView.getMapboxMap().loadStyleUri(Style.DARK,
-                        style -> {
-                            initLocationComponent();
-                            setupGesturesListener();
-                        });
-                break;
-        }
     }
-
 
     /**
      * Add a onMoveListener for when the player manually moves the map camera.
@@ -329,10 +308,10 @@ public class MapViewFragment extends Fragment {
         startActivityForResult(intent, 1);
     }
 
-    // https://www.tutorialspoint.com/how-to-send-data-to-previous-activity-in-android
 
     /**
      * Handles returning from the scanner activity and send to enter qr info activity
+     * https://www.tutorialspoint.com/how-to-send-data-to-previous-activity-in-android
      *
      * @param requestCode
      * @param resultCode
@@ -367,6 +346,7 @@ public class MapViewFragment extends Fragment {
         assert gesturesPlugin != null;
         assert locationComponentPlugin != null;
 
+        // Listen for changes to the player's location and touch events on the map
         locationComponentPlugin.addOnIndicatorPositionChangedListener(posChangedListener);
         gesturesPlugin.addOnMoveListener(onMoveListener);
     }
@@ -406,6 +386,13 @@ public class MapViewFragment extends Fragment {
         setButtonsActions();
     }
 
+
+    /**
+     * Force a draw annotations to map with serialised JSON data regardless of prior draw states
+     *
+     * @param POIList     List of Points of Interests
+     * @param forceRedraw Boolean to control redraws when called within the package
+     */
     protected void addMapMarkers(@NonNull List<MapPOI> POIList, Boolean forceRedraw) {
 
         if (forceRedraw) {
@@ -438,6 +425,11 @@ public class MapViewFragment extends Fragment {
     }
 
 
+    /**
+     * Create and draw annotations to map with serialised JSON data.
+     *
+     * @param POIList List of Point of Interests
+     */
     protected void addMapMarkers(@NonNull List<MapPOI> POIList) {
 
         if (mViewModel.lastPOILen != POIList.size()) {
@@ -486,15 +478,18 @@ public class MapViewFragment extends Fragment {
 
 
     /**
-     * Based on: https://material.io/components/sheets-bottom/android#using-bottom-sheets
+     * Launches a fragment to show the information of a QR code displayed on the map.
      *
-     * @param circleAnnotation
+     * @param circleAnnotation The annotation tapped on the map, with position and JSON-formatted
+     *                         data.
      */
     private void showInfoSheet(@NonNull CircleAnnotation circleAnnotation) {
+        // Deserialize the data back into their original types
         JsonObject annotationData = circleAnnotation.getData().getAsJsonObject();
         String hash = annotationData.get("sha256").getAsString();
         int intPoints = annotationData.get("points").getAsInt();
 
+        // Pass the deserialized data as a bundle to the QR Code details fragment
         NavController navController = Navigation.findNavController(requireView());
         Bundle bundle = new Bundle();
         bundle.putString("sha", hash);

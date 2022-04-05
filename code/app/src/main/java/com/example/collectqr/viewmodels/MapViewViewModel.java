@@ -27,8 +27,8 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
- * A class which contains information about map markers, which indicate possible QR codes
- * to be scanned
+ * View model that maintains primarily an observable of Points of Interests to display,
+ * but also provides location updates making use of the application context.
  */
 public class MapViewViewModel extends AndroidViewModel {
     /*
@@ -41,8 +41,8 @@ public class MapViewViewModel extends AndroidViewModel {
 
     // Constants
     public final Double MAX_RADIUS = 50000.0;    // 500KM search radius max
-    public final String COLLECTION = "QRCodes"; // Collection to query
-    public final String ORDERING = "geohash";   // How to order the documents
+    public final String COLLECTION = "QRCodes";  // Collection to query
+    public final String ORDERING = "geohash";    // How to order the documents
     public final String LOGGER_TAG = "MapViewController";
 
     // Class Variables
@@ -51,7 +51,8 @@ public class MapViewViewModel extends AndroidViewModel {
     private MutableLiveData<Location> locationLiveData;
     private MutableLiveData<List<MapPOI>> qrGeoLocations;
     public int lastPOILen = 0;
-    public Boolean dataLoaded = false;
+    public Boolean dataLoaded = false;           // Boolean to decide if data has already been
+    // downloaded.
 
 
     public MapViewViewModel(@NonNull Application application) {
@@ -60,11 +61,13 @@ public class MapViewViewModel extends AndroidViewModel {
 
 
     /**
-     * Get a list of
-     * @param location
-     * @return
+     * Return an observable List of Points of Interests, which can be used to annotate a map.
+     *
+     * @param location The player's current location to search for nearby QR codes from
+     * @return An observable list of map points-of-interests
      */
     public LiveData<List<MapPOI>> getPOIList(Location location) {
+        // If observing for the first time, instantiate our observable and retrieve the data
         if (qrGeoLocations == null && location != null) {
             qrGeoLocations = new MutableLiveData<>();
             loadGeoLocations(location);
@@ -73,7 +76,13 @@ public class MapViewViewModel extends AndroidViewModel {
     }
 
 
+    /**
+     * Generate the bounds of our search area and query Firestore for nearby QR codes.
+     *
+     * @param location The location the player wants to search
+     */
     private void loadGeoLocations(Location location) {
+        // Preparing the query with our search area as a geohash
         GeoLocation searchLocation = new GeoLocation(location.getLatitude(), location.getLongitude());
         String hash = GeoFireUtils.getGeoHashForLocation(searchLocation);
         double radiusInM = MAX_RADIUS;
@@ -98,16 +107,24 @@ public class MapViewViewModel extends AndroidViewModel {
                         matchingDocs.addAll(snap.getDocuments());
                     }
                     Log.d(LOGGER_TAG, Arrays.toString(matchingDocs.toArray()));
+                    // Generate GeoJson Points compatible with Mapbox in
                     generatePoints(matchingDocs);
                 });
     }
 
 
+    /**
+     * Generate an observable list of GeoJson Points.
+     *
+     * @param matchingDocs A list of DocumentSnapshots that matched the search area criteria
+     */
     private void generatePoints(@NonNull List<DocumentSnapshot> matchingDocs) {
         int listSize = matchingDocs.size();
 
+        // Clear the POIList if populated.
         POIList.clear();
 
+        // Iterate through every doc, get the necessary data to make a Point and add to List
         for (DocumentSnapshot doc : matchingDocs) {
             String lat_str = doc.getString("latitude");
             String lng_str = doc.getString("longitude");
@@ -133,15 +150,25 @@ public class MapViewViewModel extends AndroidViewModel {
     }
 
 
+    /**
+     * Force setting the current location (like on map click).
+     *
+     * @param location The location the player wants to set
+     */
     public void setLocation(Location location) {
-       if (locationLiveData == null) {
-           locationLiveData = new MutableLiveData<>();
-       }
+        if (locationLiveData == null) {
+            locationLiveData = new MutableLiveData<>();
+        }
 
         locationLiveData.setValue(location);
     }
 
 
+    /**
+     * Get the last known location that was set manually or through a location manager.
+     *
+     * @return An observable data type with the last known location
+     */
     public LiveData<Location> getLastKnownLocation() {
         return locationLiveData;
     }
