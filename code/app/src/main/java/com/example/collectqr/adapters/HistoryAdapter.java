@@ -72,7 +72,6 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.ViewHold
          * @return public
          */
         public ViewHolder(View view, OnRecyclerItemClickListener listener) {
-
             super(view);
             // Define click listener for the ViewHolder's View
 
@@ -82,13 +81,6 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.ViewHold
 
             view.setOnClickListener(new View.OnClickListener() {
                 @Override
-
-/**
- *
- * On click
- *
- * @param view  the view
- */
                 public void onClick(View view) {
 
                     if (listener != null) {
@@ -133,7 +125,6 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.ViewHold
          * @return the image view
          */
         public ImageView getImageView() {
-
             return imageView;
         }
     }
@@ -142,24 +133,21 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.ViewHold
      * Initialize the dataset of the Adapter.
      */
     public HistoryAdapter(ArrayList<QRCode> qrHistoryData) {
-
         this.qrHistoryData = qrHistoryData;
 
     }
 
     // Create new views (invoked by the layout manager)
     @Override
-
-/**
- *
- * On create view holder
- *
- * @param viewGroup  the view group
- * @param viewType  the view type
- * @return ViewHolder
- */
+    /**
+     *
+     * On create view holder
+     *
+     * @param viewGroup  the view group
+     * @param viewType  the view type
+     * @return ViewHolder
+     */
     public ViewHolder onCreateViewHolder(ViewGroup viewGroup, int viewType) {
-
         // Create a new view, which defines the UI of the list item
         this.viewGroup = viewGroup;
         View view = LayoutInflater.from(viewGroup.getContext())
@@ -169,16 +157,14 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.ViewHold
 
     // Replace the contents of a view (invoked by the layout manager)
     @Override
-
-/**
- *
- * On bind view holder
- *
- * @param viewHolder  the view holder
- * @param int  the int
- */
+    /**
+     *
+     * On bind view holder
+     *
+     * @param viewHolder  the view holder
+     * @param int  the int
+     */
     public void onBindViewHolder(ViewHolder viewHolder, final int position) {
-
         // Get element from your dataset at this position and replace the
         // contents of the view with that element
         QRCode currentItem = qrHistoryData.get(position);
@@ -193,21 +179,18 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.ViewHold
         StorageReference storageReference = storage.getReferenceFromUrl("gs://collectqr7.appspot.com/"+currentItem.getQr_image());
         Glide.with(viewGroup.getContext())
                 .load(storageReference)
-                .placeholder(R.drawable.ic_baseline_image_not_supported_24)
                 .into(viewHolder.getImageView());
     }
 
     // Return the size of your dataset (invoked by the layout manager)
     @Override
-
-/**
- *
- * Gets the item count
- *
- * @return the item count
- */
+    /**
+     *
+     * Gets the item count
+     *
+     * @return the item count
+     */
     public int getItemCount() {
-
         return qrHistoryData.size();
     }
 }

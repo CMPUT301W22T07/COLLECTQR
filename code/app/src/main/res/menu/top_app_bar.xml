@@ -9,7 +9,8 @@
         android:icon="?android:attr/actionModeWebSearchDrawable"
         app:showAsAction="collapseActionView|ifRoom"
         android:title="Search for User"
-        android:visible="false"/>
+        android:visible="false"
+        app:actionViewClass="androidx.appcompat.widget.SearchView"/>
 
     <item
         android:id="@+id/user_profile"
