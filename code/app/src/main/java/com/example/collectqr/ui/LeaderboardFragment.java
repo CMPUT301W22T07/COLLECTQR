@@ -199,18 +199,20 @@ public class LeaderboardFragment extends Fragment {
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
+                String correctQuery = "";
                 query = query.trim().toLowerCase(Locale.ROOT);
                 boolean valid = false;
                 ArrayList<User> listToSearch = dataLists.get(leaderboardController.getCurrentCategory());
                 for (int i=0; i<listToSearch.size(); i++) {
                     if (listToSearch.get(i).getUsername().toLowerCase().equals(query)) {
                         valid = true;
+                        correctQuery = listToSearch.get(i).getUsername();
                     }
                 }
                 if (valid) {
                     NavController navController = Navigation.findNavController(getActivity(), R.id.nav_host_fragment_container_main);
                     Bundle bundle = new Bundle();
-                    bundle.putString("username", query);
+                    bundle.putString("username", correctQuery);
                     searchItem.collapseActionView();
                     navController.navigate(R.id.navigation_user_profile, bundle);
                 } else {
