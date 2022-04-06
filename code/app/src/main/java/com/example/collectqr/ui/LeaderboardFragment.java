@@ -17,6 +17,8 @@ import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.AccelerateInterpolator;
+import android.view.animation.DecelerateInterpolator;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -33,6 +35,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.collectqr.R;
 import com.example.collectqr.adapters.LeaderboardRecyclerAdapter;
+import com.example.collectqr.adapters.LeaderboardRecyclerListener;
 import com.example.collectqr.data.LeaderboardController;
 import com.example.collectqr.utilities.Preferences;
 import com.example.collectqr.model.User;
@@ -50,7 +53,7 @@ import java.util.Locale;
  * Use the {@link LeaderboardFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class LeaderboardFragment extends Fragment{
+public class LeaderboardFragment extends Fragment {
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -68,6 +71,7 @@ public class LeaderboardFragment extends Fragment{
     private String username;
     private ArrayMap<String, ArrayList<User>> dataLists;
     private ArrayMap<String, LeaderboardRecyclerAdapter> adapterLists;
+    private LinearLayout persistentPlayerInfo;
     private TextView personalUsername;
     private TextView personalScore;
     private TextView personalRank;
@@ -132,7 +136,7 @@ public class LeaderboardFragment extends Fragment{
         // get user location
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(context);
         if (ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
-                && ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED){
+                && ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             latitude = 0;
             longitude = 0;
         } else {
@@ -164,7 +168,7 @@ public class LeaderboardFragment extends Fragment{
         tabs = rootView.findViewById(R.id.leaderboard_tabs);
 
         //get access to persistent UI element
-        LinearLayout persistentPlayerInfo = rootView.findViewById(R.id.persistent_user_score);
+        persistentPlayerInfo = rootView.findViewById(R.id.persistent_user_score);
 
         dataLists = new ArrayMap<>();
         dataLists.put("most_points", new ArrayList<>());
@@ -181,6 +185,7 @@ public class LeaderboardFragment extends Fragment{
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getContext());
         leaderboardList.setLayoutManager(layoutManager);
         leaderboardList.setAdapter(adapterLists.get("most_points"));
+        setLeaderboardScrollListener(leaderboardList);
 
         leaderboardController.downloadData(dataLists, adapterLists, personalScore, personalRank, latitude, longitude);
 
@@ -194,7 +199,7 @@ public class LeaderboardFragment extends Fragment{
         toolbar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem menuItem) {
-                if (menuItem.getItemId()==R.id.user_search) {
+                if (menuItem.getItemId() == R.id.user_search) {
                     setUpSearchView(menuItem);
                 }
                 return false;
@@ -205,7 +210,7 @@ public class LeaderboardFragment extends Fragment{
             @Override
             public void onClick(View view) {
                 //redirect the user to their own profile if the bottom persistent layout is clicked
-                NavController navController =  Navigation.findNavController(getView());
+                NavController navController = Navigation.findNavController(getView());
                 Bundle bundle = new Bundle();
                 bundle.putString("username", username);
                 navController.navigate(R.id.navigation_user_profile, bundle);
@@ -217,13 +222,43 @@ public class LeaderboardFragment extends Fragment{
         return rootView;
     }
 
+
+    /**
+     * Set a listener for scrolling events of the passed in RecyclerView.
+     * Source:
+     * https://mzgreen.github.io/2015/02/15/How-to-hideshow-Toolbar-when-list-is-scroling(part1)/
+     *
+     * @param leaderboardList The Recycler View to attach a listener to
+     */
+    private void setLeaderboardScrollListener(RecyclerView leaderboardList) {
+        leaderboardList.setOnScrollListener(new LeaderboardRecyclerListener() {
+
+            @Override
+            public void onHide() {
+                persistentPlayerInfo.animate()
+                        .translationY(persistentPlayerInfo.getHeight() + 69)
+                        .setInterpolator(new AccelerateInterpolator(2))
+                        .start();
+            }
+
+            @Override
+            public void onShow() {
+                persistentPlayerInfo.animate()
+                        .translationY(0)
+                        .setInterpolator(new DecelerateInterpolator(2))
+                        .start();
+            }
+
+        });
+    }
+
     private void setUpSearchView(MenuItem searchItem) {
         SearchView searchView = (SearchView) searchItem.getActionView();
         /*
         StackOverflow, Author CoolMind
         https://stackoverflow.com/a/26251197
          */
-        EditText txtSearch = ((EditText)searchView.findViewById(androidx.appcompat.R.id.search_src_text));
+        EditText txtSearch = ((EditText) searchView.findViewById(androidx.appcompat.R.id.search_src_text));
         txtSearch.setHint("Enter a username");
         txtSearch.setHintTextColor(Color.LTGRAY);
         txtSearch.setTextColor(Color.WHITE);
@@ -238,7 +273,7 @@ public class LeaderboardFragment extends Fragment{
                 query = query.trim().toLowerCase(Locale.ROOT);
                 boolean valid = false;
                 ArrayList<User> listToSearch = dataLists.get(leaderboardController.getCurrentCategory());
-                for (int i=0; i<listToSearch.size(); i++) {
+                for (int i = 0; i < listToSearch.size(); i++) {
                     if (listToSearch.get(i).getUsername().toLowerCase().equals(query)) {
                         valid = true;
                         correctQuery = listToSearch.get(i).getUsername();
@@ -256,6 +291,7 @@ public class LeaderboardFragment extends Fragment{
                 }
                 return false;
             }
+
             @Override
             public boolean onQueryTextChange(String newText) {
                 return false;
@@ -264,13 +300,13 @@ public class LeaderboardFragment extends Fragment{
     }
 
     private void setOnRecyclerItemClickListener() {
-        for ( String key : adapterLists.keySet()) {
+        for (String key : adapterLists.keySet()) {
             adapterLists.get(key).setOnItemClickListener(new LeaderboardRecyclerAdapter.OnRecyclerItemClickListener() {
                 @Override
                 public void onRecyclerItemClick(int position, String key) {
                     String userToView = dataLists.get(key).get(position).getUsername();
                     //Navigate to the User Profile of the user that was clicked on
-                    NavController navController =  Navigation.findNavController(getView());
+                    NavController navController = Navigation.findNavController(getView());
                     Bundle bundle = new Bundle();
                     bundle.putString("username", userToView);
                     navController.navigate(R.id.navigation_user_profile, bundle);
@@ -285,19 +321,19 @@ public class LeaderboardFragment extends Fragment{
             if (item.getUsername().equals(username)) {
                 if (currentCategory.equals("most_points")) {
                     personalScore.setText(item.getStats().get("total_points") + " points");
-                    String rankStr = Integer.toString(i+1);
+                    String rankStr = Integer.toString(i + 1);
                     personalRank.setText("#" + rankStr);
                 } else if (currentCategory.equals("most_codes")) {
                     personalScore.setText(item.getStats().get("num_codes") + " codes");
-                    String rankStr = Integer.toString(i+1);
+                    String rankStr = Integer.toString(i + 1);
                     personalRank.setText("#" + rankStr);
                 } else if (currentCategory.equals("best_code")) {
                     personalScore.setText(item.getStats().get("best_code") + " points");
-                    String rankStr = Integer.toString(i+1);
+                    String rankStr = Integer.toString(i + 1);
                     personalRank.setText("#" + rankStr);
-                } else if (currentCategory.equals("region_best")){
+                } else if (currentCategory.equals("region_best")) {
                     personalScore.setText(item.getStats().get("region_best") + " points");
-                    String rankStr = Integer.toString(i+1);
+                    String rankStr = Integer.toString(i + 1);
                     personalRank.setText("#" + rankStr);
                 }
             }
@@ -323,7 +359,7 @@ public class LeaderboardFragment extends Fragment{
                     leaderboardList.setAdapter(adapterLists.get("best_code"));
                     leaderboardController.setCurrentCategory("best_code");
                     updatePersonalCard("best_code");
-                } else if (tab.getPosition()==3) {
+                } else if (tab.getPosition() == 3) {
                     leaderboardList.setAdapter(adapterLists.get("region_best"));
                     leaderboardController.setCurrentCategory("region_best");
                     updatePersonalCard("region_best");
