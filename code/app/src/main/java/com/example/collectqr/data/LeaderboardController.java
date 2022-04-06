@@ -2,6 +2,11 @@ package com.example.collectqr.data;
 
 import static android.content.ContentValues.TAG;
 
+import android.Manifest;
+import android.content.Context;
+import android.content.pm.PackageManager;
+import android.graphics.Region;
+import android.location.Location;
 import android.location.LocationManager;
 
 import android.util.ArrayMap;
@@ -219,7 +224,7 @@ public class LeaderboardController {
      *
      * @param scannedCodesCollection A collection reference of scanned codes in Firestore
      * @param regionBestCallback     The interface to return the query result to once completed
-     *
+     */
     private void getRegionBest(@NonNull CollectionReference scannedCodesCollection, int userLat, int userLon,
                                RegionBestCallback regionBestCallback) {
         scannedCodesCollection.addSnapshotListener((value, error) -> {
@@ -255,11 +260,8 @@ public class LeaderboardController {
 /**
  * A callback interface to get the best code in the region.
  * https://stackoverflow.com/a/48500679 by Alex Mamo
- *
+ */
 interface RegionBestCallback {
     void onCallback(int userRegionBest);
 }
-
- */
-
 
