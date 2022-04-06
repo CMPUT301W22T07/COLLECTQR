@@ -33,7 +33,9 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.collectqr.R;
 import com.example.collectqr.adapters.LeaderboardRecyclerAdapter;
+import com.example.collectqr.adapters.RegionQRsAdapter;
 import com.example.collectqr.data.LeaderboardController;
+import com.example.collectqr.model.QRCode;
 import com.example.collectqr.utilities.Preferences;
 import com.example.collectqr.model.User;
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -67,13 +69,16 @@ public class LeaderboardFragment extends Fragment{
     private RecyclerView leaderboardList;
     private String username;
     private ArrayMap<String, ArrayList<User>> dataLists;
+    private ArrayList<QRCode> regionData;
     private ArrayMap<String, LeaderboardRecyclerAdapter> adapterLists;
+    private RegionQRsAdapter regionAdapter;
+    private View personalCard;
     private TextView personalUsername;
     private TextView personalScore;
     private TextView personalRank;
     private TabLayout tabs;
-    private int latitude;
-    private int longitude;
+    private Double latitude;
+    private Double longitude;
     private Context context;
 
     public LeaderboardFragment() {
@@ -133,8 +138,8 @@ public class LeaderboardFragment extends Fragment{
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(context);
         if (ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
                 && ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED){
-            latitude = 0;
-            longitude = 0;
+            latitude = null;
+            longitude = null;
         } else {
             fusedLocationClient.getLastLocation()
                     .addOnSuccessListener((Activity) context, new OnSuccessListener<Location>() {
@@ -142,8 +147,8 @@ public class LeaderboardFragment extends Fragment{
                         public void onSuccess(Location location) {
                             // Got last known location. In some rare situations this can be null.
                             if (location != null) {
-                                latitude = (int) location.getLatitude();
-                                longitude = (int) location.getLongitude();
+                                latitude = location.getLatitude();
+                                longitude = location.getLongitude();
                             }
                         }
                     });
@@ -158,6 +163,7 @@ public class LeaderboardFragment extends Fragment{
 
         // save views as variables
         leaderboardList = rootView.findViewById(R.id.leaderboard_list);
+        personalCard = rootView.findViewById(R.id.persistent_user_score);
         personalUsername = rootView.findViewById(R.id.personal_username_text);
         personalScore = rootView.findViewById(R.id.personal_score_text);
         personalRank = rootView.findViewById(R.id.personal_rank_text);
@@ -170,20 +176,22 @@ public class LeaderboardFragment extends Fragment{
         dataLists.put("most_points", new ArrayList<>());
         dataLists.put("most_codes", new ArrayList<>());
         dataLists.put("best_code", new ArrayList<>());
-        dataLists.put("region_best", new ArrayList<>());
+
+        regionData = new ArrayList<QRCode>();
 
         adapterLists = new ArrayMap<>();
         adapterLists.put("most_points", new LeaderboardRecyclerAdapter(dataLists.get("most_points"), "most_points"));
         adapterLists.put("most_codes", new LeaderboardRecyclerAdapter(dataLists.get("most_codes"), "most_codes"));
         adapterLists.put("best_code", new LeaderboardRecyclerAdapter(dataLists.get("best_code"), "best_code"));
-        adapterLists.put("region_best", new LeaderboardRecyclerAdapter(dataLists.get("region_best"), "region_best"));
+
+        regionAdapter = new RegionQRsAdapter(regionData, "region_best");
 
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getContext());
         leaderboardList.setLayoutManager(layoutManager);
         leaderboardList.setAdapter(adapterLists.get("most_points"));
 
-        leaderboardController.downloadData(dataLists, adapterLists, personalScore, personalRank, latitude, longitude);
-
+        leaderboardController.downloadData(dataLists, adapterLists, personalScore, personalRank);
+        leaderboardController.downloadRegionData(regionData, regionAdapter, latitude, longitude);
 
         setOnRecyclerItemClickListener();
 
@@ -280,25 +288,28 @@ public class LeaderboardFragment extends Fragment{
     }
 
     public void updatePersonalCard(String currentCategory) {
-        for (int i = 0; i < dataLists.get(currentCategory).size(); i++) {
-            User item = dataLists.get(currentCategory).get(i);
-            if (item.getUsername().equals(username)) {
-                if (currentCategory.equals("most_points")) {
-                    personalScore.setText(item.getStats().get("total_points") + " points");
-                    String rankStr = Integer.toString(i+1);
-                    personalRank.setText("#" + rankStr);
-                } else if (currentCategory.equals("most_codes")) {
-                    personalScore.setText(item.getStats().get("num_codes") + " codes");
-                    String rankStr = Integer.toString(i+1);
-                    personalRank.setText("#" + rankStr);
-                } else if (currentCategory.equals("best_code")) {
-                    personalScore.setText(item.getStats().get("best_code") + " points");
-                    String rankStr = Integer.toString(i+1);
-                    personalRank.setText("#" + rankStr);
-                } else if (currentCategory.equals("region_best")){
-                    personalScore.setText(item.getStats().get("region_best") + " points");
-                    String rankStr = Integer.toString(i+1);
-                    personalRank.setText("#" + rankStr);
+        if (currentCategory.equals("region_best")) {
+            personalCard.setVisibility(View.INVISIBLE);
+        } else {
+            for (int i = 0; i < dataLists.get(currentCategory).size(); i++) {
+                User item = dataLists.get(currentCategory).get(i);
+                if (item.getUsername().equals(username)) {
+                    if (currentCategory.equals("most_points")) {
+                        personalScore.setText(item.getStats().get("total_points") + " points");
+                        String rankStr = Integer.toString(i + 1);
+                        personalRank.setText("#" + rankStr);
+                        personalCard.setVisibility(View.VISIBLE);
+                    } else if (currentCategory.equals("most_codes")) {
+                        personalScore.setText(item.getStats().get("num_codes") + " codes");
+                        String rankStr = Integer.toString(i + 1);
+                        personalRank.setText("#" + rankStr);
+                        personalCard.setVisibility(View.VISIBLE);
+                    } else if (currentCategory.equals("best_code")) {
+                        personalScore.setText(item.getStats().get("best_code") + " points");
+                        String rankStr = Integer.toString(i + 1);
+                        personalRank.setText("#" + rankStr);
+                        personalCard.setVisibility(View.VISIBLE);
+                    }
                 }
             }
         }
@@ -324,7 +335,7 @@ public class LeaderboardFragment extends Fragment{
                     leaderboardController.setCurrentCategory("best_code");
                     updatePersonalCard("best_code");
                 } else if (tab.getPosition()==3) {
-                    leaderboardList.setAdapter(adapterLists.get("region_best"));
+                    leaderboardList.setAdapter(regionAdapter);
                     leaderboardController.setCurrentCategory("region_best");
                     updatePersonalCard("region_best");
                 }
