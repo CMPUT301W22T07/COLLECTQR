@@ -2,29 +2,39 @@ package com.example.collectqr.data;
 
 import static android.content.ContentValues.TAG;
 
+import android.location.LocationManager;
 import android.util.ArrayMap;
 import android.util.Log;
 import android.widget.TextView;
 
-import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.example.collectqr.adapters.LeaderboardRecyclerAdapter;
+import com.example.collectqr.adapters.RegionQRsAdapter;
+import com.example.collectqr.model.QRCode;
 import com.example.collectqr.model.User;
-import com.google.firebase.firestore.CollectionReference;
+import com.firebase.geofire.GeoFireUtils;
+import com.firebase.geofire.GeoLocation;
+import com.firebase.geofire.GeoQueryBounds;
+import com.google.android.gms.tasks.Task;
+import com.google.android.gms.tasks.Tasks;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
+import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.List;
 
 /**
  * Controls and manages the data needed for LeaderboardFragement
  */
 public class LeaderboardController {
+    protected LocationManager locationManager;
     private String username;
     private FirebaseFirestore db;
     private String currentCategory = "most_points";
@@ -69,8 +79,9 @@ public class LeaderboardController {
      * @param score     this is the view that will display the user's score
      * @param rank      this is the view that will display the user's rank
      */
-    public void downloadData(ArrayMap<String, ArrayList<User>> dataLists, ArrayMap<String, LeaderboardRecyclerAdapter> adapters,
-                             TextView score, TextView rank) {
+
+    public void downloadData(ArrayMap<String, ArrayList<User>> dataLists, ArrayMap<String, LeaderboardRecyclerAdapter> adapters, TextView score, TextView rank) {
+
         LeaderboardController controller = this;
         db.collection("Users")
                 .addSnapshotListener(new EventListener<QuerySnapshot>() {
@@ -91,34 +102,13 @@ public class LeaderboardController {
                             int numCodes = Integer.parseInt(String.valueOf(doc.getData().get("num_codes")));
                             int bestCode = Integer.parseInt(String.valueOf(doc.getData().get("best_code")));
 
-                            // get best code from region
-                            // setup futuretask to wait for asynchronous query of getRegionBest
-                            int regionBest;
-                            userRegionBest = 0;
-                            CollectionReference scannedCodesCollection =
-                                    doc.getReference().collection("ScannedCodes");
-
-                            // Get the best code in the region and add to list
-                            getRegionBest(scannedCodesCollection, userRegionBest -> {
-                                User userObj = new User(name);
-                                System.out.println("adding user object with stats: numCodes-" + numCodes +
-                                        " totalPoints-" + totalPoints + " bestCode-" + bestCode + " regionBest-" + userRegionBest);
-                                userObj.updateScore(numCodes, totalPoints, bestCode, userRegionBest);
-                                dataLists.get("most_points").add(userObj);
-                                dataLists.get("most_codes").add(userObj);
-                                dataLists.get("best_code").add(userObj);
-                                dataLists.get("region_best").add(userObj);
-
-                                // A cheat, resort the list and notify adapters again, inside of
-                                // this async task.
-                                controller.sortLists(dataLists);
-                                adapters.get("most_points").notifyDataSetChanged();
-                                adapters.get("most_codes").notifyDataSetChanged();
-                                adapters.get("best_code").notifyDataSetChanged();
-                                adapters.get("region_best").notifyDataSetChanged();
-                            });
+                            User userObj = new User(name);
+                            userObj.updateScore(numCodes, totalPoints, bestCode, userRegionBest);
+                            dataLists.get("most_points").add(userObj);
+                            dataLists.get("most_codes").add(userObj);
+                            dataLists.get("best_code").add(userObj);
                         }
-                        System.out.println("sorting data lists");
+                        controller.sortLists(dataLists);
 
                         // display the data in the persistent user card based on the updated lists
                         for (int i = 0; i < dataLists.get(currentCategory).size(); i++) {
@@ -147,7 +137,6 @@ public class LeaderboardController {
                         adapters.get("most_points").notifyDataSetChanged();
                         adapters.get("most_codes").notifyDataSetChanged();
                         adapters.get("best_code").notifyDataSetChanged();
-                        adapters.get("region_best").notifyDataSetChanged();
                     }
                 });
     }
@@ -177,47 +166,46 @@ public class LeaderboardController {
                 return t1.getStats().get("best_code") - user.getStats().get("best_code");
             }
         });
-        dataLists.get("region_best").sort(new Comparator<User>() {
-            @Override
-            public int compare(User user, User t1) {
-                return t1.getStats().get("region_best") - user.getStats().get("region_best");
-            }
-        });
     }
 
-
-    /**
-     * Gets a users best code points in a region from the db
-     * Resolving async issues with a callback.
-     * https://stackoverflow.com/a/48500679 by Alex Mamo
-     *
-     * @param scannedCodesCollection A collection reference of scanned codes in Firestore
-     * @param regionBestCallback     The interface to return the query result to once completed
-     */
-    private void getRegionBest(@NonNull CollectionReference scannedCodesCollection,
-                               RegionBestCallback regionBestCallback) {
-        scannedCodesCollection.addSnapshotListener((value, error) -> {
-            userRegionBest = 0;
-            assert value != null;
-            for (QueryDocumentSnapshot codeDoc : value) {
-                if (codeDoc.getData().get("points") != null) {
-                    int points = Integer.parseInt(String.valueOf(codeDoc.getData().get("points")));
-                    if (points >= userRegionBest) {
-                        userRegionBest = points;
+    public void downloadRegionData(ArrayList<QRCode> data, RegionQRsAdapter adapter, Double lat, Double lon) {
+        GeoLocation searchLocation = new GeoLocation(lat, lon);
+        List<GeoQueryBounds> bounds = GeoFireUtils.getGeoHashQueryBounds(searchLocation, 5000);
+        List<Task<QuerySnapshot>> tasks = new ArrayList<>();
+        // Query and create tasks
+        for (GeoQueryBounds bound : bounds) {
+            Query query = db.collection("QRCodes")
+                    .orderBy("geohash")
+                    .startAt(bound.startHash)
+                    .endAt(bound.endHash);
+            tasks.add(query.get());
+        }
+        // Add matching documents to list on tasks completing
+        Tasks.whenAllComplete(tasks)
+                .addOnCompleteListener(t -> {
+                    data.clear();
+                    for (Task<QuerySnapshot> task : tasks) {
+                        QuerySnapshot snap = task.getResult();
+                        for (DocumentSnapshot doc : snap.getDocuments()) {
+                            QRCode code = new QRCode(doc.getId());
+                            code.setPoints(Integer.parseInt(doc.get("points").toString()));
+                            code.setAllLocations(Double.parseDouble(doc.getString("latitude")),
+                                    Double.parseDouble(doc.getString("longitude")));
+                            data.add(code);
+                        }
                     }
-                }
-            }
-            regionBestCallback.onCallback(userRegionBest);
-        });
-
+                    Log.d("LeaderboardController", "Size of current code list: " + data.size());
+                    sortRegionList(data);
+                    adapter.notifyDataSetChanged();
+                });
     }
-}
 
-
-/**
- * A callback interface to get the best code in the region.
- * https://stackoverflow.com/a/48500679 by Alex Mamo
- */
-interface RegionBestCallback {
-    void onCallback(int userRegionBest);
+    private void sortRegionList(ArrayList<QRCode> data) {
+        data.sort(new Comparator<QRCode>() {
+            @Override
+            public int compare(QRCode qrCode, QRCode t1) {
+                return t1.getPoints() - qrCode.getPoints();
+            }
+        });
+    }
 }

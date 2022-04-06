@@ -323,10 +323,19 @@ public class MapViewFragment extends Fragment {
         if (resultCode == Activity.RESULT_OK) {
             if (requestCode == 1) {
                 if (data != null) {
-                    Intent intent = new Intent(this.getActivity(), EnterQrInfoActivity.class);
-                    intent.putExtra("sha", data.getStringExtra("sha"));
-                    intent.putExtra("username", username);
-                    startActivity(intent);
+                    if (!data.getStringExtra("sha").isEmpty()) {
+                        Intent intent = new Intent(this.getActivity(), EnterQrInfoActivity.class);
+                        intent.putExtra("sha", data.getStringExtra("sha"));
+                        intent.putExtra("username", username);
+                        startActivity(intent);
+                    } else {
+                        String returnValue = data.getStringExtra("user_to_view");
+                        System.out.println("RETURN VALUE: " + returnValue);
+                        NavController navController =  Navigation.findNavController(getView());
+                        Bundle bundle = new Bundle();
+                        bundle.putString("username", returnValue);
+                        navController.navigate(R.id.navigation_user_profile, bundle);
+                    }
                 }
             }
         }
@@ -449,7 +458,7 @@ public class MapViewFragment extends Fragment {
                 // Converting a map point's qr code hash to json
                 // https://stackoverflow.com/a/12155874 by Ankur
                 Map<String, String> dataMap = new HashMap<>();
-                dataMap.put("sha256", mapPOI.getHash());
+                dataMap.put("sha", mapPOI.getHash());
 
                 // Parsing json
                 // https://howtodoinjava.com/gson/gson-jsonparser/
@@ -486,7 +495,7 @@ public class MapViewFragment extends Fragment {
     private void showInfoSheet(@NonNull CircleAnnotation circleAnnotation) {
         // Deserialize the data back into their original types
         JsonObject annotationData = circleAnnotation.getData().getAsJsonObject();
-        String hash = annotationData.get("sha256").getAsString();
+        String hash = annotationData.get("sha").getAsString();
         int intPoints = annotationData.get("points").getAsInt();
 
         // Pass the deserialized data as a bundle to the QR Code details fragment
@@ -548,6 +557,7 @@ public class MapViewFragment extends Fragment {
                                            @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         permManager.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        onMapReady();
     }
 
 

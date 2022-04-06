@@ -44,7 +44,7 @@ public class QRCodeControllerTest {
 
         db = FirebaseFirestore.getInstance();
         db.collection("QRCode")
-                .whereEqualTo("sha256", "fakeshafortesting")
+                .whereEqualTo("sha", "fakeshafortesting")
                 .get()
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {

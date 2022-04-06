@@ -21,7 +21,7 @@ public class MapPOI {
     // Constants
     // TODO: Consider moving these DB query field constants to a "Constants" class or maintain in
     //       *Controller classes.
-    private final String HASH_FIELD = "sha256";
+    private final String HASH_FIELD = "sha";
     private final String POINTS_FIELD = "points";
     private final String LOGGING_TAG = "MapPOI";
 

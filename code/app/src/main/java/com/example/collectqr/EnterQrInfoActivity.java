@@ -17,6 +17,7 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
 
 import com.example.collectqr.data.LocationRepository;
@@ -64,6 +65,23 @@ public class EnterQrInfoActivity extends AppCompatActivity {
         addImageButton = findViewById(R.id.qr_info_add_image);
         commentView = findViewById(R.id.qr_info_comment);
         Button saveButton = findViewById(R.id.qr_info_save_code);
+
+        /*
+        https://developer.android.com/training/appbar/setting-up#add-toolbar
+        https://stackoverflow.com/a/42837106
+        StackOverflow, Author tahsinRupam
+        https://stackoverflow.com/a/46928058
+        StackOverflow, Author: iman hoshmand
+        */
+        Toolbar toolbar = (Toolbar) findViewById(R.id.topAppBar);
+        setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                onBackPressed();
+            }
+        });
 
         QRCodeController qrCodeController = new QRCodeController();
         qrCode = new QRCode(sha);

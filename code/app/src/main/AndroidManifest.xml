@@ -48,7 +48,7 @@
             </intent-filter>
         </activity>
         <activity android:name=".LoginActivity" />
-        <activity android:name=".DummyActivity"/>
+        <activity android:name=".RedirectActivity"/>
     </application>
 
 </manifest>
