@@ -1,17 +1,19 @@
 package com.example.collectqr.ui;
 
+import android.Manifest;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.location.Location;
 import android.os.Bundle;
-import android.util.ArrayMap;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.content.res.AppCompatResources;
@@ -28,11 +30,10 @@ import com.example.collectqr.model.MapPOI;
 import com.example.collectqr.utilities.Preferences;
 import com.example.collectqr.viewmodels.MapViewViewModel;
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.gson.Gson;
-import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.mapbox.android.core.permissions.PermissionsListener;
 import com.mapbox.android.core.permissions.PermissionsManager;
 import com.mapbox.android.gestures.MoveGestureDetector;
 import com.mapbox.geojson.Point;
@@ -63,28 +64,43 @@ import java.util.Map;
 /**
  * A class for displaying the main map, specifically with configuring it, and
  * setting it to be centered around the users location.
- * See {@link Fragment}.
+ *
+ * @see Fragment
  */
 public class MapViewFragment extends Fragment {
 
     private final String TAG = "MapViewFragment";
-    private FragmentMapViewBinding binding;
-    private BottomSheetDialogFragment infoSheet;
-
-    // Map Variables
-    private MapView mapView;
     // Store reference and override the circle annotation click listener
     private final OnCircleAnnotationClickListener poiClickListener =
             circleAnnotation -> {
                 Point point = circleAnnotation.getPoint();
-                Toast.makeText(
-                        requireContext(),
-                        "Annotation clicked: " + point.latitude() + " " + point.longitude(),
-                        Toast.LENGTH_SHORT
-                ).show();
                 showInfoSheet(circleAnnotation);
                 return true;
             };
+    private FragmentMapViewBinding binding;
+    private BottomSheetDialogFragment infoSheet;
+    // Map Variables
+    private MapView mapView;
+    // Store reference and override the on-move listener
+    private final OnMoveListener onMoveListener = new OnMoveListener() {
+        @Override
+        public void onMoveBegin(@NonNull MoveGestureDetector moveGestureDetector) {
+            onCameraTrackingDismissed();
+        }
+
+        @Override
+        public boolean onMove(@NonNull MoveGestureDetector moveGestureDetector) {
+            return false;
+        }
+
+        @Override
+        public void onMoveEnd(@NonNull MoveGestureDetector moveGestureDetector) {
+        }
+    };
+    private Location lastKnownLocation;
+    private GesturesPlugin gesturesPlugin;
+    private LocationComponentPlugin locationComponentPlugin;
+    private MapViewViewModel mViewModel;
     // Store reference and override the position listener
     private final OnIndicatorPositionChangedListener posChangedListener =
             new OnIndicatorPositionChangedListener() {
@@ -145,27 +161,19 @@ public class MapViewFragment extends Fragment {
                 }
 
             };
-    // Store reference and override the on-move listener
-    private final OnMoveListener onMoveListener = new OnMoveListener() {
-        @Override
-        public void onMoveBegin(@NonNull MoveGestureDetector moveGestureDetector) {
-            onCameraTrackingDismissed();
-        }
-
-        @Override
-        public boolean onMove(@NonNull MoveGestureDetector moveGestureDetector) {
-            return false;
-        }
-
-        @Override
-        public void onMoveEnd(@NonNull MoveGestureDetector moveGestureDetector) {
-        }
-    };
-
-    private Location lastKnownLocation;
-    private GesturesPlugin gesturesPlugin;
-    private LocationComponentPlugin locationComponentPlugin;
-    private MapViewViewModel mViewModel;
+    /* Permissions callback because onRequestPermissionsResult is deprecated...
+       https://stackoverflow.com/a/63546099 by Ace
+       https://stackoverflow.com/a/66552678 by Daniel.Wang */
+    private final ActivityResultLauncher requestPermissionLauncher =
+            registerForActivityResult(new ActivityResultContracts.RequestPermission(), granted -> {
+                if (granted) {
+                    onMapReady();
+                } else {
+                    Toast.makeText(requireContext(),
+                            "Location is used to search for nearby QR codes",
+                            Toast.LENGTH_LONG).show();
+                }
+            });
     private PermissionsManager permManager;
     private String username;
 
@@ -211,26 +219,23 @@ public class MapViewFragment extends Fragment {
     private void checkPermissions() {
         if (PermissionsManager.areLocationPermissionsGranted(requireContext())) {
             onMapReady();
+        } else if (shouldShowRequestPermissionRationale("")) {
+            new MaterialAlertDialogBuilder(requireContext(),
+                    com.google.android.material.R.style.ThemeOverlay_Material3_Dialog)
+                    // https://stackoverflow.com/a/19064968 by Singhak
+                    .setCancelable(false)
+                    .setMessage("We rely on your current location to search for nearby QR codes " +
+                            "seamlessly. Recording your location is optional.")
+                    .setPositiveButton("OK", (dialogInterface, i) -> {
+                        // https://stackoverflow.com/a/27765687 by sivi
+                    })
+                    .show();
         } else {
-            permManager = new PermissionsManager(new PermissionsListener() {
-                @Override
-                public void onExplanationNeeded(List<String> list) {
-                    Toast.makeText(requireContext(),
-                            "Location is used to move the map to where you are",
-                            Toast.LENGTH_LONG).show();
-                }
-
-                @Override
-                public void onPermissionResult(boolean granted) {
-                    if (granted) {
-                        onMapReady();
-                    } else {
-                        requireActivity().finish();
-                    }
-                }
-            });
-            permManager.requestLocationPermissions(requireActivity());
+            requestPermissionLauncher.launch(
+                    Manifest.permission.ACCESS_FINE_LOCATION
+            );
         }
+
     }
 
 
@@ -331,7 +336,7 @@ public class MapViewFragment extends Fragment {
                     } else {
                         String returnValue = data.getStringExtra("user_to_view");
                         System.out.println("RETURN VALUE: " + returnValue);
-                        NavController navController =  Navigation.findNavController(getView());
+                        NavController navController = Navigation.findNavController(getView());
                         Bundle bundle = new Bundle();
                         bundle.putString("username", returnValue);
                         navController.navigate(R.id.navigation_user_profile, bundle);
@@ -346,6 +351,7 @@ public class MapViewFragment extends Fragment {
      * Move the map's camera to the player's current location.
      */
     private void onCameraTrackingRequested() {
+        checkPermissions();
         Toast.makeText(requireContext(), "Moving to your location", Toast.LENGTH_SHORT).show();
 
         GesturesPlugin gesturesPlugin = mapView.getPlugin(Plugin.MAPBOX_GESTURES_PLUGIN_ID);
@@ -365,7 +371,7 @@ public class MapViewFragment extends Fragment {
      * When the map camera moves, stop the camera from tracking the player's movement.
      */
     private void onCameraTrackingDismissed() {
-        Toast.makeText(requireContext(), "onCameraTrackingDismissed", Toast.LENGTH_SHORT).show();
+        Toast.makeText(requireContext(), "Camera tracking disabled", Toast.LENGTH_SHORT).show();
 
         GesturesPlugin gesturesPlugin = mapView.getPlugin(Plugin.MAPBOX_GESTURES_PLUGIN_ID);
         LocationComponentPlugin locationComponentPlugin =
