@@ -78,7 +78,6 @@ public class LeaderboardFragment extends Fragment {
     private TabLayout tabs;
     private double latitude;
     private double longitude;
-    private Context context;
 
     public LeaderboardFragment() {
         // Required empty public constructor
@@ -131,23 +130,22 @@ public class LeaderboardFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
-        context = container.getContext();
-
         // get user location
-        fusedLocationClient = LocationServices.getFusedLocationProviderClient(context);
-        if (ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
-                && ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(requireActivity());
+        if (ActivityCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
+                && ActivityCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             latitude = 0;
             longitude = 0;
         } else {
             fusedLocationClient.getLastLocation()
-                    .addOnSuccessListener((Activity) context, new OnSuccessListener<Location>() {
+                    .addOnSuccessListener(requireActivity(), new OnSuccessListener<Location>() {
                         @Override
                         public void onSuccess(Location location) {
                             // Got last known location. In some rare situations this can be null.
                             if (location != null) {
                                 latitude = location.getLatitude();
                                 longitude = location.getLongitude();
+
                             }
                         }
                     });
