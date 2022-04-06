@@ -138,8 +138,8 @@ public class LeaderboardFragment extends Fragment{
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(context);
         if (ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
                 && ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED){
-            latitude = null;
-            longitude = null;
+            latitude = 53.5232183;
+            longitude = -113.5263183;
         } else {
             fusedLocationClient.getLastLocation()
                     .addOnSuccessListener((Activity) context, new OnSuccessListener<Location>() {
