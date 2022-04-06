@@ -28,26 +28,20 @@ import androidx.appcompat.widget.SearchView;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.LiveData;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.collectqr.MainAppActivity;
 import com.example.collectqr.R;
 import com.example.collectqr.adapters.LeaderboardRecyclerAdapter;
 import com.example.collectqr.adapters.LeaderboardRecyclerListener;
 import com.example.collectqr.data.LeaderboardController;
-import com.example.collectqr.data.LocationRepository;
-import com.example.collectqr.databinding.ActivityAppBinding;
-import com.example.collectqr.databinding.FragmentLeaderboardBinding;
 import com.example.collectqr.utilities.Preferences;
 import com.example.collectqr.model.User;
 import com.example.collectqr.viewmodels.LeaderboardViewModel;
 import com.google.android.gms.location.FusedLocationProviderClient;
-import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.tabs.TabLayout;
@@ -72,16 +66,19 @@ public class LeaderboardFragment extends Fragment {
     private String mParam1;
     private String mParam2;
 
+    private FusedLocationProviderClient fusedLocationClient;
+    private View rootView;
     private LeaderboardController leaderboardController;
     private RecyclerView leaderboardList;
     private String username;
     private ArrayMap<String, ArrayList<User>> dataLists;
     private ArrayMap<String, LeaderboardRecyclerAdapter> adapterLists;
-    private LeaderboardViewModel leaderboardViewModel;
-    private double latitude;
-    private double longitude;
-    private FragmentLeaderboardBinding binding;
-    private ActivityAppBinding appBinding;
+    private LinearLayout persistentPlayerInfo;
+    private TextView personalUsername;
+    private TextView personalScore;
+    private TextView personalRank;
+    private TabLayout tabs;
+    private LeaderboardViewModel viewModel;
 
     public LeaderboardFragment() {
         // Required empty public constructor
@@ -119,7 +116,8 @@ public class LeaderboardFragment extends Fragment {
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
 
-        leaderboardViewModel = new ViewModelProvider(this).get(LeaderboardViewModel.class);
+        // Reference to view model for getting location data
+        viewModel = new ViewModelProvider(this).get(LeaderboardViewModel.class);
     }
 
     /**
@@ -135,12 +133,23 @@ public class LeaderboardFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        binding = FragmentLeaderboardBinding.inflate(inflater, container, false);
-        View view = binding.getRoot();
+
+        // Inflate the layout for this fragment
+        rootView = inflater.inflate(R.layout.fragment_leaderboard, container, false);
 
         // gets signed in user's username from shared preferences
-        username = Preferences.loadUserName(requireContext());
+        username = Preferences.loadUserName(rootView.getContext());
         leaderboardController = new LeaderboardController(username);
+
+        // save views as variables
+        leaderboardList = rootView.findViewById(R.id.leaderboard_list);
+        personalUsername = rootView.findViewById(R.id.personal_username_text);
+        personalScore = rootView.findViewById(R.id.personal_score_text);
+        personalRank = rootView.findViewById(R.id.personal_rank_text);
+        tabs = rootView.findViewById(R.id.leaderboard_tabs);
+
+        //get access to persistent UI element
+        persistentPlayerInfo = rootView.findViewById(R.id.persistent_user_score);
 
         dataLists = new ArrayMap<>();
         dataLists.put("most_points", new ArrayList<>());
@@ -154,41 +163,60 @@ public class LeaderboardFragment extends Fragment {
         adapterLists.put("best_code", new LeaderboardRecyclerAdapter(dataLists.get("best_code"), "best_code"));
         adapterLists.put("region_best", new LeaderboardRecyclerAdapter(dataLists.get("region_best"), "region_best"));
 
-        RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getContext());
-        binding.leaderboardList.setLayoutManager(layoutManager);
-        binding.leaderboardList.setAdapter(adapterLists.get("most_points"));
+        Toolbar toolbar = (Toolbar) getActivity().findViewById(R.id.topAppBar);
+        toolbar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem menuItem) {
+                if (menuItem.getItemId() == R.id.user_search) {
+                    setUpSearchView(menuItem);
+                }
+                return false;
+            }
+        });
+
+        persistentPlayerInfo.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                //redirect the user to their own profile if the bottom persistent layout is clicked
+                NavController navController = Navigation.findNavController(getView());
+                Bundle bundle = new Bundle();
+                bundle.putString("username", username);
+                navController.navigate(R.id.navigation_user_profile, bundle);
+            }
+        });
+
+        personalUsername.setText(username);
+
+        setupLeaderboard();
+
+        return rootView;
+    }
+
+
+    /**
+     * Set the layout manager for the Recycler View and download data upon a non-null location.
+     */
+    private void setupLeaderboard() {
+        RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(requireContext());
+        leaderboardList.setLayoutManager(layoutManager);
+        leaderboardList.setAdapter(adapterLists.get("most_points"));
         setLeaderboardScrollListener(leaderboardList);
 
-        leaderboardController.downloadData(dataLists,
-                adapterLists,
-                binding.personalScoreText,
-                binding.personalRankText,
-                latitude,
-                longitude);
+        // Observe for a non-null location, then download data
+        viewModel.getLocationLiveData().observe(getViewLifecycleOwner(), location -> {
+            if (location != null) {
+                leaderboardController.downloadData(dataLists,
+                        adapterLists,
+                        personalScore,
+                        personalRank,
+                        location.getLatitude(),
+                        location.getLongitude());
 
-
-        setOnRecyclerItemClickListener();
-
-        setTabListeners();
-
-        appBinding.topAppBar.setOnMenuItemClickListener(menuItem -> {
-            if (menuItem.getItemId() == R.id.user_search) {
-                setUpSearchView(menuItem);
+                setOnRecyclerItemClickListener();
+                setTabListeners();
             }
-            return false;
         });
 
-        binding.persistentUserScore.setOnClickListener(persistentUserScoreView -> {
-            //redirect the user to their own profile if the bottom persistent layout is clicked
-            NavController navController = Navigation.findNavController(getView());
-            Bundle bundle = new Bundle();
-            bundle.putString("username", username);
-            navController.navigate(R.id.navigation_user_profile, bundle);
-        });
-
-        binding.personalUsernameText.setText(username);
-
-        return view;
     }
 
 
@@ -204,15 +232,15 @@ public class LeaderboardFragment extends Fragment {
 
             @Override
             public void onHide() {
-                binding.persistentUserScore.animate()
-                        .translationY(binding.persistentUserScore.getHeight() + 69)
+                persistentPlayerInfo.animate()
+                        .translationY(persistentPlayerInfo.getHeight() + 69)
                         .setInterpolator(new AccelerateInterpolator(2))
                         .start();
             }
 
             @Override
             public void onShow() {
-                binding.persistentUserScore.animate()
+                persistentPlayerInfo.animate()
                         .translationY(0)
                         .setInterpolator(new DecelerateInterpolator(2))
                         .start();
@@ -289,21 +317,21 @@ public class LeaderboardFragment extends Fragment {
             User item = dataLists.get(currentCategory).get(i);
             if (item.getUsername().equals(username)) {
                 if (currentCategory.equals("most_points")) {
-                    binding.personalScoreText.setText(item.getStats().get("total_points") + " points");
+                    personalScore.setText(item.getStats().get("total_points") + " points");
                     String rankStr = Integer.toString(i + 1);
-                    binding.personalRankText.setText("#" + rankStr);
+                    personalRank.setText("#" + rankStr);
                 } else if (currentCategory.equals("most_codes")) {
-                    binding.personalScoreText.setText(item.getStats().get("num_codes") + " codes");
+                    personalScore.setText(item.getStats().get("num_codes") + " codes");
                     String rankStr = Integer.toString(i + 1);
-                    binding.personalRankText.setText("#" + rankStr);
+                    personalRank.setText("#" + rankStr);
                 } else if (currentCategory.equals("best_code")) {
-                    binding.personalScoreText.setText(item.getStats().get("best_code") + " points");
+                    personalScore.setText(item.getStats().get("best_code") + " points");
                     String rankStr = Integer.toString(i + 1);
-                    binding.personalRankText.setText("#" + rankStr);
+                    personalRank.setText("#" + rankStr);
                 } else if (currentCategory.equals("region_best")) {
-                    binding.personalScoreText.setText(item.getStats().get("region_best") + " points");
+                    personalScore.setText(item.getStats().get("region_best") + " points");
                     String rankStr = Integer.toString(i + 1);
-                    binding.personalRankText.setText("#" + rankStr);
+                    personalRank.setText("#" + rankStr);
                 }
             }
         }
@@ -313,7 +341,7 @@ public class LeaderboardFragment extends Fragment {
      * Sets listeners on the tabs and handles the events
      */
     private void setTabListeners() {
-        binding.leaderboardTabs.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
+        tabs.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
             public void onTabSelected(TabLayout.Tab tab) {
                 if (tab.getPosition() == 0) {
