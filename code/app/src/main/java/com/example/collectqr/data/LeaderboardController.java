@@ -197,15 +197,15 @@ public class LeaderboardController {
                         }
                     }
                     Log.d("LeaderboardController", "Size of current code list: "+data.size());
+                    sortRegionList(data);
+                    adapter.notifyDataSetChanged();
                 });
-        sortRegionList(data);
-        adapter.notifyDataSetChanged();
     }
     private void sortRegionList(ArrayList<QRCode> data) {
         data.sort(new Comparator<QRCode>() {
             @Override
             public int compare(QRCode qrCode, QRCode t1) {
-                return qrCode.getPoints() - t1.getPoints();
+                return t1.getPoints() - qrCode.getPoints();
             }
         });
     }
