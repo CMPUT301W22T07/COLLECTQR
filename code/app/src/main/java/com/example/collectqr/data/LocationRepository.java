@@ -30,7 +30,7 @@ public final class LocationRepository extends LiveData<Location> {
 
     // https://www.geeksforgeeks.org/singleton-class-java/ Pavan Gopal Rayapati
     // Naive singleton. Honestly trash for use in Android in particular but works for now
-    private static volatile LocationRepository sSoleInstance = null;
+    // private static volatile LocationRepository sSoleInstance = null;
     private final FusedLocationProviderClient fusedLocationProviderClient;
     private final LocationRequest locationRequest;
 
@@ -46,20 +46,6 @@ public final class LocationRepository extends LiveData<Location> {
         locationRequest.setFastestInterval(ONE_MINUTE / 4);
         locationRequest.setPriority(LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY);
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(context);
-    }
-
-
-    /**
-     * Location repository
-     * @param context  the context
-     * @return LocationRepository
-     */
-    public static LocationRepository locationRepository(Context context) {
-
-        if (sSoleInstance == null) {
-            sSoleInstance = new LocationRepository(context);
-        }
-        return sSoleInstance;
     }
 
     @SuppressLint("MissingPermission")
@@ -85,8 +71,12 @@ public final class LocationRepository extends LiveData<Location> {
             @Override
             public void onLocationResult(@NonNull LocationResult locationResult) {
                 super.onLocationResult(locationResult);
-                for (Location location : locationResult.getLocations()) {
-                    setLocationData(location);
+                if (locationResult == null) {
+                    return;
+                } else {
+                    for (Location location : locationResult.getLocations()) {
+                        setLocationData(location);
+                    }
                 }
             }
         };

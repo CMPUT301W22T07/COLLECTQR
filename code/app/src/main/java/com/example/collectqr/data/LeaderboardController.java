@@ -3,11 +3,9 @@ package com.example.collectqr.data;
 import static android.content.ContentValues.TAG;
 
 import android.location.LocationManager;
-
 import android.util.ArrayMap;
 import android.util.Log;
 import android.widget.TextView;
-
 
 import androidx.annotation.Nullable;
 
@@ -20,7 +18,6 @@ import com.firebase.geofire.GeoLocation;
 import com.firebase.geofire.GeoQueryBounds;
 import com.google.android.gms.tasks.Task;
 import com.google.android.gms.tasks.Tasks;
-import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -37,11 +34,11 @@ import java.util.List;
  * Controls and manages the data needed for LeaderboardFragement
  */
 public class LeaderboardController {
+    protected LocationManager locationManager;
     private String username;
     private FirebaseFirestore db;
     private String currentCategory = "most_points";
     private int userRegionBest;
-    protected LocationManager locationManager;
 
     /**
      * saves instance of Firestore and current user's username
@@ -172,7 +169,6 @@ public class LeaderboardController {
     }
 
     public void downloadRegionData(ArrayList<QRCode> data, RegionQRsAdapter adapter, Double lat, Double lon) {
-        data.clear();
         GeoLocation searchLocation = new GeoLocation(lat, lon);
         List<GeoQueryBounds> bounds = GeoFireUtils.getGeoHashQueryBounds(searchLocation, 5000);
         List<Task<QuerySnapshot>> tasks = new ArrayList<>();
@@ -187,9 +183,10 @@ public class LeaderboardController {
         // Add matching documents to list on tasks completing
         Tasks.whenAllComplete(tasks)
                 .addOnCompleteListener(t -> {
+                    data.clear();
                     for (Task<QuerySnapshot> task : tasks) {
                         QuerySnapshot snap = task.getResult();
-                        for (DocumentSnapshot doc: snap.getDocuments()) {
+                        for (DocumentSnapshot doc : snap.getDocuments()) {
                             QRCode code = new QRCode(doc.getId());
                             code.setPoints(Integer.parseInt(doc.get("points").toString()));
                             code.setAllLocations(Double.parseDouble(doc.getString("latitude")),
@@ -197,11 +194,12 @@ public class LeaderboardController {
                             data.add(code);
                         }
                     }
-                    Log.d("LeaderboardController", "Size of current code list: "+data.size());
+                    Log.d("LeaderboardController", "Size of current code list: " + data.size());
                     sortRegionList(data);
                     adapter.notifyDataSetChanged();
                 });
     }
+
     private void sortRegionList(ArrayList<QRCode> data) {
         data.sort(new Comparator<QRCode>() {
             @Override
@@ -211,5 +209,3 @@ public class LeaderboardController {
         });
     }
 }
-
-
