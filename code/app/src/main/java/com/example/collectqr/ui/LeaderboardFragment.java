@@ -76,8 +76,8 @@ public class LeaderboardFragment extends Fragment {
     private TextView personalScore;
     private TextView personalRank;
     private TabLayout tabs;
-    private int latitude;
-    private int longitude;
+    private double latitude;
+    private double longitude;
     private Context context;
 
     public LeaderboardFragment() {
@@ -146,8 +146,8 @@ public class LeaderboardFragment extends Fragment {
                         public void onSuccess(Location location) {
                             // Got last known location. In some rare situations this can be null.
                             if (location != null) {
-                                latitude = (int) location.getLatitude();
-                                longitude = (int) location.getLongitude();
+                                latitude = location.getLatitude();
+                                longitude = location.getLongitude();
                             }
                         }
                     });

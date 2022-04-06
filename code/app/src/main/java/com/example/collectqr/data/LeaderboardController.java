@@ -72,14 +72,15 @@ public class LeaderboardController {
      * Takes an empty ArrayList and the adapter of the ListView
      * Downloads the data into the ArrayList sorts it and notifies the adapter
      * Updates the views that represent the current users rank and points based on the updates in the data
-     *
-     * @param dataLists this is a map of lists
+     *  @param dataLists this is a map of lists
      * @param adapters  this is a map of adapters
      * @param score     this is the view that will display the user's score
      * @param rank      this is the view that will display the user's rank
+     * @param userLat
+     * @param userLon
      */
   
-    public void downloadData(ArrayMap<String, ArrayList<User>> dataLists, ArrayMap<String, LeaderboardRecyclerAdapter> adapters, TextView score, TextView rank, int userLat, int userLon) {
+    public void downloadData(ArrayMap<String, ArrayList<User>> dataLists, ArrayMap<String, LeaderboardRecyclerAdapter> adapters, TextView score, TextView rank, double userLat, double userLon) {
 
         LeaderboardController controller = this;
         db.collection("Users")
@@ -198,11 +199,12 @@ public class LeaderboardController {
      * Gets a users best code points in a region from the db
      * Resolving async issues with a callback.
      * https://stackoverflow.com/a/48500679 by Alex Mamo
-     *
-     * @param scannedCodesCollection A collection reference of scanned codes in Firestore
+     *  @param scannedCodesCollection A collection reference of scanned codes in Firestore
+     * @param userLat
+     * @param userLon
      * @param regionBestCallback     The interface to return the query result to once completed
      */
-    private void getRegionBest(@NonNull CollectionReference scannedCodesCollection, int userLat, int userLon,
+    private void getRegionBest(@NonNull CollectionReference scannedCodesCollection, double userLat, double userLon,
                                RegionBestCallback regionBestCallback) {
         scannedCodesCollection.addSnapshotListener((value, error) -> {
             userRegionBest = 0;
