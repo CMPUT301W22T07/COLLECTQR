@@ -50,6 +50,7 @@ import com.mapbox.maps.plugin.annotation.generated.CircleAnnotationManager;
 import com.mapbox.maps.plugin.annotation.generated.CircleAnnotationOptions;
 import com.mapbox.maps.plugin.annotation.generated.OnCircleAnnotationClickListener;
 import com.mapbox.maps.plugin.gestures.GesturesPlugin;
+import com.mapbox.maps.plugin.gestures.OnMapLongClickListener;
 import com.mapbox.maps.plugin.gestures.OnMoveListener;
 import com.mapbox.maps.plugin.locationcomponent.LocationComponentPlugin;
 import com.mapbox.maps.plugin.locationcomponent.OnIndicatorPositionChangedListener;
@@ -76,6 +77,24 @@ public class MapViewFragment extends Fragment {
                 Point point = circleAnnotation.getPoint();
                 showInfoSheet(circleAnnotation);
                 return true;
+            };
+    // Store reference and override the map click listener
+    private final OnMapLongClickListener mapClickListener =
+            new OnMapLongClickListener() {
+                @Override
+                public boolean onMapLongClick(@NonNull Point point) {
+                    Location location = new Location("");
+                    location.setLatitude(point.latitude());
+                    location.setLongitude(point.longitude());
+                    mViewModel.getPOIList(location).observe(getViewLifecycleOwner(),
+                            mapPOIS -> {
+                        addMapMarkers(mapPOIS, true);
+                            });
+                    Toast.makeText(requireContext(),
+                            "Searching in a 500KM radius",
+                            Toast.LENGTH_SHORT).show();
+                    return true;
+                }
             };
     private FragmentMapViewBinding binding;
     private BottomSheetDialogFragment infoSheet;
@@ -219,7 +238,7 @@ public class MapViewFragment extends Fragment {
     private void checkPermissions() {
         if (PermissionsManager.areLocationPermissionsGranted(requireContext())) {
             onMapReady();
-        } else if (shouldShowRequestPermissionRationale("")) {
+        } else if (shouldShowRequestPermissionRationale(Manifest.permission.ACCESS_FINE_LOCATION)) {
             new MaterialAlertDialogBuilder(requireContext(),
                     com.google.android.material.R.style.ThemeOverlay_Material3_Dialog)
                     // https://stackoverflow.com/a/19064968 by Singhak
@@ -260,6 +279,7 @@ public class MapViewFragment extends Fragment {
         gesturesPlugin = mapView.getPlugin(Plugin.Mapbox.MAPBOX_GESTURES_PLUGIN_ID);
         assert gesturesPlugin != null;
         gesturesPlugin.addOnMoveListener(onMoveListener);
+        gesturesPlugin.addOnMapLongClickListener(mapClickListener);
     }
 
 
