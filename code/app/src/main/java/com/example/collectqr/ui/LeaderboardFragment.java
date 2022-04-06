@@ -1,16 +1,7 @@
 package com.example.collectqr.ui;
 
 
-import android.Manifest;
-import android.app.Activity;
-import android.content.Context;
-import android.content.Intent;
-import android.content.pm.PackageManager;
-
 import android.graphics.Color;
-import android.location.Location;
-import android.location.LocationListener;
-import android.location.LocationManager;
 import android.os.Bundle;
 import android.util.ArrayMap;
 import android.view.LayoutInflater;
@@ -26,7 +17,6 @@ import android.widget.Toast;
 
 import androidx.appcompat.widget.SearchView;
 import androidx.appcompat.widget.Toolbar;
-import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavController;
@@ -36,18 +26,14 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.collectqr.R;
 import com.example.collectqr.adapters.LeaderboardRecyclerAdapter;
-import com.example.collectqr.adapters.RegionQRsAdapter;
 import com.example.collectqr.adapters.LeaderboardRecyclerListener;
+import com.example.collectqr.adapters.RegionQRsAdapter;
 import com.example.collectqr.data.LeaderboardController;
 import com.example.collectqr.model.QRCode;
-import com.example.collectqr.utilities.Preferences;
 import com.example.collectqr.model.User;
+import com.example.collectqr.utilities.Preferences;
 import com.example.collectqr.viewmodels.LeaderboardViewModel;
-import com.google.android.gms.location.FusedLocationProviderClient;
-import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.tabs.TabLayout;
-import com.mapbox.android.core.permissions.PermissionsManager;
 
 import java.util.ArrayList;
 import java.util.Locale;
@@ -68,7 +54,6 @@ public class LeaderboardFragment extends Fragment {
     private String mParam1;
     private String mParam2;
 
-    private FusedLocationProviderClient fusedLocationClient;
     private View rootView;
     private LeaderboardController leaderboardController;
     private RecyclerView leaderboardList;
@@ -83,9 +68,6 @@ public class LeaderboardFragment extends Fragment {
     private TextView personalScore;
     private TextView personalRank;
     private TabLayout tabs;
-    private Double latitude;
-    private Double longitude;
-    private Context context;
     private LeaderboardViewModel viewModel;
 
     public LeaderboardFragment() {
@@ -174,18 +156,6 @@ public class LeaderboardFragment extends Fragment {
 
         regionAdapter = new RegionQRsAdapter(regionData, "region_best");
 
-        RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getContext());
-        leaderboardList.setLayoutManager(layoutManager);
-        leaderboardList.setAdapter(adapterLists.get("most_points"));
-
-        leaderboardController.downloadData(dataLists, adapterLists, personalScore, personalRank);
-        leaderboardController.downloadRegionData(regionData, regionAdapter, latitude, longitude);
-
-        setOnRecyclerItemClickListener();
-
-        setTabListeners();
-
-
         Toolbar toolbar = (Toolbar) getActivity().findViewById(R.id.topAppBar);
         toolbar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
             @Override
@@ -223,22 +193,23 @@ public class LeaderboardFragment extends Fragment {
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(requireContext());
         leaderboardList.setLayoutManager(layoutManager);
         leaderboardList.setAdapter(adapterLists.get("most_points"));
-        setLeaderboardScrollListener(leaderboardList);
+
+        // Download regular data ahead of location-dependent data
+        leaderboardController.downloadData(dataLists, adapterLists, personalScore, personalRank);
 
         // Observe for a non-null location, then download data
         viewModel.getLocationLiveData().observe(getViewLifecycleOwner(), location -> {
             if (location != null) {
-                leaderboardController.downloadData(dataLists,
-                        adapterLists,
-                        personalScore,
-                        personalRank,
+                leaderboardController.downloadRegionData(regionData,
+                        regionAdapter,
                         location.getLatitude(),
                         location.getLongitude());
-
-                setOnRecyclerItemClickListener();
-                setTabListeners();
             }
         });
+
+        setLeaderboardScrollListener(leaderboardList);
+        setOnRecyclerItemClickListener();
+        setTabListeners();
 
     }
 
@@ -272,6 +243,12 @@ public class LeaderboardFragment extends Fragment {
         });
     }
 
+
+    /**
+     * Configure the views and Firestore query for searching users
+     *
+     * @param searchItem The view to listen for text from
+     */
     private void setUpSearchView(MenuItem searchItem) {
         SearchView searchView = (SearchView) searchItem.getActionView();
         /*
@@ -342,21 +319,19 @@ public class LeaderboardFragment extends Fragment {
             for (int i = 0; i < dataLists.get(currentCategory).size(); i++) {
                 User item = dataLists.get(currentCategory).get(i);
                 if (item.getUsername().equals(username)) {
+                    personalCard.setVisibility(View.VISIBLE);
                     if (currentCategory.equals("most_points")) {
                         personalScore.setText(item.getStats().get("total_points") + " points");
                         String rankStr = Integer.toString(i + 1);
                         personalRank.setText("#" + rankStr);
-                        personalCard.setVisibility(View.VISIBLE);
                     } else if (currentCategory.equals("most_codes")) {
                         personalScore.setText(item.getStats().get("num_codes") + " codes");
                         String rankStr = Integer.toString(i + 1);
                         personalRank.setText("#" + rankStr);
-                        personalCard.setVisibility(View.VISIBLE);
                     } else if (currentCategory.equals("best_code")) {
                         personalScore.setText(item.getStats().get("best_code") + " points");
                         String rankStr = Integer.toString(i + 1);
                         personalRank.setText("#" + rankStr);
-                        personalCard.setVisibility(View.VISIBLE);
                     }
                 }
             }
@@ -382,7 +357,10 @@ public class LeaderboardFragment extends Fragment {
                     leaderboardList.setAdapter(adapterLists.get("best_code"));
                     leaderboardController.setCurrentCategory("best_code");
                     updatePersonalCard("best_code");
-                } else if (tab.getPosition()==3) {
+                } else if (tab.getPosition() == 3) {
+                    Toast.makeText(requireContext(),
+                            "Current region: 500KM",
+                            Toast.LENGTH_SHORT).show();
                     leaderboardList.setAdapter(regionAdapter);
                     leaderboardController.setCurrentCategory("region_best");
                     updatePersonalCard("region_best");

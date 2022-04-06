@@ -2,17 +2,10 @@ package com.example.collectqr.data;
 
 import static android.content.ContentValues.TAG;
 
-import android.Manifest;
-import android.content.Context;
-import android.content.pm.PackageManager;
-import android.graphics.Region;
-import android.location.Location;
 import android.location.LocationManager;
-
 import android.util.ArrayMap;
 import android.util.Log;
 import android.widget.TextView;
-
 
 import androidx.annotation.Nullable;
 
@@ -25,7 +18,6 @@ import com.firebase.geofire.GeoLocation;
 import com.firebase.geofire.GeoQueryBounds;
 import com.google.android.gms.tasks.Task;
 import com.google.android.gms.tasks.Tasks;
-import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -42,11 +34,11 @@ import java.util.List;
  * Controls and manages the data needed for LeaderboardFragement
  */
 public class LeaderboardController {
+    protected LocationManager locationManager;
     private String username;
     private FirebaseFirestore db;
     private String currentCategory = "most_points";
     private int userRegionBest;
-    protected LocationManager locationManager;
 
     /**
      * saves instance of Firestore and current user's username
@@ -191,9 +183,10 @@ public class LeaderboardController {
         // Add matching documents to list on tasks completing
         Tasks.whenAllComplete(tasks)
                 .addOnCompleteListener(t -> {
+                    data.clear();
                     for (Task<QuerySnapshot> task : tasks) {
                         QuerySnapshot snap = task.getResult();
-                        for (DocumentSnapshot doc: snap.getDocuments()) {
+                        for (DocumentSnapshot doc : snap.getDocuments()) {
                             QRCode code = new QRCode(doc.getId());
                             code.setPoints(Integer.parseInt(doc.get("points").toString()));
                             code.setAllLocations(Double.parseDouble(doc.getString("latitude")),
@@ -201,11 +194,12 @@ public class LeaderboardController {
                             data.add(code);
                         }
                     }
-                    Log.d("LeaderboardController", "Size of current code list: "+data.size());
+                    Log.d("LeaderboardController", "Size of current code list: " + data.size());
                     sortRegionList(data);
                     adapter.notifyDataSetChanged();
                 });
     }
+
     private void sortRegionList(ArrayList<QRCode> data) {
         data.sort(new Comparator<QRCode>() {
             @Override
@@ -215,53 +209,3 @@ public class LeaderboardController {
         });
     }
 }
-/*
-
-    /**
-     * Gets a users best code points in a region from the db
-     * Resolving async issues with a callback.
-     * https://stackoverflow.com/a/48500679 by Alex Mamo
-     *
-     * @param scannedCodesCollection A collection reference of scanned codes in Firestore
-     * @param regionBestCallback     The interface to return the query result to once completed
-     */
-    private void getRegionBest(@NonNull CollectionReference scannedCodesCollection, int userLat, int userLon,
-                               RegionBestCallback regionBestCallback) {
-        scannedCodesCollection.addSnapshotListener((value, error) -> {
-            userRegionBest = 0;
-            assert value != null;
-            for (QueryDocumentSnapshot codeDoc : value) {
-                if (codeDoc.getData().get("points") != null) {
-                    int points = Integer.parseInt(String.valueOf(codeDoc.getData().get("points")));
-                    String lat = String.valueOf(codeDoc.getData().get("latitude"));
-                    String lon = String.valueOf(codeDoc.getData().get("longitude"));
-
-                    System.out.println("lat: " + lat + " lon: " + lon);
-                    // compare code location with user location
-                    if ((lat != "null") && (lon != "null") && (lat.length() >=1) && (lon.length() >=1)){
-                        if ((Double.parseDouble(lat) <= userLat + 1) && (Double.parseDouble(lat) >= userLat - 1)){
-                            if ((Double.parseDouble(lon) <= userLon + 1) && (Double.parseDouble(lon) >= userLon -1)){
-                                // user is within 1 degree of lat/long from code (about 60km)
-                                if (points >= userRegionBest) {
-                                    userRegionBest = points;
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-            regionBestCallback.onCallback(userRegionBest);
-        });
-
-    }
-}
-
-
-/**
- * A callback interface to get the best code in the region.
- * https://stackoverflow.com/a/48500679 by Alex Mamo
- */
-interface RegionBestCallback {
-    void onCallback(int userRegionBest);
-}
-
