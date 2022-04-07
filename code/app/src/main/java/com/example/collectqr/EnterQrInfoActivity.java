@@ -1,31 +1,22 @@
 package com.example.collectqr;
 
-import android.Manifest;
 import android.content.ActivityNotFoundException;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
-import android.location.Location;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ImageView;
-import android.widget.Switch;
 import android.widget.TextView;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
-import androidx.core.app.ActivityCompat;
+import androidx.lifecycle.ViewModelProvider;
 
-import com.example.collectqr.data.LocationRepository;
 import com.example.collectqr.model.QRCode;
 import com.example.collectqr.utilities.QRCodeScore;
-import com.google.android.gms.location.FusedLocationProviderClient;
-import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.tasks.OnFailureListener;
+import com.example.collectqr.viewmodels.LeaderboardViewModel;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
@@ -45,15 +36,14 @@ public class EnterQrInfoActivity extends AppCompatActivity {
     private Button addImageButton;
     private EditText commentView;
     private QRCode qrCode;
-    private FusedLocationProviderClient fusedLocationClient;
-    private Double latitude = null;
-    private Double longitude = null;
     private Bitmap imageBitmap = null;
+    private LeaderboardViewModel viewModel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_enter_qr_info);
+        viewModel = new ViewModelProvider(this).get(LeaderboardViewModel.class);
 
         // setup activity for entering qr code info
         Intent intent = getIntent();
@@ -73,7 +63,7 @@ public class EnterQrInfoActivity extends AppCompatActivity {
         https://stackoverflow.com/a/46928058
         StackOverflow, Author: iman hoshmand
         */
-        Toolbar toolbar = (Toolbar) findViewById(R.id.topAppBar);
+        Toolbar toolbar = findViewById(R.id.topAppBar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         toolbar.setNavigationOnClickListener(new View.OnClickListener() {
@@ -97,110 +87,80 @@ public class EnterQrInfoActivity extends AppCompatActivity {
             locationSwitch.setEnabled(true);
         }
 
-        //get the location from the user, to be used if they want a location assigned with the code
-        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            // TODO: Consider calling
-            //    ActivityCompat#requestPermissions
-            // here to request the missing permissions, and then overriding
-            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-            //                                          int[] grantResults)
-            // to handle the case where the user grants the permission. See the documentation
-            // for ActivityCompat#requestPermissions for more details.
-            return;
-        }
-        fusedLocationClient.getLastLocation()
-                .addOnSuccessListener(this, new OnSuccessListener<Location>() {
-                    @Override
-                    public void onSuccess(Location location) {
-                        // Got last known location. In some rare situations this can be null.
-                        if (location != null) {
-                            latitude = location.getLatitude();
-                            longitude = location.getLongitude();
-                        }
-                    }
-                });
-
         // optional additions to the qr code post
-        addImageButton.setOnClickListener(new View.OnClickListener() {
-            @Override
+        /**
+         *
+         * On click
+         *
+         * @param view  the view
+         */addImageButton.setOnClickListener(view -> {
 
-/**
- *
- * On click
- *
- * @param view  the view
- */
-            public void onClick(View view) {
+             // TODO: add image functionality
+             Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+             try {
+                 startActivityForResult(takePictureIntent, 1);
+             } catch (ActivityNotFoundException e) {
+             }
+         });
+        /**
+         *
+         * On click
+         *
+         * @param view  the view
+         */saveButton.setOnClickListener(view -> {
+             String imagePath = "default_image.jpg"; //set a default image
 
-                // TODO: add image functionality
-                Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-                try {
-                    startActivityForResult(takePictureIntent, 1);
-                } catch (ActivityNotFoundException e) {
-                }
-            }
-        });
-        saveButton.setOnClickListener(new View.OnClickListener() {
-            @Override
+             //set the qr image, first check if an image was uploaded by checking the bitmap
+             if (imageBitmap != null) {
+                 FirebaseStorage storage = FirebaseStorage.getInstance();
+                 // Create a storage reference from our app
+                 StorageReference storageRef = storage.getReference();
+                 String random = UUID.randomUUID().toString();
+                 imagePath = username + random + ".jpg";
+                 // Create a reference to "ourimage.jpg"
+                 StorageReference ref = storageRef.child(imagePath);
+                 // Create a reference to 'images/ourimage'
+                 //StorageReference imagesRef = storageRef.child("images/"+imagePath);
 
-/**
- *
- * On click
- *
- * @param view  the view
- */
-            public void onClick(View view) {
-                String imagePath = "default_image.jpg"; //set a default image
+                 //comvert the image bitmap into a stream of bytes
+                 ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                 imageBitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos);
+                 byte[] data = baos.toByteArray();
 
-                //set the qr image, first check if an image was uploaded by checking the bitmap
-                if(imageBitmap != null) {
-                    FirebaseStorage storage = FirebaseStorage.getInstance();
-                    // Create a storage reference from our app
-                    StorageReference storageRef = storage.getReference();
-                    String random = UUID.randomUUID().toString();
-                    imagePath = username+random+".jpg";
-                    // Create a reference to "ourimage.jpg"
-                    StorageReference ref = storageRef.child(imagePath);
-                    // Create a reference to 'images/ourimage'
-                    //StorageReference imagesRef = storageRef.child("images/"+imagePath);
+                 //upload the stream of bytes to firestore
+                 UploadTask uploadTask = ref.putBytes(data);
+                 uploadTask.addOnFailureListener(exception -> {
+                     // Handle unsuccessful uploads
+                 }).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                     @Override
+                     public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                         // taskSnapshot.getMetadata() contains file metadata such as size, content-type, etc.
+                     }
+                 });
+             }
 
-                    //comvert the image bitmap into a stream of bytes
-                    ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                    imageBitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos);
-                    byte[] data = baos.toByteArray();
+             //set the path to the image
+             qrCode.setQr_image(imagePath);
 
-                    //upload the stream of bytes to firestore
-                    UploadTask uploadTask = ref.putBytes(data);
-                    uploadTask.addOnFailureListener(exception -> {
-                        // Handle unsuccessful uploads
-                    }).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-                        @Override
-                        public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                            // taskSnapshot.getMetadata() contains file metadata such as size, content-type, etc.
-                        }
-                    });
-                }
+             //add the location of it was allowed
+             if (locationSwitch.isChecked()) {
+                 viewModel.getLocationLiveData().observe(this, location -> {
+                     if (location != null) {
+                         qrCode.setAllLocations(location.getLatitude(), location.getLongitude());
+                     }
+                 });
+             }
 
-                //set the path to the image
-                qrCode.setQr_image(imagePath);
+             //add a comment if one was provided
+             if (!commentView.getText().toString().equals("")) {
+                 qrCode.addComment(username, commentView.getText().toString());
+             }
 
-                //add the location of it was allowed
-                if(locationSwitch.isChecked()) {
-                    qrCode.setAllLocations(latitude, longitude);
-                }
-
-                //add a comment if one was provided
-                if (!commentView.getText().toString().equals("")) {
-                    qrCode.addComment(username, commentView.getText().toString());
-                }
-
-                //finally, write all the data to firestore, and close the activity
-                qrCodeController.writeToUserFirestore(qrCode, username);
-                qrCodeController.writeToCodesFirestore(qrCode, username);
-                finish();
-            }
-        });
+             //finally, write all the data to firestore, and close the activity
+             qrCodeController.writeToUserFirestore(qrCode, username);
+             qrCodeController.writeToCodesFirestore(qrCode, username);
+             finish();
+         });
     }
 
     @Override
@@ -209,7 +169,7 @@ public class EnterQrInfoActivity extends AppCompatActivity {
         if (requestCode == 1 && resultCode == RESULT_OK) {
             Bundle extras = data.getExtras();
             imageBitmap = (Bitmap) extras.get("data");
-            System.out.println("EPIC! "+imageBitmap);
+            System.out.println("EPIC! " + imageBitmap);
         }
     }
 }

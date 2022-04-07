@@ -144,7 +144,7 @@ public class RegionQRsAdapter extends RecyclerView.Adapter<RegionQRsAdapter.View
         TextView userRank = viewGroup.findViewById(R.id.rank_text);
 
         viewHolder.getPoints().setText(code.getPoints().toString()+" points");
-        viewHolder.getDistance().setText("sha: "+code.getSha256());
+        viewHolder.getDistance().setText("lat: "+code.getLatitudeAsString()+", lon: "+code.getLongitudeAsString());
         // index of user in sorted list plus 1 = rank
         viewHolder.getRank().setText(Integer.toString(data.indexOf(code)+1));
     }
