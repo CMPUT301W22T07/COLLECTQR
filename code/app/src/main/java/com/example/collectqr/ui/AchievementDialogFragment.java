@@ -111,7 +111,7 @@ public class AchievementDialogFragment extends DialogFragment {
                                 achievementDataList.add(new AchievementItem(R.drawable.achievement_icon, "You scanned 50 codes, wow!"));
                             }
                             if((boolean) data.get("scan_10_points")) {
-                                achievementDataList.add(new AchievementItem(R.drawable.achievement_icon, "You scanned a code only worth 10 points, tough luck."));
+                                achievementDataList.add(new AchievementItem(R.drawable.achievement_icon, "You scanned a code worth less than 10 points, tough luck."));
                             }
                             if((boolean) data.get("scan_100_points")) {
                                 achievementDataList.add(new AchievementItem(R.drawable.achievement_icon, "You scanned a code worth 100 points! Lucky!"));
