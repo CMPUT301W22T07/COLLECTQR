@@ -38,6 +38,7 @@ import com.mapbox.android.core.permissions.PermissionsManager;
 import com.mapbox.android.gestures.MoveGestureDetector;
 import com.mapbox.geojson.Point;
 import com.mapbox.maps.CameraOptions;
+import com.mapbox.maps.CameraState;
 import com.mapbox.maps.MapView;
 import com.mapbox.maps.Style;
 import com.mapbox.maps.plugin.LocationPuck2D;
@@ -78,24 +79,6 @@ public class MapViewFragment extends Fragment {
                 showInfoSheet(circleAnnotation);
                 return true;
             };
-    // Store reference and override the map click listener
-    private final OnMapLongClickListener mapClickListener =
-            new OnMapLongClickListener() {
-                @Override
-                public boolean onMapLongClick(@NonNull Point point) {
-                    Location location = new Location("");
-                    location.setLatitude(point.latitude());
-                    location.setLongitude(point.longitude());
-                    mViewModel.getPOIList(location).observe(getViewLifecycleOwner(),
-                            mapPOIS -> {
-                        addMapMarkers(mapPOIS, true);
-                            });
-                    Toast.makeText(requireContext(),
-                            "Searching in a 500KM radius",
-                            Toast.LENGTH_SHORT).show();
-                    return true;
-                }
-            };
     private FragmentMapViewBinding binding;
     private BottomSheetDialogFragment infoSheet;
     // Map Variables
@@ -120,6 +103,27 @@ public class MapViewFragment extends Fragment {
     private GesturesPlugin gesturesPlugin;
     private LocationComponentPlugin locationComponentPlugin;
     private MapViewViewModel mViewModel;
+    // Store reference and override the map click listener
+    private final OnMapLongClickListener mapClickListener =
+            new OnMapLongClickListener() {
+                @Override
+                public boolean onMapLongClick(@NonNull Point point) {
+                    mViewModel.clearQrGeoLocations();
+
+                    Location location = new Location("");
+                    location.setLatitude(point.latitude());
+                    location.setLongitude(point.longitude());
+
+                    mViewModel.getPOIList(location).observe(getViewLifecycleOwner(),
+                            mapPOIS -> {
+                                addMapMarkers(mapPOIS, true);
+                            });
+                    Toast.makeText(requireContext(),
+                            "Searching in a 500KM radius",
+                            Toast.LENGTH_SHORT).show();
+                    return true;
+                }
+            };
     // Store reference and override the position listener
     private final OnIndicatorPositionChangedListener posChangedListener =
             new OnIndicatorPositionChangedListener() {
@@ -140,6 +144,7 @@ public class MapViewFragment extends Fragment {
                     mViewModel.getPOIList(location).observe(
                             getViewLifecycleOwner(), this::addMapMarkers);
                 }
+
 
                 private void addMapMarkers(List<MapPOI> POIList) {
 
@@ -180,20 +185,22 @@ public class MapViewFragment extends Fragment {
                 }
 
             };
+    private MapViewFragment permManager;
+    private CameraState cameraState;
     /* Permissions callback because onRequestPermissionsResult is deprecated...
        https://stackoverflow.com/a/63546099 by Ace
        https://stackoverflow.com/a/66552678 by Daniel.Wang */
     private final ActivityResultLauncher requestPermissionLauncher =
             registerForActivityResult(new ActivityResultContracts.RequestPermission(), granted -> {
                 if (granted) {
-                    onMapReady();
+                    checkPermissions();
                 } else {
                     Toast.makeText(requireContext(),
                             "Location is used to search for nearby QR codes",
                             Toast.LENGTH_LONG).show();
+                    setupDegradedGesturesListener();
                 }
             });
-    private PermissionsManager permManager;
     private String username;
 
     /**
@@ -221,10 +228,19 @@ public class MapViewFragment extends Fragment {
                              @Nullable Bundle savedInstanceState) {
 
         super.onCreateView(inflater, container, savedInstanceState);
+
+        if (savedInstanceState != null) {
+            cameraState = (CameraState) savedInstanceState.getSerializable("CAMERA_STATE");
+        }
+        if (mViewModel != null && mViewModel.getCameraStateBundle() != null) {
+            cameraState = (CameraState) mViewModel.getCameraStateBundle().getSerializable("CAMERA_STATE");
+        }
+
         username = Preferences.loadUserName(requireContext());
         binding = FragmentMapViewBinding.inflate(inflater, container, false);
         View view = binding.getRoot();
         mapView = binding.mapView;
+        setupDegradedGesturesListener();
         checkPermissions();
         return view;
 
@@ -247,8 +263,12 @@ public class MapViewFragment extends Fragment {
                             "seamlessly. Recording your location is optional.")
                     .setPositiveButton("OK", (dialogInterface, i) -> {
                         // https://stackoverflow.com/a/27765687 by sivi
+                        requestPermissionLauncher.launch(
+                                Manifest.permission.ACCESS_FINE_LOCATION);
                     })
                     .show();
+
+            setupDegradedGesturesListener();
         } else {
             requestPermissionLauncher.launch(
                     Manifest.permission.ACCESS_FINE_LOCATION
@@ -262,14 +282,31 @@ public class MapViewFragment extends Fragment {
      * Setup the map's style, camera, and location/gesture listeners.
      */
     private void onMapReady() {
-        mapView.getMapboxMap().setCamera(
-                new CameraOptions.Builder().zoom(14.0).pitch(40.0).build()
-        );
-        mapView.getMapboxMap().loadStyleUri(Style.MAPBOX_STREETS,
-                style -> {
-                    initLocationComponent();
-                    setupGesturesListener();
-                });
+
+        if (cameraState != null) {
+            CameraOptions cameraOptions = new CameraOptions.Builder()
+                    .center(cameraState.getCenter())
+                    .padding(cameraState.getPadding())
+                    .zoom(cameraState.getZoom())
+                    .bearing(cameraState.getBearing())
+                    .pitch(cameraState.getPitch())
+                    .build();
+
+            stopLocationListeners();
+            mapView.getMapboxMap().setCamera(cameraOptions);
+            mapView.getMapboxMap().loadStyleUri(Style.MAPBOX_STREETS);
+        } else {
+            mapView.getMapboxMap().setCamera(
+                    new CameraOptions.Builder().zoom(14.0).pitch(40.0).build()
+            );
+
+            mapView.getMapboxMap().loadStyleUri(Style.MAPBOX_STREETS,
+                    style -> {
+                        initLocationComponent();
+                        setupGesturesListener();
+                    });
+        }
+
     }
 
     /**
@@ -279,6 +316,12 @@ public class MapViewFragment extends Fragment {
         gesturesPlugin = mapView.getPlugin(Plugin.Mapbox.MAPBOX_GESTURES_PLUGIN_ID);
         assert gesturesPlugin != null;
         gesturesPlugin.addOnMoveListener(onMoveListener);
+    }
+
+
+    private void setupDegradedGesturesListener() {
+        gesturesPlugin = mapView.getPlugin(Plugin.Mapbox.MAPBOX_GESTURES_PLUGIN_ID);
+        assert gesturesPlugin != null;
         gesturesPlugin.addOnMapLongClickListener(mapClickListener);
     }
 
@@ -331,6 +374,7 @@ public class MapViewFragment extends Fragment {
     private void startScanner() {
         Intent intent = new Intent(this.getActivity(), ScanQRCodeActivity.class);
         startActivityForResult(intent, 1);
+
     }
 
 
@@ -439,7 +483,6 @@ public class MapViewFragment extends Fragment {
                             new AnnotationConfig()
                     );
 
-            List<CircleAnnotation> circleAnnotations = circleAnnotationManager.getAnnotations();
             circleAnnotationManager.addClickListener(poiClickListener);
 
             for (MapPOI mapPOI : POIList) {
@@ -549,6 +592,27 @@ public class MapViewFragment extends Fragment {
 
     }
 
+    private void stopGestureListeners() {
+        GesturesPlugin gesturesPlugin = mapView.getPlugin(Plugin.MAPBOX_GESTURES_PLUGIN_ID);
+        assert gesturesPlugin != null;
+        gesturesPlugin.removeOnMoveListener(onMoveListener);
+        gesturesPlugin.removeOnMapLongClickListener(mapClickListener);
+    }
+
+    private void stopLocationListeners() {
+        LocationComponentPlugin locationComponentPlugin =
+                mapView.getPlugin(Plugin.Mapbox.MAPBOX_LOCATION_COMPONENT_PLUGIN_ID);
+
+        assert locationComponentPlugin != null;
+
+        locationComponentPlugin.removeOnIndicatorPositionChangedListener(posChangedListener);
+    }
+
+    private void stopAllListeners() {
+        stopGestureListeners();
+        stopLocationListeners();
+    }
+
 
     /**
      * Stop all defined listeners from listening, such as location and gestures.
@@ -556,15 +620,21 @@ public class MapViewFragment extends Fragment {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        GesturesPlugin gesturesPlugin = mapView.getPlugin(Plugin.MAPBOX_GESTURES_PLUGIN_ID);
-        LocationComponentPlugin locationComponentPlugin =
-                mapView.getPlugin(Plugin.Mapbox.MAPBOX_LOCATION_COMPONENT_PLUGIN_ID);
+        stopAllListeners();
+    }
 
-        assert gesturesPlugin != null;
-        assert locationComponentPlugin != null;
 
-        locationComponentPlugin.removeOnIndicatorPositionChangedListener(posChangedListener);
-        gesturesPlugin.removeOnMoveListener(onMoveListener);
+    @Override
+    public void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putSerializable("CAMERA_STATE", mapView.getMapboxMap().getCameraState());
+    }
+
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        mViewModel.setCameraStateBundle(mapView.getMapboxMap().getCameraState());
     }
 
 
@@ -583,7 +653,7 @@ public class MapViewFragment extends Fragment {
                                            @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         permManager.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        onMapReady();
+        checkPermissions();
     }
 
 
@@ -595,7 +665,7 @@ public class MapViewFragment extends Fragment {
     @Override
     public void onConfigurationChanged(@NonNull Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
-        onMapReady();
+        checkPermissions();
     }
 
 }

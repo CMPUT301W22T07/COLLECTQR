@@ -15,8 +15,10 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.example.collectqr.model.QRCode;
+import com.example.collectqr.ui.MapViewFragment;
 import com.example.collectqr.utilities.QRCodeScore;
 import com.example.collectqr.viewmodels.LeaderboardViewModel;
+import com.example.collectqr.viewmodels.MapViewViewModel;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
@@ -147,6 +149,9 @@ public class EnterQrInfoActivity extends AppCompatActivity {
                  viewModel.getLocationLiveData().observe(this, location -> {
                      if (location != null) {
                          qrCode.setAllLocations(location.getLatitude(), location.getLongitude());
+
+                         MapViewViewModel viewModel = new ViewModelProvider(this).get(MapViewViewModel.class);
+                         viewModel.clearQrGeoLocations();
                      }
                  });
              }

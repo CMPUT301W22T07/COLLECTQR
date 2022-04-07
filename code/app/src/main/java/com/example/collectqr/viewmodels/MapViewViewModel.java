@@ -2,6 +2,7 @@ package com.example.collectqr.viewmodels;
 
 import android.app.Application;
 import android.location.Location;
+import android.os.Bundle;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
@@ -10,7 +11,6 @@ import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
-import com.example.collectqr.data.MapViewController;
 import com.example.collectqr.model.MapPOI;
 import com.firebase.geofire.GeoFireUtils;
 import com.firebase.geofire.GeoLocation;
@@ -21,6 +21,8 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QuerySnapshot;
+import com.mapbox.maps.CameraState;
+import com.mapbox.maps.plugin.annotation.generated.CircleAnnotation;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -48,11 +50,12 @@ public class MapViewViewModel extends AndroidViewModel {
     // Class Variables
     private final FirebaseFirestore db = FirebaseFirestore.getInstance();
     private final List<MapPOI> POIList = new ArrayList<>();
-    private MutableLiveData<Location> locationLiveData;
-    private MutableLiveData<List<MapPOI>> qrGeoLocations;
     public int lastPOILen = 0;
     public Boolean dataLoaded = false;           // Boolean to decide if data has already been
-    // downloaded.
+    private MutableLiveData<Location> locationLiveData;
+    private MutableLiveData<List<MapPOI>> qrGeoLocations;
+    private Bundle cameraStateBundle;
+    private List<CircleAnnotation> circleAnnotations;
 
 
     public MapViewViewModel(@NonNull Application application) {
@@ -176,6 +179,34 @@ public class MapViewViewModel extends AndroidViewModel {
     @Nullable
     public List<MapPOI> getPOIList() {
         return qrGeoLocations.getValue();
+    }
+
+
+    public void clearQrGeoLocations() {
+        qrGeoLocations = null;
+    }
+
+
+    public void setCameraStateBundle(CameraState cameraState) {
+        if (cameraStateBundle == null) {
+            cameraStateBundle = new Bundle();
+        }
+        cameraStateBundle.putSerializable("CAMERA_STATE", cameraState);
+    }
+
+
+    public Bundle getCameraStateBundle() {
+        return cameraStateBundle;
+    }
+
+
+    public void setCircleAnnotations(List<CircleAnnotation> circleAnnotationList) {
+        this.circleAnnotations = circleAnnotationList;
+    }
+
+
+    public List<CircleAnnotation> getCircleAnnotations() {
+        return circleAnnotations;
     }
 
 
